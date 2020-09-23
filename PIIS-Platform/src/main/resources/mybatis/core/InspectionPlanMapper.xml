@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionPlanMapper">
+
+    <!--巡视计划ResultMap-->
+    <resultMap id="inspectionPlanResultMap" type="tech.piis.modules.core.domain.po.InspectionPlanPO">
+        <id property="planId" column="PLAN_ID"/>
+        <result property="planName" column="PLAN_NAME"/>
+        <result property="beginTime" column="BEGIN_TIME"/>
+        <result property="endTime" column="END_TIME"/>
+        <result property="status" column="STATUS"/>
+        <result property="planDesc" column="PLAN_DESC"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+        <collection property="inspectionGroupList" javaType="java.util.List" resultMap="InspectionGroupResultMap"/>
+    </resultMap>
+
+    <!--巡视组ResultMap-->
+    <resultMap id="InspectionGroupResultMap" type="tech.piis.modules.core.domain.po.InspectionGroupPO">
+        <id property="groupId" column="GROUP_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="groupName" column="GROUP_NAME"/>
+        <result property="leaderId" column="LEADER_ID"/>
+        <result property="leaderName" column="LEADER_NAME"/>
+        <result property="deputyLeaderId" column="DEPUTY_LEADER_ID"/>
+        <result property="deputyLeaderName" column="DEPUTY_LEADER_NAME"/>
+        <result property="remark" column="REMARK"/>
+        <collection property="inspectionUnitsList" javaType="java.util.List" resultMap="inspectionUnitsResultMap"/>
+        <collection property="inspectionGroupMemberList" javaType="java.util.List"
+                    resultMap="inspectionGroupMemberResultMap"/>
+    </resultMap>
+
+    <!--被巡视单位ResultMap-->
+    <resultMap id="inspectionUnitsResultMap" type="tech.piis.modules.core.domain.po.InspectionUnitsPO">
+        <id property="unitsId" column="UNITS_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="groupId" column="GROUP_ID"/>
+        <result property="inspectionTime" column="INSPECTION_TIME"/>
+        <result property="orgId" column="ORG_ID"/>
+        <result property="orgName" column="ORG_NAME"/>
+    </resultMap>
+
+    <!--巡视组组员ResultMap-->
+    <resultMap id="inspectionGroupMemberResultMap" type="tech.piis.modules.core.domain.po.InspectionGroupMemberPO">
+        <id property="groupMemberId" column="GROUP_MEMBER_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="groupId" column="GROUP_ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="memberName" column="MEMBER_NAME"/>
+        <result property="memberCompany" column="MEMBER_COMPANY"/>
+        <result property="memberCompanyName" column="MEMBER_COMPANY_NAME"/>
+        <result property="memberPost" column="MEMBER_POST"/>
+        <result property="contact" column="CONTACT"/>
+    </resultMap>
+
+    <select id="selectPlanList" resultMap="inspectionPlanResultMap">
+      select
+      p.PLAN_ID,
+      p.PLAN_NAME ,
+      p.BEGIN_TIME ,
+      p.END_TIME,
+      p.STATUS,
+      p.PLAN_DESC,
+      g.GROUP_ID,
+      g.GROUP_NAME,
+      g.LEADER_ID,
+      g.LEADER_NAME,
+      g.DEPUTY_LEADER_ID,
+      g.DEPUTY_LEADER_NAME,
+      g.REMARK,
+      m.MEMBER_ID,
+      m.MEMBER_NAME,
+      m.MEMBER_COMPANY,
+      m.MEMBER_COMPANY_NAME,
+      m.MEMBER_POST,
+      m.CONTACT,
+      u.UNITS_ID,
+      u.INSPECTION_TIME,
+      u.ORG_ID,
+      u.ORG_NAME
+    from inspection_plan p
+      left join inspection_group g on p.PLAN_ID = g.PLAN_ID
+      left join inspection_group_member m on g.GROUP_ID = m.GROUP_ID
+      left join inspection_units u on u.GROUP_ID = g.GROUP_ID
+    </select>
+</mapper> 

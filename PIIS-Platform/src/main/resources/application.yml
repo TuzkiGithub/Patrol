@@ -1,0 +1,116 @@
+# Project Setting
+piis:
+  name: PIIS
+  version: V1.0.0
+  copyright: 2020
+  # Upload Path （Windows D:/king/upload,Linux /home/king/upload)
+  profile: E:/upload
+  # Get IP Address
+  ipAddress: true
+
+# Development Environment Setting
+server:
+  # HTTP Port
+  port: 8081
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    # Tomcat Max Threads (default:200)
+    max-threads: 800
+    # Tomcat Initialize Threads (default:25)
+    min-spare-threads: 30
+  connection-timeout: 180000ms
+# Spring Settings
+spring:
+  # dev|test|prod
+  profiles:
+    active: dev
+  # Resource Messages
+  messages:
+    # I18N Resource Path
+    basename: i18n/messages
+  jackson:
+      default-property-inclusion: non_null
+  # File Upload
+  servlet:
+     multipart:
+       # Single File Max-Size
+       max-file-size:  10MB
+       # Total Files Max-Size
+       max-request-size:  50MB
+  # Devtools
+  devtools:
+    restart:
+      # Hot Deployment
+      enabled: true
+  # Redis Setting
+  redis:
+    # Host
+    host: localhost
+    # Port (default:6379)
+    port: 6379
+    password:
+    timeout: 10s
+    lettuce:
+      pool:
+        # Connection Pool Smallest Idle Connections
+        min-idle: 0
+        # Connection Pool Largest Idle Connections
+        max-idle: 8
+        # Connection Pool Maximum Database Connections
+        max-active: 8
+        # Connection Pool Maximum Blocking Wait Time (Negative Value To No Limit)
+        max-wait: -1ms
+
+# Token Setting
+token:
+    # Custom Token Mark
+    header: Authorization
+    # Token Secret
+    secret: abcdefghijklmnopqrstuvwxyz
+    # Token Expire Time (default 30min)
+    expireTime: 600
+  
+# MyBatis Setting
+#mybatis:
+#    typeAliasesPackage: tech.piis.modules.**.domain
+#    mapperLocations: classpath*:mybatis/**/*Mapper.xml
+#    configLocation: classpath:mybatis/mybatis-config.xml
+
+mybatis-plus:
+      typeAliasesPackage: tech.piis.modules.**.domain.po,tech.piis.modules.**.domain.vo
+      mapperLocations: classpath*:mybatis/**/*Mapper.xml
+      configLocation: classpath:mybatis/mybatis-config.xml
+
+
+# PageHelper Setting
+pagehelper: 
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: false  #取消自动分页
+  
+# Code Generate Setting
+gen: 
+  author: Kevin
+  # Package Name
+  packageName: tech.piis.modules.system
+  # Auto Remove Prefix
+  autoRemovePre: false
+  # Table Prefix (xx_,xx_,xx_)
+  tablePrefix: sys_
+
+# XSS Setting
+xss:
+  # XSS Filter Enabled
+  enabled: true
+  # Excludes UIL (/XX/*,/XX/*,/XX/*)
+  excludes: /system/notice/*
+  # Patterns UIL (/XX/*,/XX/*,/XX/*)
+  urlPatterns: /system/*,/monitor/*,/tool/*
+
+# Logging Setting
+logging:
+  level:
+    tech.kevinwong: debug
+    org.springframework: warn
