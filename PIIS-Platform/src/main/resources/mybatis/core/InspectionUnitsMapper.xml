@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionUnitsMapper">
+
+    <!--被巡视单位ResultMap-->
+    <resultMap id="inspectionUnitsResultMap" type="tech.piis.modules.core.domain.po.InspectionUnitsPO">
+        <id property="unitsId" column="UNITS_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="groupId" column="GROUP_ID"/>
+        <result property="inspectionTime" column="INSPECTION_TIME"/>
+        <result property="orgId" column="ORG_ID"/>
+        <result property="orgName" column="ORG_NAME"/>
+    </resultMap>
+
+    <insert id="insertBatch" parameterType="InspectionUnitsPO">
+        insert into inspection_units(PLAN_ID,GROUP_ID,ORG_ID,ORG_NAME,INSPECTION_TIME) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.planId},#{item.groupId},#{item.orgId},#{item.orgName},#{item.inspectionTime})
+    </foreach>
+    </insert>
+</mapper> 

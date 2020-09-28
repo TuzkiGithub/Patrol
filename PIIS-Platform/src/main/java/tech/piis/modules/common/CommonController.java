@@ -3,6 +3,7 @@ package tech.piis.modules.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,14 +15,16 @@ import tech.piis.framework.config.ServerConfig;
 import tech.piis.framework.utils.file.FileUploadUtils;
 import tech.piis.framework.utils.file.FileUtils;
 import tech.piis.framework.web.domain.AjaxResult;
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.mapper.PiisDocumentMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 通用请求处理
- *
- * @author Kevin<EastascendWang               @               gmail.com>
+ * 文件请求
  */
 @RestController
 public class CommonController {
@@ -29,6 +32,12 @@ public class CommonController {
 
     @Autowired
     private ServerConfig serverConfig;
+
+    @Autowired
+    private PiisDocumentMapper documentMapper;
+
+    @Value("${piis.serverAddr}")
+    private String serverFileUrl;
 
     /**
      * 通用下载请求
@@ -83,14 +92,27 @@ public class CommonController {
      */
     @PostMapping("/common/uploads")
     public AjaxResult uploadFiles(MultipartFile[] files) throws Exception {
+        List<PiisDocumentPO> documents = null;
         if (files.length != 0) {
+            documents = new ArrayList<>(files.length);
             for (MultipartFile file : files) {
-                uploadFile(file);
+                if (null != file && !StringUtils.isEmpty(file.getOriginalFilename())) {
+                    // 上传文件路径
+                    String filePath = PIISConfig.getUploadPath();
+                    // 上传并返回新文件名称
+                    String fileName = FileUploadUtils.upload(filePath, file);
+                    PiisDocumentPO document = new PiisDocumentPO()
+                            .setFileName(fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length()))
+                            .setFileSize(file.getSize())
+                            .setFilePath(serverFileUrl + fileName);
+                    documents.add(document);
+                    documentMapper.insert(document);
+                }
             }
         } else {
             return AjaxResult.error();
         }
-        return AjaxResult.success();
+        return AjaxResult.success(documents);
     }
 
     /**

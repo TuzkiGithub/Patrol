@@ -3,15 +3,16 @@ piis:
   name: PIIS
   version: V1.0.0
   copyright: 2020
-  # Upload Path （Windows D:/king/upload,Linux /home/king/upload)
-  profile: E:/upload
+  # Upload Path
+  profile: E:/file/upload
+  serverAddr: piis.file.com:81
   # Get IP Address
   ipAddress: true
 
 # Development Environment Setting
 server:
   # HTTP Port
-  port: 8081
+  port: 8080
   servlet:
     context-path: /
   tomcat:

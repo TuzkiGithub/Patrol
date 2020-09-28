@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 /**
@@ -35,19 +36,44 @@ public class InspectionMobilizeAttendeePO extends PIBaseEntity {
     /**
      * 参会人员ID
      */
+    @NotBlank(message = "动员编号不能为空！")
     private String attendeeId;
     /**
      * 参会人员姓名
      */
+    @NotBlank(message = "动员姓名不能为空！")
     private String attendeeName;
     /**
      * 参会人员职务
      */
+    @NotBlank(message = "动员职务不能为空！")
     private String attendeePost;
     /**
-     * 参会人员公司
+     * 参会人员公司名称
      */
+    @NotBlank(message = "所在公司名称不能为空！")
     private String attendeeCompany;
+
+    /**
+     * 参会人员公司ID
+     */
+    @NotBlank(message = "所在公司ID不能为空！")
+    private String attendeeCompanyId;
+
+    /**
+     * 授课时间
+     */
+    @NotBlank(message = "授课时间不能为空！")
+    private String attendeeTime;
+
+    /**
+     * 动员人员类型
+     * 0 普通人员
+     * 1 授课老师
+     * 2 领导
+     */
+    private String attendeePersonType;
+
     /**
      * 创建人
      */

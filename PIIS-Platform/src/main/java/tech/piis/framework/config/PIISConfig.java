@@ -98,6 +98,6 @@ public class PIISConfig
      */
     public static String getUploadPath()
     {
-        return getProfile() + "/upload";
+        return getProfile();
     }
 }

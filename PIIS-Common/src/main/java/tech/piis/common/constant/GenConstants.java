@@ -91,4 +91,10 @@ public class GenConstants
 
     /** 需要 */
     public static final String REQUIRE = "1";
+
+    /**
+     * 默认分页参数
+     */
+    public static final Integer DEFAULT_PAGE_NUM = 0;
+    public static final Integer DEFAULT_PAGE_SIZE = 10;
 }

@@ -1,6 +1,7 @@
 package tech.piis.modules.core.domain.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -30,7 +31,13 @@ public class PiisDocumentPO extends PIBaseEntity {
     /**
      * 巡视编号
      */
-    private String piisId;
+    private String ObjectId;
+
+    /**
+     * 文件字典ID
+     */
+    private Long fileDictId;
+
     /**
      * 文件名称
      */
@@ -43,5 +50,13 @@ public class PiisDocumentPO extends PIBaseEntity {
      * 文件路径
      */
     private String filePath;
+
+
+    /**  业务字段
+     *   操作类型
+     * 1 新增 3删除
+     */
+    @TableField(exist = false)
+    private Integer operationType;
 
 }

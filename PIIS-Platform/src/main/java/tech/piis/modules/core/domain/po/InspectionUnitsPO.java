@@ -9,6 +9,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -24,30 +27,39 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 public class InspectionUnitsPO extends PIBaseEntity {
+
     /**
      * 编号
      */
     @TableId(value = "UNITS_ID", type = IdType.AUTO)
     private Long unitsId;
+
     /**
      * 计划编号
      */
     private String planId;
+
     /**
      * 巡视组ID
      */
-    private Long groupId;
+    private String groupId;
+
     /**
      * 巡视时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @NotNull(message = "被巡视时间不能为空！")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date inspectionTime;
+
     /**
      * 部门ID
      */
+    @NotBlank(message = "部门ID不能为空！")
     private String orgId;
+
     /**
      * 部门名称
      */
+    @NotBlank(message = "部门名称不能为空！")
     private String orgName;
 }

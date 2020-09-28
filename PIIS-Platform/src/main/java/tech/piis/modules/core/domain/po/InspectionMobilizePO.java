@@ -8,6 +8,10 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -36,15 +40,21 @@ public class InspectionMobilizePO extends PIBaseEntity {
     /**
      * 会议名称
      */
+    @NotBlank(message = "会议名称不能为空！")
     private String meetName;
+
     /**
      * 会议地点
      */
+    @NotBlank(message = "会议地点不能为空！")
     private String meetPlace;
+
     /**
      * 会议时间
      */
+    @NotNull(message = "会议时间不能为空！")
     private Date meetTime;
+
     /**
      * 会议内容
      */
@@ -73,5 +83,7 @@ public class InspectionMobilizePO extends PIBaseEntity {
     /**
      * 巡视动员参会人员
      */
+    @Valid
+    @NotEmpty(message = "动员成员信息不能为空！")
     private List<InspectionMobilizeAttendeePO> inspectionMobilizeAttendeeList;
 }

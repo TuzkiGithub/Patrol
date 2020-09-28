@@ -59,33 +59,52 @@
     </resultMap>
 
     <select id="selectPlanList" resultMap="inspectionPlanResultMap">
-      select
-      p.PLAN_ID,
-      p.PLAN_NAME ,
-      p.BEGIN_TIME ,
-      p.END_TIME,
-      p.STATUS,
-      p.PLAN_DESC,
-      g.GROUP_ID,
-      g.GROUP_NAME,
-      g.LEADER_ID,
-      g.LEADER_NAME,
-      g.DEPUTY_LEADER_ID,
-      g.DEPUTY_LEADER_NAME,
-      g.REMARK,
-      m.MEMBER_ID,
-      m.MEMBER_NAME,
-      m.MEMBER_COMPANY,
-      m.MEMBER_COMPANY_NAME,
-      m.MEMBER_POST,
-      m.CONTACT,
-      u.UNITS_ID,
-      u.INSPECTION_TIME,
-      u.ORG_ID,
-      u.ORG_NAME
-    from inspection_plan p
-      left join inspection_group g on p.PLAN_ID = g.PLAN_ID
-      left join inspection_group_member m on g.GROUP_ID = m.GROUP_ID
-      left join inspection_units u on u.GROUP_ID = g.GROUP_ID
+        select
+        p.PLAN_ID,
+        p.PLAN_NAME ,
+        p.BEGIN_TIME ,
+        p.END_TIME,
+        p.STATUS,
+        p.PLAN_DESC,
+        g.GROUP_ID,
+        g.GROUP_NAME,
+        g.LEADER_ID,
+        g.LEADER_NAME,
+        g.DEPUTY_LEADER_ID,
+        g.DEPUTY_LEADER_NAME,
+        g.REMARK,
+        m.GROUP_MEMBER_ID,
+        m.MEMBER_ID,
+        m.MEMBER_NAME,
+        m.MEMBER_COMPANY,
+        m.MEMBER_COMPANY_NAME,
+        m.MEMBER_POST,
+        m.CONTACT,
+        u.UNITS_ID,
+        u.INSPECTION_TIME,
+        u.ORG_ID,
+        u.ORG_NAME
+        from (
+          select
+                PLAN_ID,
+                PLAN_NAME ,
+                BEGIN_TIME ,
+                END_TIME,
+                STATUS,
+                PLAN_DESC
+          from
+              inspection_plan
+          limit #{pageNum},#{pageSize}
+        ) p
+        left join inspection_group g on p.PLAN_ID = g.PLAN_ID
+        left join inspection_group_member m on g.GROUP_ID = m.GROUP_ID
+        left join inspection_units u on u.GROUP_ID = g.GROUP_ID
+        <where>
+            <if test="planName!=null and planName!=''">
+                AND plan_name like concat('%', #{planName}, '%')
+            </if>
+            and GROUP_MEMBER_ID is not null
+            and UNITS_ID is not null
+        </where>
     </select>
 </mapper> 

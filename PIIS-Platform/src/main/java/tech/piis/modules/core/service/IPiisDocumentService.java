@@ -1,6 +1,10 @@
 package tech.piis.modules.core.service;
 
 
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
+
+import java.util.List;
+
 /**
  * 巡视附件 Service接口
  * 
@@ -9,4 +13,11 @@ package tech.piis.modules.core.service;
  */
 public interface IPiisDocumentService {
 
+    /**
+     * 获取巡视方案文件
+     * @param documentPO
+     * @return
+     * @throws Exception
+     */
+    List<PiisDocumentPO> getPlanFileList(PiisDocumentPO documentPO) throws Exception;
 }

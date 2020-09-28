@@ -19,8 +19,8 @@ import java.io.IOException;
  * 
  * @author Kevin<EastascendWang@gmail.com>
  */
-public class FileUploadUtils
-{
+public class FileUploadUtils {
+
     /**
      * 默认大小 50M
      */
@@ -92,7 +92,6 @@ public class FileUploadUtils
      *
      * @param baseDir 相对应用的基目录
      * @param file 上传的文件
-     * @param extension 上传文件类型
      * @return 返回上传成功的文件名
      * @throws FileSizeLimitExceededException 如果超出最大大小
      * @throws FileNameLengthLimitExceededException 文件名太长
@@ -115,8 +114,7 @@ public class FileUploadUtils
 
         File desc = getAbsoluteFile(baseDir, fileName);
         file.transferTo(desc);
-        String pathFileName = getPathFileName(baseDir, fileName);
-        return pathFileName;
+        return getPathFileName(baseDir, fileName);
     }
 
     /**
@@ -126,7 +124,7 @@ public class FileUploadUtils
     {
         String fileName = file.getOriginalFilename();
         String extension = getExtension(file);
-        fileName = DateUtils.datePath() + "/" + encodingFilename(fileName) + "." + extension;
+        fileName = DateUtils.datePath() + "/" + fileName;
         return fileName;
     }
 
@@ -149,8 +147,7 @@ public class FileUploadUtils
     {
         int dirLastIndex = PIISConfig.getProfile().length() + 1;
         String currentDir = StringUtils.substring(uploadDir, dirLastIndex);
-        String pathFileName = Constants.RESOURCE_PREFIX + "/" + currentDir + "/" + fileName;
-        return pathFileName;
+        return "/" + fileName;
     }
 
     /**
@@ -240,5 +237,19 @@ public class FileUploadUtils
             extension = MimeTypeUtils.getExtension(file.getContentType());
         }
         return extension;
+    }
+
+
+    /**
+     * 删除文件
+     * @param filePath
+     * @return
+     */
+    public static boolean deleteServerFile(String filePath){
+        boolean delete_flag = false;
+        File file = new File(filePath);
+        if (file.exists() && file.isFile() && file.delete())
+            delete_flag = true;
+        return delete_flag;
     }
 }

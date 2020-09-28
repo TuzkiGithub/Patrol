@@ -1,5 +1,6 @@
 package tech.piis.modules.core.domain.po;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -40,8 +41,10 @@ public class PIBaseEntity {
      */
     private String entId;
 
+    @TableField(exist = false)
     private Integer pageNum;
 
+    @TableField(exist = false)
     private Integer pageSize;
 
 }

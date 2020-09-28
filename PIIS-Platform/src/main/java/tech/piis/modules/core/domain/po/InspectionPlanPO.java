@@ -1,12 +1,19 @@
 package tech.piis.modules.core.domain.po;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +27,8 @@ import java.util.List;
 @TableName("inspection_plan")
 @Data
 @Accessors(chain = true)
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class InspectionPlanPO extends PIBaseEntity {
     /**
      * 编号
@@ -29,10 +38,12 @@ public class InspectionPlanPO extends PIBaseEntity {
     /**
      * 方案名称
      */
+    @NotBlank(message = "巡视方案不能为空！")
     private String planName;
     /**
      * 预计开始时间
      */
+    @NotNull(message = "巡视开始时间不能为空！")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date beginTime;
 
@@ -54,6 +65,20 @@ public class InspectionPlanPO extends PIBaseEntity {
     /**
      * 巡视组
      */
+    @Valid
+    @NotEmpty(message = "巡视组信息不能为空！")
     private List<InspectionGroupPO> inspectionGroupList;
+
+
+    /**
+     * 文件列表
+     *
+     * PS 业务字段
+     */
+    @TableField(exist = false)
+    @NotEmpty(message = "文件信息不能为空！")
+    private List<PiisDocumentPO> documents;
+    public InspectionPlanPO() {
+    }
 
 }

@@ -75,10 +75,6 @@ public class SysUser extends BaseEntity {
      */
     private String salt;
 
-    private Integer a;
-
-    private Integer b;
-
     /**
      * 帐号状态（0正常 1停用）
      */
@@ -126,6 +122,11 @@ public class SysUser extends BaseEntity {
      */
     private Long[] postIds;
 
+    /**
+     * 职务信息
+     */
+    private String post;
+
     public SysUser() {
 
     }
@@ -156,6 +157,14 @@ public class SysUser extends BaseEntity {
 
     public void setDeptId(String[] deptId) {
         this.deptId = deptId;
+    }
+
+    public String getPost() {
+        return post;
+    }
+
+    public void setPost(String post) {
+        this.post = post;
     }
 
     @Size(min = 0, max = 30, message = "用户昵称长度不能超过30个字符")
@@ -297,7 +306,7 @@ public class SysUser extends BaseEntity {
     public String toString() {
         return "SysUser{" +
                 "userId=" + userId +
-                ", deptId='" + deptId + '\'' +
+                ", deptId=" + Arrays.toString(deptId) +
                 ", userName='" + userName + '\'' +
                 ", nickName='" + nickName + '\'' +
                 ", email='" + email + '\'' +
@@ -314,6 +323,7 @@ public class SysUser extends BaseEntity {
                 ", roles=" + roles +
                 ", roleIds=" + Arrays.toString(roleIds) +
                 ", postIds=" + Arrays.toString(postIds) +
+                ", post='" + post + '\'' +
                 '}';
     }
 }
