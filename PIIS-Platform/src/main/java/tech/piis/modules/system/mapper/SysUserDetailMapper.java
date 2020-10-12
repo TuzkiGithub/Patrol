@@ -51,4 +51,11 @@ public interface SysUserDetailMapper {
      * @return
      */
     List<UserVO> selectUserDeptRole(SysUser user);
+
+    /**
+     * 查询用户-部门-岗位
+     * @param user
+     * @return
+     */
+    List<UserVO> selectUserDeptPost(SysUser user);
 }

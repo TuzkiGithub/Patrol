@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import tech.piis.framework.web.domain.BaseEntity;
 import tech.piis.modules.system.domain.SysDept;
+import tech.piis.modules.system.domain.SysPost;
 import tech.piis.modules.system.domain.SysRole;
 
 import java.util.Date;
@@ -101,6 +102,11 @@ public class UserVO extends BaseEntity {
      * 角色对象
      */
     private List<SysRole> roles;
+
+    /**
+     * 岗位对象
+     */
+    private List<SysPost> posts;
 
     /**
      * 权限列表

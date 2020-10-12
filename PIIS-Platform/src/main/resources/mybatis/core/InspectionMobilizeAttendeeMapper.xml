@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="tech.piis.modules.core.mapper.InspectionMobilizeAttendeeMapper">
+
+    <!--巡视动员参会人员ResultMap-->
+    <resultMap id="inspectionMobilizeAttendeeResultMap"
+               type="tech.piis.modules.core.domain.po.InspectionMobilizeAttendeePO">
+        <id property="mobilizeAttendeeId" column="MOBILIZE_ATTENDEE_ID"/>
+        <result property="mobilizeId" column="MOBILIZE_ID"/>
+        <result property="attendeeId" column="ATTENDEE_ID"/>
+        <result property="attendeeTime" column="ATTENDEE_TIME"/>
+        <result property="attendeeName" column="ATTENDEE_NAME"/>
+        <result property="attendeePost" column="ATTENDEE_POST"/>
+        <result property="attendeeCompany" column="ATTENDEE_COMPANY"/>
+        <result property="attendeeCompanyId" column="ATTENDEE_COMPANY_ID"/>
+        <result property="attendeePersonType" column="ATTENDEE_PERSON_TYPE"/>
+        <result property="remark" column="REMARK"/>
+        <collection property="documents" javaType="java.util.List" resultMap="documentResultMap"/>
+    </resultMap>
+
+    <resultMap id="documentResultMap" type="PiisDocumentPO">
+        <id property="piisDocId" column="PIIS_DOC_ID"/>
+        <result property="objectId" column="OBJECT_ID"/>
+        <result property="fileDictId" column="FILE_DICT_ID"/>
+        <result property="fileName" column="FILE_NAME"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+        <result property="filePath" column="FILE_PATH"/>
+    </resultMap>
+
+    <select id="selectAttendeeDocuments" parameterType="java.lang.String"
+            resultMap="inspectionMobilizeAttendeeResultMap">
+        select *
+        from inspection_mobilize_attendee a
+        left join piis_document d on a.MOBILIZE_ATTENDEE_ID = d.OBJECT_ID
+        where  ATTENDEE_ID in(
+            select ATTENDEE_ID
+            from inspection_mobilize m, inspection_mobilize_attendee a
+            where m.MOBILIZE_ID = a.MOBILIZE_ID
+            and m.MOBILIZE_ID = #{mobilizeId}
+        )
+        and a.MOBILIZE_ID = #{mobilizeId}
+    </select>
+
+    <insert id="saveMobilizeAttendeeBatch" useGeneratedKeys="true" keyProperty="mobilizeAttendeeId"
+            parameterType="InspectionMobilizeAttendeePO">
+        insert into
+        inspection_mobilize_attendee(MOBILIZE_ID,ATTENDEE_ID,ATTENDEE_NAME,ATTENDEE_POST,ATTENDEE_COMPANY,ATTENDEE_COMPANY_ID,ATTENDEE_PERSON_TYPE,ATTENDEE_TIME,REMARK)
+        values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.mobilizeId},#{item.attendeeId},#{item.attendeeName},#{item.attendeePost},#{item.attendeeCompany},#{item.attendeeCompanyId},#{item.attendeePersonType},#{item.attendeeTime},#{item.remark})
+        </foreach>
+    </insert>
+
+</mapper>

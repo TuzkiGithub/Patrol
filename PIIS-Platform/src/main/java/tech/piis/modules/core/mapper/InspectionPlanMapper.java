@@ -2,6 +2,7 @@ package tech.piis.modules.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import tech.piis.modules.core.domain.po.InspectionPlanPO;
+import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
 
 import java.util.List;
 
@@ -20,4 +21,10 @@ public interface InspectionPlanMapper extends BaseMapper<InspectionPlanPO> {
      * @return
      */
     List<InspectionPlanPO> selectPlanList(InspectionPlanPO inspectionPlanPO);
+
+    /**
+     * 统计各公司巡察次数
+     * @return
+     */
+    List<PlanCompanyCountVO> selectPlanCompanyTotal();
 }

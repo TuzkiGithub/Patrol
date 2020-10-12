@@ -34,7 +34,7 @@ public interface SysUserMapper
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    public SysUser selectUserById(Long userId);
+    public SysUser selectUserById(String userId);
 
 
     /**
@@ -77,7 +77,7 @@ public interface SysUserMapper
      * @param userId 用户ID
      * @return 结果
      */
-    public int deleteUserById(Long userId);
+    public int deleteUserById(String userId);
 
     /**
      * 批量删除用户信息
@@ -85,7 +85,7 @@ public interface SysUserMapper
      * @param userIds 需要删除的用户ID
      * @return 结果
      */
-    public int deleteUserByIds(Long[] userIds);
+    public int deleteUserByIds(String[] userIds);
 
     /**
      * 校验用户名称是否唯一
@@ -116,4 +116,11 @@ public interface SysUserMapper
      * @return
      */
     public int selectCount();
+
+    /**
+     * 批量新增用户
+     * @param users
+     * @return
+     */
+    public int insertBatch(List<SysUser> users);
 }

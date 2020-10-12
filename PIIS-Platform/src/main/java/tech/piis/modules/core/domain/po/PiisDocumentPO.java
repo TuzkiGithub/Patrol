@@ -31,7 +31,7 @@ public class PiisDocumentPO extends PIBaseEntity {
     /**
      * 巡视编号
      */
-    private String ObjectId;
+    private String objectId;
 
     /**
      * 文件字典ID
@@ -42,10 +42,12 @@ public class PiisDocumentPO extends PIBaseEntity {
      * 文件名称
      */
     private String fileName;
+
     /**
      * 文件大小
      */
     private Long fileSize;
+
     /**
      * 文件路径
      */

@@ -34,7 +34,7 @@ public interface ISysUserService
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    public SysUser selectUserById(Long userId);
+    public SysUser selectUserById(String userId);
 
     /**
      * 根据用户ID查询用户所属角色组
@@ -139,7 +139,7 @@ public interface ISysUserService
      * @param userId 用户ID
      * @return 结果
      */
-    public int deleteUserById(Long userId);
+    public int deleteUserById(String userId);
 
     /**
      * 批量删除用户信息
@@ -147,7 +147,7 @@ public interface ISysUserService
      * @param userIds 需要删除的用户ID
      * @return 结果
      */
-    public int deleteUserByIds(Long[] userIds);
+    public int deleteUserByIds(String[] userIds);
 
     /**
      * 导入用户数据
@@ -164,4 +164,12 @@ public interface ISysUserService
      * @return
      */
     public int selectCount();
+
+
+    /**
+     * 查询用户部门岗位
+     * @param user
+     * @return
+     */
+    List<UserVO> selectUserDeptPost(SysUser user);
 }

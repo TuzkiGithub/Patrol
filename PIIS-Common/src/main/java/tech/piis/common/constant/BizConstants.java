@@ -10,5 +10,5 @@ package tech.piis.common.constant;
  */
 public class BizConstants {
 
-    public static final String PARAMS_NULL = "param is null!";
+    public static final String PARAMS_NULL = "PARAM IS NULL!";
 }

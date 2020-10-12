@@ -63,6 +63,22 @@ public class InspectionPlanPO extends PIBaseEntity {
     private String planDesc;
 
     /**
+     * 巡视巡察状态 0 巡视 1 巡察
+     */
+    private int planType;
+
+
+    /**
+     * 巡视单位ID
+     */
+    private String planCompanyId;
+
+    /**
+     * 巡视单位名称
+     */
+    private String planCompanyName;
+
+    /**
      * 巡视组
      */
     @Valid
@@ -72,13 +88,13 @@ public class InspectionPlanPO extends PIBaseEntity {
 
     /**
      * 文件列表
-     *
-     * PS 业务字段
      */
-    @TableField(exist = false)
     @NotEmpty(message = "文件信息不能为空！")
+    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
-    public InspectionPlanPO() {
-    }
 
+    /**
+     * 巡视动员
+     */
+    private InspectionMobilizePO inspectionMobilize;
 }

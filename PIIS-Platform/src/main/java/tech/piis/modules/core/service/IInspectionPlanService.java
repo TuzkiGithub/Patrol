@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tech.piis.modules.core.domain.dto.InspectionPlanSaveDTO;
 import tech.piis.modules.core.domain.po.InspectionPlanPO;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
 
 import java.util.List;
 
@@ -44,5 +45,17 @@ public interface IInspectionPlanService {
      * @return
      */
     int delPlanByIds(String[] planIds);
+
+    /**
+     * 查询总记录数
+     * @return
+     */
+    int selectCount();
+
+    /**
+     * 统计公司巡察次数
+     * @return
+     */
+    List<PlanCompanyCountVO> selectCountByCompany();
 
 }

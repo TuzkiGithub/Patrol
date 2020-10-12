@@ -19,5 +19,12 @@ public interface InspectionMobilizeAttendeeMapper extends BaseMapper<InspectionM
      * @return
      * @throws Exception
      */
-    int saveMobilizeAttendeeBatch(List<InspectionMobilizeAttendeePO> inspectionMobilizeAttendeeList) throws Exception;
+    int saveMobilizeAttendeeBatch(List<InspectionMobilizeAttendeePO> inspectionMobilizeAttendeeList);
+
+    /**
+     * 查询动员信息及文件
+     * @param mobilizeId
+     * @return
+     */
+    List<InspectionMobilizeAttendeePO> selectAttendeeDocuments(String mobilizeId);
 }

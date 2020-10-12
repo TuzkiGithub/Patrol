@@ -1,6 +1,7 @@
 package tech.piis.modules.system.mapper;
 
 import tech.piis.modules.system.domain.SysUserPost;
+import tech.piis.modules.system.domain.SysUserPostVO;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface SysUserPostMapper
      * @param userId 用户ID
      * @return 结果
      */
-    public int deleteUserPostByUserId(Long userId);
+    public int deleteUserPostByUserId(String userId);
 
     /**
      * 通过岗位ID查询岗位使用数量
@@ -25,7 +26,7 @@ public interface SysUserPostMapper
      * @param postId 岗位ID
      * @return 结果
      */
-    public int countUserPostById(Long postId);
+    public int countUserPostById(String postId);
 
     /**
      * 批量删除用户和岗位关联
@@ -42,4 +43,26 @@ public interface SysUserPostMapper
      * @return 结果
      */
     public int batchUserPost(List<SysUserPost> userPostList);
+
+    /**
+     * 新增用户-岗位
+     * @param post
+     * @return
+     */
+    public int saveUserPost(SysUserPost post);
+
+    /**
+     * 查询用户-岗位
+     * @param post
+     * @return
+     */
+    public SysUserPostVO selectUserPost(SysUserPostVO post);
+
+    /**
+     * 根据用户ID批量删除用户-岗位关系
+     * @param userPosts
+     * @return
+     */
+    public int delUserPostBatch(List<SysUserPost> userPosts);
+
 }

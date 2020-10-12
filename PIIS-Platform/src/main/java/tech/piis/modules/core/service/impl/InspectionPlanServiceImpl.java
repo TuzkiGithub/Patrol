@@ -12,8 +12,10 @@ import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.config.PIISConfig;
+import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.file.FileUploadUtils;
 import tech.piis.modules.core.domain.po.*;
+import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
 import tech.piis.modules.core.mapper.*;
 import tech.piis.modules.core.service.IInspectionPlanService;
 
@@ -72,148 +74,18 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         String planId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
         inspectionPlanPO.setPlanId(planId);
         List<InspectionGroupPO> groupList = inspectionPlanPO.getInspectionGroupList();
+
         groupList.forEach(group -> group.setPlanId(planId));
         //新增巡视组
         saveGroups(inspectionPlanPO.getInspectionGroupList());
         //更新文件表
         updateFile(inspectionPlanPO.getDocuments(), planId);
         //新增计划
+        BizUtils.setCreatedOperation(InspectionPlanPO.class, inspectionPlanPO);
         return planMapper.insert(inspectionPlanPO.setInspectionGroupList(null));
 
     }
 
-    /**
-     * documentList 文件列表
-     * planId  巡视计划ID
-     *
-     * @param documentList
-     */
-    public void updateFile(List<PiisDocumentPO> documentList, String planId) {
-        if (!CollectionUtils.isEmpty(documentList)) {
-            documentList.forEach(document -> {
-                Integer operationType = document.getOperationType();
-                if (null != operationType) {
-                    switch (operationType) {
-                        case INSERT: {
-                            //将业务字段赋予文件表
-                            document.setFileDictId(FileEnum.WORK_PREPARED_OTHER_FILE.getCode())
-                                    .setObjectId(planId);
-                            documentMapper.updateById(document);
-                            break;
-                        }
-                        case DELETE: {
-                            //删除服务器上文件以及文件表数据
-                            documentMapper.deleteById(document.getPiisDocId());
-                            String filePath = document.getFilePath();
-                            if (!StringUtils.isEmpty(filePath)) {
-                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
-                            }
-                            break;
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    /**
-     * 上传文件
-     *
-     * @param planId
-     * @param files
-     * @throws Exception
-     */
-    public List<String> upload(String planId, MultipartFile[] files) throws Exception {
-        List<String> fileNames = new ArrayList<>();
-        for (MultipartFile file : files) {
-            String originalFileName = file.getOriginalFilename();
-            QueryWrapper queryCondition = new QueryWrapper();
-            queryCondition.eq("OBJECT_ID", planId);
-            List<PiisDocumentPO> documents = documentMapper.selectList(queryCondition);
-            if (!CollectionUtils.isEmpty(documents)) {
-                documents.forEach(document -> {
-                    if (document.equals(originalFileName)) {
-
-                    }
-                });
-            }
-            String filename = FileUploadUtils.upload(file);
-            fileNames.add(filename);
-            PiisDocumentPO document = new PiisDocumentPO()
-                    .setObjectId(planId)
-                    .setFileDictId(FileEnum.WORK_PREPARED_OTHER_FILE.getCode())
-                    .setFileName(filename.substring(filename.lastIndexOf("/") + 1, filename.length()))
-                    .setFileSize(file.getSize())
-                    .setFilePath(PIISConfig.getProfile() + filename);
-            documentMapper.insert(document);
-        }
-        return fileNames;
-    }
-
-    /**
-     * 批量新增巡视组组员、被巡视单位
-     *
-     * @param groupList 巡视组列表
-     * @param isSave    是否是新增巡视计划
-     */
-    private void saveGroupRelation(List<InspectionGroupPO> groupList, boolean isSave) {
-        if (!CollectionUtils.isEmpty(groupList)) {
-            for (int i = 0; i < groupList.size(); i++) {
-                InspectionGroupPO group = groupList.get(i);
-                if (isSave) {
-                    String groupId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6) + i;
-                    group.setGroupId(groupId);
-                }
-                //新增巡视组成员
-                List<InspectionGroupMemberPO> groupMemberList = group.getInspectionGroupMemberList();
-                if (!CollectionUtils.isEmpty(groupMemberList)) {
-                    groupMemberList.forEach(groupMember -> {
-                        groupMember.setPlanId(group.getPlanId());
-                        groupMember.setGroupId(group.getGroupId());
-                    });
-                    saveGroupMembers(groupMemberList);
-                }
-                //新增被巡视单位
-                List<InspectionUnitsPO> unitsList = group.getInspectionUnitsList();
-                if (!CollectionUtils.isEmpty(unitsList)) {
-                    unitsList.forEach(units -> {
-                        units.setPlanId(group.getPlanId());
-                        units.setGroupId(group.getGroupId());
-                    });
-                    saveUnits(unitsList);
-                }
-            }
-        }
-    }
-
-    /**
-     * 批量新增巡视组
-     *
-     * @param groupList
-     */
-    private void saveGroups(List<InspectionGroupPO> groupList) {
-        saveGroupRelation(groupList, true);
-        groupMapper.insertBatch(groupList);
-    }
-
-    /**
-     * 批量新增被巡视单位
-     */
-    public void saveUnits(List<InspectionUnitsPO> unitsList) {
-        if (!CollectionUtils.isEmpty(unitsList)) {
-            unitsMapper.insertBatch(unitsList);
-        }
-    }
-
-
-    /**
-     * 批量新增巡视组组员
-     */
-    public void saveGroupMembers(List<InspectionGroupMemberPO> groupMemberList) {
-        if (!CollectionUtils.isEmpty(groupMemberList)) {
-            groupMemberMapper.insertBatch(groupMemberList);
-        }
-    }
 
     /**
      * 修改巡视计划
@@ -254,30 +126,110 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                 }
             });
         }
-//        editFile(inspectionPlanPO, files);
+        updateFile(inspectionPlanPO.getDocuments(), inspectionPlanPO.getPlanId());
         return planMapper.updateById(inspectionPlanPO.setInspectionGroupList(null));
     }
 
     /**
-     * 修改文件
+     * documentList 文件列表
+     * planId  巡视计划ID
      *
-     * @param inspectionPlanPO
-     * @param files
-     * @throws Exception
+     * @param documentList
      */
-    private void editFile(InspectionPlanPO inspectionPlanPO, MultipartFile[] files) throws Exception {
-        //删除文件
-        List<PiisDocumentPO> documents = inspectionPlanPO.getDocuments();
-        if (!CollectionUtils.isEmpty(documents)) {
-            documents.forEach(document -> {
-                FileUploadUtils.deleteServerFile(document.getFilePath());
-                QueryWrapper<PiisDocumentPO> queryWrapper = new QueryWrapper<>();
-                queryWrapper.eq("PIIS_DOC_ID", document.getPiisDocId());
-                documentMapper.delete(queryWrapper);
+    private void updateFile(List<PiisDocumentPO> documentList, String planId) {
+        if (!CollectionUtils.isEmpty(documentList)) {
+            documentList.forEach(document -> {
+                Integer operationType = document.getOperationType();
+                if (null != operationType) {
+                    switch (operationType) {
+                        case INSERT: {
+                            //将业务字段赋予文件表
+                            document.setFileDictId(FileEnum.WORK_PREPARED_OTHER_FILE.getCode())
+                                    .setObjectId(planId);
+                            documentMapper.updateById(document);
+                            break;
+                        }
+                        case DELETE: {
+                            //删除服务器上文件以及文件表数据
+                            documentMapper.deleteById(document.getPiisDocId());
+                            String filePath = document.getFilePath();
+                            if (!StringUtils.isEmpty(filePath)) {
+                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                            }
+                            break;
+                        }
+                    }
+                }
             });
         }
-        //新增文件
-        upload(inspectionPlanPO.getPlanId(), files);
+    }
+
+
+    /**
+     * 批量新增巡视组
+     *
+     * @param groupList
+     */
+    private void saveGroups(List<InspectionGroupPO> groupList) {
+        saveGroupRelation(groupList, true);
+        groupMapper.insertBatch(groupList);
+    }
+
+    /**
+     * 批量新增被巡视单位
+     */
+    public void saveUnits(List<InspectionUnitsPO> unitsList) {
+        if (!CollectionUtils.isEmpty(unitsList)) {
+            unitsMapper.insertBatch(unitsList);
+        }
+    }
+
+
+    /**
+     * 批量新增巡视组组员、被巡视单位
+     *
+     * @param groupList 巡视组列表
+     * @param isSave    是否是新增巡视计划
+     */
+    private void saveGroupRelation(List<InspectionGroupPO> groupList, boolean isSave) {
+        if (!CollectionUtils.isEmpty(groupList)) {
+            for (int i = 0; i < groupList.size(); i++) {
+                InspectionGroupPO group = groupList.get(i);
+                if (isSave) {
+                    String groupId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6) + i;
+                    group.setGroupId(groupId);
+                }
+                //新增巡视组成员
+                List<InspectionGroupMemberPO> groupMemberList = group.getInspectionGroupMemberList();
+                if (!CollectionUtils.isEmpty(groupMemberList)) {
+                    groupMemberList.forEach(groupMember -> {
+                        groupMember.setPlanId(group.getPlanId());
+                        groupMember.setGroupId(group.getGroupId());
+                    });
+                    saveGroupMembers(groupMemberList);
+                }
+                //新增被巡视单位
+                List<InspectionUnitsPO> unitsList = group.getInspectionUnitsList();
+                if (!CollectionUtils.isEmpty(unitsList)) {
+                    unitsList.forEach(units -> {
+                        units.setPlanId(group.getPlanId());
+                        units.setGroupId(group.getGroupId());
+                    });
+                    saveUnits(unitsList);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 批量新增巡视组组员
+     */
+    @Transactional
+    public void saveGroupMembers(List<InspectionGroupMemberPO> groupMemberList) {
+        if (!CollectionUtils.isEmpty(groupMemberList)) {
+            groupMemberMapper.insertBatch(groupMemberList);
+        }
     }
 
     /**
@@ -307,11 +259,32 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     }
 
     /**
+     * 查询总记录数
+     *
+     * @return
+     */
+    @Override
+    public int selectCount() {
+        return planMapper.selectCount(null);
+    }
+
+    /**
+     * 统计公司巡察次数
+     *
+     * @return
+     */
+    @Override
+    public List<PlanCompanyCountVO> selectCountByCompany() {
+        return this.planMapper.selectPlanCompanyTotal();
+    }
+
+    /**
      * 删除巡视组
      *
      * @param group
      */
-    private void delGroup(InspectionGroupPO group) {
+    @Transactional
+    public void delGroup(InspectionGroupPO group) {
         Map<String, Object> params = new HashMap<>();
         params.put("GROUP_ID", group.getGroupId());
         //删除巡视组
@@ -323,7 +296,8 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     /**
      * 删除巡视组组员和被巡视单位信息
      */
-    private void delGroupRelation(InspectionGroupPO group) {
+    @Transactional
+    public void delGroupRelation(InspectionGroupPO group) {
         Map<String, Object> params = new HashMap<>();
         params.put("GROUP_ID", group.getGroupId());
         //删除关联巡视组组员

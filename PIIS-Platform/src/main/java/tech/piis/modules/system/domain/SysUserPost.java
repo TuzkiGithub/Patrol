@@ -11,27 +11,27 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class SysUserPost
 {
     /** 用户ID */
-    private Long userId;
+    private String userId;
     
     /** 岗位ID */
-    private Long postId;
+    private String postId;
 
-    public Long getUserId()
+    public String getUserId()
     {
         return userId;
     }
 
-    public void setUserId(Long userId)
+    public void setUserId(String userId)
     {
         this.userId = userId;
     }
 
-    public Long getPostId()
+    public String getPostId()
     {
         return postId;
     }
 
-    public void setPostId(Long postId)
+    public void setPostId(String postId)
     {
         this.postId = postId;
     }

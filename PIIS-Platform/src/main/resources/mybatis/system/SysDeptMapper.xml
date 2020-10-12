@@ -170,4 +170,18 @@
         where dept_id = #{parentId}
         and del_flag != '2'
     </select>
+
+    <insert id="insertDeptBatch" parameterType="tech.piis.modules.system.domain.SysDept">
+        insert into
+        sys_dept(dept_id,parent_id,dept_name,ancestors,leaf,order_num,leader,phone,email,status,create_by,create_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.deptId},#{item.parentId},#{item.deptName},#{item.ancestors},#{item.leaf},#{item.orderNum},#{item.leader},#{item.phone},#{item.email},#{item.status},#{item.createBy},sysdate())
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        dept_id = values(dept_id),parent_id = values(parent_id),dept_name = values(dept_name),
+        ancestors = values(ancestors),leaf = values(leaf),order_num = values(order_num),leader = values(leader),phone =
+        values(phone),email = values(email),status = values(status),update_by= values(update_by),create_time =
+        sysdate()
+    </insert>
 </mapper> 

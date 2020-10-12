@@ -22,4 +22,11 @@ public interface SysUserDeptMapper extends BaseMapper<SysUserDept> {
      * @return
      */
     public int batchUserDept(List<SysUserDept> userDepts);
+
+    /**
+     * 批量删除
+     * @param userDepts
+     * @return
+     */
+    public int delUserDeptBatch(List<SysUserDept> userDepts);
 }

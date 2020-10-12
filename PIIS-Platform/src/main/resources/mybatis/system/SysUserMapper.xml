@@ -108,7 +108,8 @@
 		select user_id, email from sys_user where email = #{email}
 	</select>
 
-    <insert id="insertUser" parameterType="tech.piis.modules.system.domain.SysUser" useGeneratedKeys="true" keyProperty="userId">
+    <insert id="insertUser" parameterType="tech.piis.modules.system.domain.SysUser" useGeneratedKeys="true"
+            keyProperty="userId">
         insert into sys_user(
         <if test="userId != null and userId != 0">user_id,</if>
         <if test="userName != null and userName != ''">user_name,</if>
@@ -186,4 +187,20 @@
         FROM sys_user u
         where del_flag != '2'
 	</select>
+
+    <insert id="insertBatch" parameterType="tech.piis.modules.system.domain.SysUser">
+        insert into sys_user(user_id, user_name, email,phonenumber,sex, create_by,create_time, update_by,update_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.userId},#{item.userName},#{item.email},#{item.phonenumber},#{item.sex},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        user_id = values(user_id),
+        user_name = values(user_name),
+        email = values(email),
+        phonenumber = values(phonenumber),
+        sex = values(sex),
+        update_by = values(update_by),
+        update_time = values(update_time)
+    </insert>
 </mapper> 

@@ -1,6 +1,10 @@
 package tech.piis.modules.core.service;
 
 
+import tech.piis.modules.core.domain.po.InspectionMobilizeAttendeePO;
+
+import java.util.List;
+
 /**
  * 巡视动员参会人员 Service接口
  * 
@@ -9,4 +13,10 @@ package tech.piis.modules.core.service;
  */
 public interface IInspectionMobilizeAttendeeService {
 
+    /**
+     * 查询动员信息及文件
+     * @param mobilizeAttendeeId
+     * @return
+     */
+    List<InspectionMobilizeAttendeePO> selectAttendeeDocuments(String mobilizeAttendeeId);
 }

@@ -9,7 +9,7 @@ package tech.piis.common.constant;
  * Description:
  */
 public enum ResultEnum {
-    SUCCESS(200, "success"), FAILED(-1, "failed"), EXCEPTION(-2, "exception");
+    SUCCESS(200, "success"), FAILED(-1, "failed"), EXCEPTION(-2, "exception"),EXTERNAL_FAILED(-3,"external failed");
     private Integer code;
     private String msg;
 

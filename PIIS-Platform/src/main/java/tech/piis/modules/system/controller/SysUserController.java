@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.ResultEnum;
 import tech.piis.common.constant.UserConstants;
 import tech.piis.common.utils.ServletUtils;
@@ -26,10 +27,13 @@ import tech.piis.modules.system.service.ISysUserService;
 
 import java.util.List;
 
+import static tech.piis.common.constant.GenConstants.DEFAULT_PAGE_NUM;
+import static tech.piis.common.constant.GenConstants.DEFAULT_PAGE_SIZE;
+
 /**
  * 用户信息
  *
- * @author Kevin<EastascendWang               @               gmail.com>
+ * @author Kevin<EastascendWang                                                                                                                               @                                                                                                                               gmail.com>
  */
 @RestController
 @RequestMapping("/system/user")
@@ -65,6 +69,28 @@ public class SysUserController extends BaseController {
                 .setTotal(userService.selectCount());
     }
 
+    /**
+     * 根据用户名称模糊查询用户、部门、岗位信息
+     *
+     * @param user
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('system:user:query')")
+    @GetMapping("find")
+    public AjaxResult findUserDeptPostInfo(SysUser user) {
+        if (null != user) {
+            if (user.getPageNum() == null || user.getPageSize() == null) {
+                user.setPageNum(DEFAULT_PAGE_NUM);
+                user.setPageSize(DEFAULT_PAGE_SIZE);
+            } else {
+                user.setPageNum(user.getPageNum() + user.getPageNum() * user.getPageSize());
+            }
+        } else {
+            return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        return AjaxResult.success(userService.selectUserDeptPost(user));
+    }
+
     @Log(title = "用户管理", businessType = BusinessType.IMPORT)
     @PreAuthorize("@ss.hasPermi('system:user:import')")
     @PostMapping("/importData")
@@ -88,7 +114,7 @@ public class SysUserController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping(value = {"/", "/{userId}"})
-    public AjaxResult getInfo(@PathVariable(value = "userId", required = false) Long userId) {
+    public AjaxResult getInfo(@PathVariable(value = "userId", required = false) String userId) {
         AjaxResult ajax = AjaxResult.success();
         ajax.put("roles", roleService.selectRoleAll());
         ajax.put("posts", postService.selectPostAll());
@@ -142,7 +168,7 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:remove')")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
-    public AjaxResult remove(@PathVariable Long[] userIds) {
+    public AjaxResult remove(@PathVariable String[] userIds) {
         return toAjax(userService.deleteUserByIds(userIds));
     }
 

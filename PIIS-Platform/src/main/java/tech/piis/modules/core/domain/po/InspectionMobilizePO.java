@@ -1,8 +1,9 @@
 package tech.piis.modules.core.domain.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -31,11 +32,12 @@ public class InspectionMobilizePO extends PIBaseEntity {
     /**
      * 编号
      */
-    @TableId(value = "MOBILIZE_ID", type = IdType.AUTO)
-    private Long mobilizeId;
+    @TableId(value = "MOBILIZE_ID")
+    private String mobilizeId;
     /**
      * 计划编号
      */
+    @NotNull(message = "巡视方案ID不能为空！")
     private String planId;
     /**
      * 会议名称
@@ -52,6 +54,7 @@ public class InspectionMobilizePO extends PIBaseEntity {
     /**
      * 会议时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "会议时间不能为空！")
     private Date meetTime;
 
@@ -85,5 +88,12 @@ public class InspectionMobilizePO extends PIBaseEntity {
      */
     @Valid
     @NotEmpty(message = "动员成员信息不能为空！")
+    @TableField(exist = false)
     private List<InspectionMobilizeAttendeePO> inspectionMobilizeAttendeeList;
+
+    /**
+     * 会议通知文件信息
+     */
+    @TableField(exist = false)
+    private List<PiisDocumentPO> documents;
 }

@@ -30,6 +30,7 @@
         </collection>
         <collection property="depts" javaType="java.util.List" resultMap="deptResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="roleResult"/>
+        <collection property="posts" javaType="java.util.List" resultMap="postResult"/>
     </resultMap>
 
     <resultMap type="tech.piis.modules.system.domain.vo.UserVO" id="SysUserDeptResult">
@@ -52,6 +53,7 @@
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
         <collection property="depts" javaType="java.util.List" resultMap="deptResult"/>
+        <collection property="posts" javaType="java.util.List" resultMap="postResult"/>
     </resultMap>
 
     <resultMap type="tech.piis.modules.system.domain.vo.UserVO" id="SysUserDeptRoleResult">
@@ -75,8 +77,21 @@
         <result property="remark" column="remark"/>
         <collection property="depts" javaType="java.util.List" resultMap="deptResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="roleResult"/>
+        <collection property="posts" javaType="java.util.List" resultMap="postResult"/>
     </resultMap>
 
+    <resultMap type="tech.piis.modules.system.domain.SysPost" id="postResult">
+        <id property="postId" column="post_id"/>
+        <result property="postCode" column="post_code"/>
+        <result property="postName" column="post_name"/>
+        <result property="postSort" column="post_sort"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
 
     <resultMap id="deptResult" type="tech.piis.modules.system.domain.SysDept">
         <id property="deptId" column="dept_id"/>
@@ -204,7 +219,8 @@
             WHERE u.user_id = #{userId}
     </select>
 
-    <select id="selectUserDeptRole" parameterType="tech.piis.modules.system.domain.SysUser" resultMap="SysUserDeptRoleResult">
+    <select id="selectUserDeptRole" parameterType="tech.piis.modules.system.domain.SysUser"
+            resultMap="SysUserDeptRoleResult">
         SELECT
         u.user_id,
         u.user_name,
@@ -284,5 +300,36 @@
             LEFT JOIN sys_user_dept ud ON ud.user_id = u.user_id
             LEFT JOIN sys_dept d ON d.dept_id = ud.dept_id
             WHERE d.dept_id = #{deptId}
+    </select>
+
+
+    <select id="selectUserDeptPost" parameterType="tech.piis.modules.system.domain.SysUser"
+            resultMap="SysUserDeptResult">
+        select
+        u.user_id,
+        u.user_name,
+        u.email,
+        u.phonenumber,
+        u.sex,
+        u.status,
+        d.dept_id,
+        d.dept_name,
+        p.post_id,
+        p.post_name
+        from
+          (
+            select u.user_id, u.user_name, u.email, u.phonenumber, u.sex,u.status, u.del_flag
+            from sys_user u
+            where u.del_flag = '0'
+        ) u
+        left join sys_user_dept ud on u.user_id = ud.user_id
+        left join sys_dept d on d.dept_id = ud.dept_id
+        left join sys_user_post up on up.user_id = u.user_id
+        left join sys_post p on p.post_id = up.post_id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND u.user_name like concat('%', #{userName}, '%')
+            </if>
+        </where>
     </select>
 </mapper> 

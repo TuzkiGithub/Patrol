@@ -132,4 +132,11 @@ public interface SysDeptMapper extends BaseMapper<SysDept> {
      * @return
      */
     public SysDept selectDeptByParentId(String parentId);
+
+    /**
+     * 批量新增部门
+     * @param sysDeptList
+     * @return
+     */
+    int insertDeptBatch(List<SysDept> sysDeptList);
 }

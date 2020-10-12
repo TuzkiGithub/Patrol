@@ -108,15 +108,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  		)
 	</insert>
 	
-	<delete id="deletePostById" parameterType="Long">
+	<delete id="deletePostById" parameterType="String">
 		delete from sys_post where post_id = #{postId}
 	</delete>
 	
-	<delete id="deletePostByIds" parameterType="Long">
+	<delete id="deletePostByIds" parameterType="String">
  		delete from sys_post where post_id in
  		<foreach collection="array" item="postId" open="(" separator="," close=")">
  			#{postId}
         </foreach> 
  	</delete>
 
+	<insert id="insertPostBatch" parameterType="tech.piis.modules.system.domain.SysPost">
+		insert into sys_post(post_id,post_name,status,create_by,create_time, update_by,update_time)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.postId},#{item.postName},#{item.status},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime})
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+		post_id = values(post_id),
+		post_name = values(post_name),
+		status = values(status),
+		update_by = values(update_by),
+		update_time = values(update_time)
+	</insert>
 </mapper> 

@@ -1,6 +1,7 @@
 package tech.piis;
 
-import tech.piis.modules.core.domain.po.InspectionGroupMemberPO;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,8 +23,14 @@ public class TEST {
 //        System.out.println(groupMemberPO1.equals(groupMemberPO2));
 //        double d;
 //        System.out.println(d);
-        String str = "piis.file.com:81/2020/09/28/集团本部-云资源配置清单.xls";
-//        System.out.println(str.substring(str.indexOf("\\/"),str.length() - 1));
-        System.out.println(str.replace("piis.file.com:81","E:/file/upload"));
+        String str = "0000000000|1800000000|1805000000";
+        str = str.replace("|", ",").replace("1805000000", "");
+        String[] strings = str.split(",");
+        Collections.reverse(Arrays.asList(strings));
+        String newStr = "";
+        for (String s : strings) {
+            newStr += s + ",";
+        }
+        System.out.println(newStr.substring(0,newStr.lastIndexOf(",")));
     }
 }

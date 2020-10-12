@@ -5,8 +5,8 @@
 <mapper namespace="tech.piis.modules.core.mapper.InspectionMobilizeMapper">
 
     <!--巡视动员resultMap-->
-    <resultMap id="inspectionGroupResultMap" type="tech.piis.modules.core.domain.po.InspectionMobilizePO">
-        <id property="id" column="id"/>
+    <resultMap id="inspectionMobilizeResultMap" type="tech.piis.modules.core.domain.po.InspectionMobilizePO">
+        <id property="mobilizeId" column="MOBILIZE_ID"/>
         <result property="planId" column="PLAN_ID"/>
         <result property="meetName" column="MEET_NAME"/>
         <result property="meetPlace" column="MEET_PLACE"/>
@@ -17,19 +17,34 @@
         <result property="updatedBy" column="UPDATED_BY"/>
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
-        <collection property="inspectionMobilizeAttendeeList" javaType="java.util.List" resultMap="inspectionMobilizeAttendeeResultMap"/>
+        <collection property="inspectionMobilizeAttendeeList" javaType="java.util.List"
+                    resultMap="inspectionMobilizeAttendeeResultMap"/>
     </resultMap>
 
     <!--巡视动员参会人员ResultMap-->
-    <resultMap id="inspectionMobilizeAttendeeResultMap" type="tech.piis.modules.core.domain.po.InspectionMobilizeAttendeePO">
-        <id property="id" column="id"/>
-        <result property="planId" column="PLAN_ID"/>
+    <resultMap id="inspectionMobilizeAttendeeResultMap"
+               type="tech.piis.modules.core.domain.po.InspectionMobilizeAttendeePO">
+        <id property="mobilizeAttendeeId" column="MOBILIZE_ATTENDEE_ID"/>
         <result property="mobilizeId" column="MOBILIZE_ID"/>
         <result property="attendeeId" column="ATTENDEE_ID"/>
         <result property="attendeeName" column="ATTENDEE_NAME"/>
         <result property="attendeePost" column="ATTENDEE_POST"/>
         <result property="attendeeCompany" column="ATTENDEE_COMPANY"/>
+        <result property="attendeeCompanyId" column="ATTENDEE_COMPANY_ID"/>
+        <result property="attendeeTime" column="ATTENDEE_TIME"/>
+        <result property="attendeePersonType" column="ATTENDEE_PERSON_TYPE"/>
+        <result property="remark" column="REMARK"/>
     </resultMap>
 
+    <select id="selectMobilizeList" parameterType="InspectionMobilizePO" resultMap="inspectionMobilizeResultMap">
+        select m.*,a.ATTENDEE_ID,a.ATTENDEE_NAME,a.ATTENDEE_NAME,a.ATTENDEE_POST,a.ATTENDEE_COMPANY,a.ATTENDEE_COMPANY_ID,a.ATTENDEE_TIME,a.REMARK
+        from inspection_mobilize m
+        left join inspection_mobilize_attendee a on a.MOBILIZE_ID = m.MOBILIZE_ID
+        <where>
+            <if test="mobilizeId !=null and mobilizeId !=''">
+                MOBILIZE_ID = #{mobilizeId}
+            </if>
+        </where>
+    </select>
 
 </mapper> 

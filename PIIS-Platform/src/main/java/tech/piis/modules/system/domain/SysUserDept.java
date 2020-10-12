@@ -20,6 +20,6 @@ import lombok.experimental.Accessors;
 public class SysUserDept {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    private Long userId;
+    private String userId;
     private String deptId;
 }

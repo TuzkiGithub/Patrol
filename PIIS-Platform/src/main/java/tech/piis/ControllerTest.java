@@ -14,12 +14,15 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tech.piis.framework.job.SyncData;
 import tech.piis.framework.security.LoginBody;
+import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.modules.system.domain.SysDept;
+import tech.piis.modules.system.domain.SysUser;
 import tech.piis.modules.system.mapper.SysDeptMapper;
+import tech.piis.modules.system.mapper.SysUserDetailMapper;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -32,12 +35,18 @@ import java.util.List;
  * Time: 20:59
  * Description:
  */
-//@RequestMapping("test")
-//@RestController
+@RequestMapping("test")
+@RestController
 public class ControllerTest {
 
     @Autowired
     private SysDeptMapper sysDeptMapper;
+
+    @Autowired
+    private SysUserDetailMapper sysUserDetailMapper;
+
+    @Autowired
+    private SyncData syncData;
 
     @GetMapping("auth")
     public String auth(LoginBody loginBody, HttpServletResponse httpServletResponse) throws Exception {
@@ -67,12 +76,29 @@ public class ControllerTest {
     }
 
     @GetMapping("dept")
-    public String testDept(){
+    public String testDept() {
         SysDept dept = new SysDept();
         dept.setDeptId("100");
         dept.setLeaf(false);
         dept.setLeader("@@@");
         sysDeptMapper.updateDept(dept);
         return "0";
+    }
+
+    @GetMapping("sync/dept")
+    public int syncDept() {
+        syncData.syncDept();
+        return 0;
+    }
+
+    @GetMapping("sync/user")
+    public int syncUser() {
+        syncData.syncUser();
+        return 0;
+    }
+
+    @GetMapping("/userDeptPost")
+    public AjaxResult selectUserDeptPost(SysUser user) {
+        return AjaxResult.success(sysUserDetailMapper.selectUserDeptPost(user));
     }
 }

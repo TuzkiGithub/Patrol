@@ -21,6 +21,7 @@ server:
     max-threads: 800
     # Tomcat Initialize Threads (default:25)
     min-spare-threads: 30
+    max-http-header-size: 8192
   connection-timeout: 180000ms
 # Spring Settings
 spring:

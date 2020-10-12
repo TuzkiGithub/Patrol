@@ -11,4 +11,13 @@
             (#{item.userId},#{item.deptId})
         </foreach>
     </insert>
-</mapper> 
+
+    <delete id="delUserDeptBatch" parameterType="tech.piis.modules.system.domain.SysUserDept">
+        delete from sys_user_dept
+        where user_id in (
+        <foreach collection="list" item="item" separator=",">
+            #{item.userId}
+        </foreach>
+        )
+    </delete>
+</mapper>

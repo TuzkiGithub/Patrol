@@ -12,11 +12,16 @@
         <result property="endTime" column="END_TIME"/>
         <result property="status" column="STATUS"/>
         <result property="planDesc" column="PLAN_DESC"/>
+        <result property="planType" column="PLAN_TYPE"/>
+        <result property="planCompanyName" column="PLAN_COMPANY_NAME"/>
+        <result property="planCompanyId" column="PLAN_COMPANY_ID"/>
         <result property="createdBy" column="CREATED_BY"/>
         <result property="createdTime" column="CREATED_TIME"/>
         <result property="updatedBy" column="UPDATED_BY"/>
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
+        <association property="inspectionMobilize" javaType="InspectionMobilizePO" column="planId" resultMap="inspectionMobilizeResultMap"/>
+
         <collection property="inspectionGroupList" javaType="java.util.List" resultMap="InspectionGroupResultMap"/>
     </resultMap>
 
@@ -58,6 +63,47 @@
         <result property="contact" column="CONTACT"/>
     </resultMap>
 
+    <!--巡视动员resultMap-->
+    <resultMap id="inspectionMobilizeResultMap" type="InspectionMobilizePO">
+        <id property="mobilizeId" column="MOBILIZE_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="meetName" column="MEET_NAME"/>
+        <result property="meetPlace" column="MEET_PLACE"/>
+        <result property="meetTime" column="MEET_TIME"/>
+        <result property="meetDesc" column="MEET_DESC"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+        <collection property="inspectionMobilizeAttendeeList" javaType="java.util.List"
+                    resultMap="inspectionMobilizeAttendeeResultMap"/>
+    </resultMap>
+
+    <!--巡视动员参会人员ResultMap-->
+    <resultMap id="inspectionMobilizeAttendeeResultMap"
+               type="InspectionMobilizeAttendeePO">
+        <id property="mobilizeAttendeeId" column="MOBILIZE_ATTENDEE_ID"/>
+        <result property="mobilizeId" column="MOBILIZE_ID"/>
+        <result property="attendeeId" column="ATTENDEE_ID"/>
+        <result property="attendeeName" column="ATTENDEE_NAME"/>
+        <result property="attendeePost" column="ATTENDEE_POST"/>
+        <result property="attendeeCompany" column="ATTENDEE_COMPANY"/>
+        <result property="attendeeCompanyId" column="ATTENDEE_COMPANY_ID"/>
+        <result property="attendeeTime" column="ATTENDEE_TIME"/>
+        <result property="attendeePersonType" column="ATTENDEE_PERSON_TYPE"/>
+        <result property="remark" column="REMARK"/>
+    </resultMap>
+
+
+    <resultMap id="selectPlanCompanyTotalResultMap"
+               type="PlanCompanyCountVO">
+        <result property="companyId" column="companyId"/>
+        <result property="companyName" column="companyName"/>
+        <result property="count" column="companyName"/>
+    </resultMap>
+
+
     <select id="selectPlanList" resultMap="inspectionPlanResultMap">
         select
         p.PLAN_ID,
@@ -65,6 +111,9 @@
         p.BEGIN_TIME ,
         p.END_TIME,
         p.STATUS,
+        p.PLAN_TYPE,
+        P.PLAN_COMPANY_ID,
+        P.PLAN_COMPANY_NAME,
         p.PLAN_DESC,
         g.GROUP_ID,
         g.GROUP_NAME,
@@ -83,28 +132,49 @@
         u.UNITS_ID,
         u.INSPECTION_TIME,
         u.ORG_ID,
-        u.ORG_NAME
+        u.ORG_NAME,
+        mb.MOBILIZE_ID,
+        mb.MEET_NAME,
+        mb.MEET_PLACE,
+        mb.MEET_TIME,
+        mb.MEET_DESC,
+        mba.MOBILIZE_ATTENDEE_ID,
+        mba.ATTENDEE_ID,
+        mba.ATTENDEE_NAME,
+        mba.ATTENDEE_POST,
+        mba.ATTENDEE_COMPANY,
+        mba.ATTENDEE_COMPANY_ID,
+        mba.ATTENDEE_PERSON_TYPE,
+        mba.ATTENDEE_TIME
         from (
-          select
-                PLAN_ID,
-                PLAN_NAME ,
-                BEGIN_TIME ,
-                END_TIME,
-                STATUS,
-                PLAN_DESC
-          from
-              inspection_plan
-          limit #{pageNum},#{pageSize}
+        select
+        PLAN_ID,
+        PLAN_NAME ,
+        BEGIN_TIME ,
+        END_TIME,
+        STATUS,
+        PLAN_TYPE,
+        PLAN_COMPANY_ID,
+        PLAN_COMPANY_NAME,
+        PLAN_DESC
+        from
+        inspection_plan
+        limit #{pageNum},#{pageSize}
         ) p
         left join inspection_group g on p.PLAN_ID = g.PLAN_ID
         left join inspection_group_member m on g.GROUP_ID = m.GROUP_ID
         left join inspection_units u on u.GROUP_ID = g.GROUP_ID
+        left join inspection_mobilize mb on mb.PLAN_ID = p.PLAN_ID
+        left join inspection_mobilize_attendee mba on mba.MOBILIZE_ID = mb.MOBILIZE_ID
         <where>
             <if test="planName!=null and planName!=''">
                 AND plan_name like concat('%', #{planName}, '%')
-            </if>
-            and GROUP_MEMBER_ID is not null
-            and UNITS_ID is not null
+        </if>
         </where>
+    </select>
+
+    <select id="selectPlanCompanyTotal" resultMap="selectPlanCompanyTotalResultMap">
+        select PLAN_COMPANY_ID,PLAN_COMPANY_NAME,count(PLAN_COMPANY_ID)
+        from inspection_plan
     </select>
 </mapper> 

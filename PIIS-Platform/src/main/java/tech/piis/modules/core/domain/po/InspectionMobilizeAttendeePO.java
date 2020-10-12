@@ -1,6 +1,7 @@
 package tech.piis.modules.core.domain.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -9,7 +10,9 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 巡视动员参会人员 对象 inspection_mobilize_attendee
@@ -28,7 +31,7 @@ public class InspectionMobilizeAttendeePO extends PIBaseEntity {
      * 编号
      */
     @TableId(value = "MOBILIZE_ATTENDEE_ID", type = IdType.AUTO)
-    private String mobilizeAttendeeId;
+    private Long mobilizeAttendeeId;
     /**
      * 动员编号
      */
@@ -63,7 +66,6 @@ public class InspectionMobilizeAttendeePO extends PIBaseEntity {
     /**
      * 授课时间
      */
-    @NotBlank(message = "授课时间不能为空！")
     private String attendeeTime;
 
     /**
@@ -72,7 +74,13 @@ public class InspectionMobilizeAttendeePO extends PIBaseEntity {
      * 1 授课老师
      * 2 领导
      */
-    private String attendeePersonType;
+    @NotNull(message = "人员类型不能为空！")
+    private Integer attendeePersonType;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
     /**
      * 创建人
@@ -94,4 +102,18 @@ public class InspectionMobilizeAttendeePO extends PIBaseEntity {
      * 租户编号
      */
     private String entId;
+
+
+    /**
+     * 业务字段，表示巡视组操作类型
+     *
+     * 1：新增  2：修改  3：删除
+     */
+    @TableField(exist = false)
+    private Integer operationType;
+
+    /**
+     * 文件信息
+     */
+    private List<PiisDocumentPO> documents;
 }
