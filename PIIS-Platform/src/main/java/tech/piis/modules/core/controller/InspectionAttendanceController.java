@@ -44,18 +44,19 @@ public class InspectionAttendanceController extends BaseController {
     public TableDataInfo list(InspectionAttendancePO inspectionAttendance) throws BaseException {
         startPage();
         List<InspectionAttendancePO> data = inspectionAttendanceService.selectInspectionAttendanceList(inspectionAttendance);
+        attendanceCovert2List(data);
         return getDataTable(data);
     }
 
     /**
      * 查询参会情况文件
      *
-     * @param inspectionAttendanceId 文件关联ID
+     * @param attendanceId 文件关联ID
      */
     @PreAuthorize("@ss.hasPermi('piis:attendance:query')")
     @GetMapping("/file")
-    public AjaxResult findInspectionAttendanceFile(String inspectionAttendanceId) throws BaseException {
-        return AjaxResult.success(documentService.getFileListByBizId(inspectionAttendanceId));
+    public AjaxResult findInspectionAttendanceFile(String attendanceId) throws BaseException {
+        return AjaxResult.success(documentService.getFileListByBizId("Attendance" + attendanceId));
     }
 
     /**
@@ -81,6 +82,8 @@ public class InspectionAttendanceController extends BaseController {
         if (null == inspectionAttendance) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        BizUtils.setCreatedOperation(InspectionAttendancePO.class, inspectionAttendance);
+        attendanceCovert2String(inspectionAttendance);
         return toAjax(inspectionAttendanceService.save(inspectionAttendance));
     }
 
@@ -97,6 +100,7 @@ public class InspectionAttendanceController extends BaseController {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
         BizUtils.setUpdatedOperation(InspectionAttendancePO.class, inspectionAttendance);
+        attendanceCovert2String(inspectionAttendance);
         return toAjax(inspectionAttendanceService.update(inspectionAttendance));
     }
 
@@ -116,7 +120,7 @@ public class InspectionAttendanceController extends BaseController {
      *
      * @param inspectionAttendance
      */
-    private void specialReportCovert2String(InspectionAttendancePO inspectionAttendance) {
+    private void attendanceCovert2String(InspectionAttendancePO inspectionAttendance) {
         if (null != inspectionAttendance) {
             inspectionAttendance.setReporterId(paramsCovert2String(inspectionAttendance.getReporter()).get(0));
             inspectionAttendance.setReporterName(paramsCovert2String(inspectionAttendance.getReporter()).get(1));
@@ -132,7 +136,7 @@ public class InspectionAttendanceController extends BaseController {
      *
      * @param attendanceList
      */
-    private void specialReportCovert2List(List<InspectionAttendancePO> attendanceList) {
+    private void attendanceCovert2List(List<InspectionAttendancePO> attendanceList) {
         if (!CollectionUtils.isEmpty(attendanceList)) {
             attendanceList.forEach(specialReport -> {
                 specialReport.setReporter(paramsCovert2List(specialReport.getReporterId(), specialReport.getReporterName()));
