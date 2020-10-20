@@ -52,9 +52,10 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
      * 统计巡视方案下被巡视单位InspectionOrganizationMeetings次数
      *
      * @param planId 巡视计划ID
+     * @param organizationType 组织类型
      */
-    public List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(String planId) throws BaseException {
-        return inspectionOrganizationMeetingsMapper.selectInspectionOrganizationMeetingsCount(planId);
+    public List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(String planId, Integer organizationType) throws BaseException {
+        return inspectionOrganizationMeetingsMapper.selectInspectionOrganizationMeetingsCount(planId, organizationType);
     }
 
     /**
@@ -86,7 +87,7 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
             for (PiisDocumentPO document : documents) {
                 BizUtils.setUpdatedOperation(PiisDocumentPO.class, document);
                 Long dictId = getFileDictId(inspectionOrganizationMeetings.getOrganizationType());
-                documentService.updateDocumentById(document.setObjectId(String.valueOf("OrganizationMeetings" + inspectionOrganizationMeetings.getOrganizationMeetingsId())).setFileDictId(dictId));
+                documentService.updateDocumentById(document.setObjectId("OrganizationMeetings" + inspectionOrganizationMeetings.getOrganizationMeetingsId()).setFileDictId(dictId));
             }
         }
         return result;
@@ -111,7 +112,7 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
                             Integer organizationType = inspectionOrganizationMeetings.getOrganizationType();
                             Long dictId = getFileDictId(organizationType);
                             document.setFileDictId(dictId)
-                                    .setObjectId(String.valueOf("OrganizationMeetings" + inspectionOrganizationMeetings.getOrganizationMeetingsId()));
+                                    .setObjectId("OrganizationMeetings" + inspectionOrganizationMeetings.getOrganizationMeetingsId());
                             documentService.updateDocumentById(document);
                             break;
                         }

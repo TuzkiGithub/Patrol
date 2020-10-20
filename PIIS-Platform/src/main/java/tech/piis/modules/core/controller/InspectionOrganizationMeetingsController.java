@@ -51,23 +51,24 @@ public class InspectionOrganizationMeetingsController extends BaseController {
     /**
      * 查询组织会议文件
      *
-     * @param inspectionOrganizationMeetingsId 文件关联ID
+     * @param organizationMeetingsId 文件关联ID
      */
     @PreAuthorize("@ss.hasPermi('piis:meetings:query')")
     @GetMapping("/file")
-    public AjaxResult findInspectionOrganizationMeetingsFile(String inspectionOrganizationMeetingsId) throws BaseException {
-        return AjaxResult.success(documentService.getFileListByBizId(inspectionOrganizationMeetingsId));
+    public AjaxResult findInspectionOrganizationMeetingsFile(String organizationMeetingsId) throws BaseException {
+        return AjaxResult.success(documentService.getFileListByBizId("OrganizationMeetings" + organizationMeetingsId));
     }
 
     /**
      * 查询组织会议总览列表
      *
      * @param planId 巡视计划ID
+     * @param organizationType 组织类型
      */
     @PreAuthorize("@ss.hasPermi('piis:meetings:query')")
     @GetMapping("/count")
-    public AjaxResult countInspectionOrganizationMeetingsList(String planId) throws BaseException {
-        return AjaxResult.success(inspectionOrganizationMeetingsService.selectInspectionOrganizationMeetingsCount(planId));
+    public AjaxResult countInspectionOrganizationMeetingsList(@RequestParam("planId") String planId, @RequestParam("organizationType") Integer organizationType) throws BaseException {
+        return AjaxResult.success(inspectionOrganizationMeetingsService.selectInspectionOrganizationMeetingsCount(planId, organizationType));
     }
 
     /**

@@ -1,5 +1,6 @@
 package tech.piis.modules.core.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import tech.piis.modules.core.domain.po.InspectionOrganizationMeetingsPO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import tech.piis.common.exception.BaseException;
@@ -16,7 +17,8 @@ public interface InspectionOrganizationMeetingsMapper extends BaseMapper<Inspect
     /**
      * 统计巡视方案下被巡视单位InspectionOrganizationMeetings次数
      * @param planId 巡视计划ID
+     * @param organizationType 组织类型
      *
      */
-    List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(String planId) throws BaseException;
+    List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(@Param("planId") String planId, @Param("organizationType") Integer organizationType) throws BaseException;
 }

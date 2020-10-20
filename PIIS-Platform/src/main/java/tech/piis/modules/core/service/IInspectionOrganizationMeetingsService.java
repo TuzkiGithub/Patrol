@@ -16,9 +16,10 @@ public interface IInspectionOrganizationMeetingsService {
     /**
      * 统计巡视方案下被巡视单位InspectionOrganizationMeetings次数
      * @param planId 巡视计划ID
+     * @param organizationType 组织类型
      *
      */
-    List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(String planId) throws BaseException;
+    List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(String planId, Integer organizationType) throws BaseException;
 
     /**
      * 查询组织会议列表

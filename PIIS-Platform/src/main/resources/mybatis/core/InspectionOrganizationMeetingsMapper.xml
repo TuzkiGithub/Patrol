@@ -32,11 +32,12 @@
         select ORGANIZATION_MEETINGS_ID, PLAN_ID, MEETINGS_NAME, MEETINGS_TIME, MEETINGS_PLACE, PARTICIPANTS_ID, PARTICIPANTS_NAME, ORGANIZATION_TYPE, MEETINGS_CONTENT, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_organization_meetings
     </sql>
 
-    <select id="selectInspectionOrganizationMeetingsCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
+    <select id="selectInspectionOrganizationMeetingsCount" resultMap="unitsBizCountResultMap" >
         select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(o.UNITS_ID) as count
         from inspection_units u, inspection_Organization_Meetings o
         where u.UNITS_ID = o.UNITS_ID
         and u.plan_id = #{planId}
+        and o.ORGANIZATION_TYPE = #{organizationType}
         group by o.UNITS_ID
     </select>
 
