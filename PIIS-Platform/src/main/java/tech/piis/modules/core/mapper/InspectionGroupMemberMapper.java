@@ -12,6 +12,7 @@ import java.util.List;
  * @date 2020-09-14
  */
 public interface InspectionGroupMemberMapper extends BaseMapper<InspectionGroupMemberPO> {
+
     public int insertBatch(List<InspectionGroupMemberPO> groupMemberList);
 
 }

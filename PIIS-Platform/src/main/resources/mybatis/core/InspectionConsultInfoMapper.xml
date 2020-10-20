@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionConsultInfoMapper">
+    
+    <resultMap type="InspectionConsultInfoPO" id="InspectionConsultInfoResult">
+        <result property="consultInfoId"    column="CONSULT_INFO_ID"    />
+        <result property="planId"    column="PLAN_ID"    />
+        <result property="signFlag"    column="SIGN_FLAG"    />
+        <result property="signTime"    column="SIGN_TIME"    />
+        <result property="checkPersonId"    column="CHECK_PERSON_ID"    />
+        <result property="checkPersonName"    column="CHECK_PERSON_NAME"    />
+        <result property="checkTime"    column="CHECK_TIME"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="createdTime"    column="CREATED_TIME"    />
+        <result property="updatedBy"    column="UPDATED_BY"    />
+        <result property="updatedTime"    column="UPDATED_TIME"    />
+        <result property="entId"    column="ENT_ID"    />
+    </resultMap>
+
+    <sql id="selectInspectionConsultInfoVo">
+        select CONSULT_INFO_ID, PLAN_ID, SIGN_FLAG, SIGN_TIME, CHECK_PERSON_ID, CHECK_PERSON_NAME, CHECK_TIME, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_consult_info
+    </sql>
+
+    <select id="selectInspectionConsultInfoList" parameterType="InspectionConsultInfoPO" resultMap="InspectionConsultInfoResult">
+        <include refid="selectInspectionConsultInfoVo"/>
+        <where>  
+            <if test="planId != null  and planId != ''"> and PLAN_ID = #{planId}</if>
+            <if test="signFlag != null "> and SIGN_FLAG = #{signFlag}</if>
+            <if test="signTime != null "> and SIGN_TIME = #{signTime}</if>
+            <if test="checkPersonId != null  and checkPersonId != ''"> and CHECK_PERSON_ID = #{checkPersonId}</if>
+            <if test="checkPersonName != null  and checkPersonName != ''"> and CHECK_PERSON_NAME like concat('%', #{checkPersonName}, '%')</if>
+            <if test="checkTime != null "> and CHECK_TIME = #{checkTime}</if>
+            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
+            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
+            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
+            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
+        </where>
+    </select>
+    
+    <select id="selectInspectionConsultInfoById" parameterType="String" resultMap="InspectionConsultInfoResult">
+        <include refid="selectInspectionConsultInfoVo"/>
+        where CONSULT_INFO_ID = #{consultInfoId}
+    </select>
+        
+    <insert id="insertInspectionConsultInfo" parameterType="InspectionConsultInfoPO">
+        insert into inspection_consult_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="consultInfoId != null  and consultInfoId != ''">CONSULT_INFO_ID,</if>
+            <if test="planId != null  and planId != ''">PLAN_ID,</if>
+            <if test="signFlag != null ">SIGN_FLAG,</if>
+            <if test="signTime != null ">SIGN_TIME,</if>
+            <if test="checkPersonId != null  and checkPersonId != ''">CHECK_PERSON_ID,</if>
+            <if test="checkPersonName != null  and checkPersonName != ''">CHECK_PERSON_NAME,</if>
+            <if test="checkTime != null ">CHECK_TIME,</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
+            <if test="createdTime != null ">CREATED_TIME,</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
+            <if test="updatedTime != null ">UPDATED_TIME,</if>
+            <if test="entId != null  and entId != ''">ENT_ID,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="consultInfoId != null  and consultInfoId != ''">#{consultInfoId},</if>
+            <if test="planId != null  and planId != ''">#{planId},</if>
+            <if test="signFlag != null ">#{signFlag},</if>
+            <if test="signTime != null ">#{signTime},</if>
+            <if test="checkPersonId != null  and checkPersonId != ''">#{checkPersonId},</if>
+            <if test="checkPersonName != null  and checkPersonName != ''">#{checkPersonName},</if>
+            <if test="checkTime != null ">#{checkTime},</if>
+            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
+            <if test="createdTime != null ">#{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
+            <if test="updatedTime != null ">#{updatedTime},</if>
+            <if test="entId != null  and entId != ''">#{entId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateInspectionConsultInfo" parameterType="InspectionConsultInfoPO">
+        update inspection_consult_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="planId != null  and planId != ''">PLAN_ID = #{planId},</if>
+            <if test="signFlag != null ">SIGN_FLAG = #{signFlag},</if>
+            <if test="signTime != null ">SIGN_TIME = #{signTime},</if>
+            <if test="checkPersonId != null  and checkPersonId != ''">CHECK_PERSON_ID = #{checkPersonId},</if>
+            <if test="checkPersonName != null  and checkPersonName != ''">CHECK_PERSON_NAME = #{checkPersonName},</if>
+            <if test="checkTime != null ">CHECK_TIME = #{checkTime},</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
+            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
+            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
+            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
+        </trim>
+        where CONSULT_INFO_ID = #{consultInfoId}
+    </update>
+
+    <delete id="deleteInspectionConsultInfoById" parameterType="String">
+        delete from inspection_consult_info where CONSULT_INFO_ID = #{consultInfoId}
+    </delete>
+
+    <delete id="deleteInspectionConsultInfoByIds" parameterType="String">
+        delete from inspection_consult_info where CONSULT_INFO_ID in 
+        <foreach item="consultInfoId" collection="array" open="(" separator="," close=")">
+            #{consultInfoId}
+        </foreach>
+    </delete>
+    
+</mapper>

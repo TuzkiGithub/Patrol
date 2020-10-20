@@ -12,8 +12,6 @@
     <modules>
         <module>PIIS-Platform</module>
         <module>PIIS-Common</module>
-        <module>PIIS-Survey</module>
-        <module>PIIS-Core</module>
     </modules>
 
     <parent>
@@ -315,16 +313,6 @@
         </dependency>
         <!--http-->
     </dependencies>
-
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
     <repositories>
         <repository>

@@ -56,6 +56,7 @@ public class InspectionPlanPO extends PIBaseEntity {
     /**
      * 巡视状态 0未开始，1进行中，2结束
      */
+    @NotNull(message = "巡视类型不能为空！")
     private int status;
     /**
      * 方案内容
@@ -65,8 +66,7 @@ public class InspectionPlanPO extends PIBaseEntity {
     /**
      * 巡视巡察状态 0 巡视 1 巡察
      */
-    private int planType;
-
+    private Integer planType;
 
     /**
      * 巡视单位ID

@@ -65,4 +65,6 @@ public interface SysUserPostMapper
      */
     public int delUserPostBatch(List<SysUserPost> userPosts);
 
+    
+
 }

@@ -1,6 +1,7 @@
 package tech.piis.modules.core.service;
 
 
+import tech.piis.common.exception.BaseException;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface IPiisDocumentService {
      * @return
      * @throws Exception
      */
-    List<PiisDocumentPO> getFileListByBizId(String bizId) throws Exception;
+    List<PiisDocumentPO> getFileListByBizId(String bizId) throws BaseException;
 
     /**
      * 获取巡视动员文件
@@ -27,7 +28,7 @@ public interface IPiisDocumentService {
      * @return
      * @throws Exception
      */
-    List<PiisDocumentPO> getFileListByBizIds(List<String> bizIds) throws Exception;
+    List<PiisDocumentPO> getFileListByBizIds(List<String> bizIds) throws BaseException;
 
     /**
      * 根据ID更新文件对象
@@ -35,7 +36,7 @@ public interface IPiisDocumentService {
      * @return
      * @throws Exception
      */
-    int updateDocumentById(PiisDocumentPO documentPO) throws Exception;
+    int updateDocumentById(PiisDocumentPO documentPO) throws BaseException;
 
     /**
      * 新增文件对象
@@ -43,5 +44,12 @@ public interface IPiisDocumentService {
      * @return
      * @throws Exception
      */
-    int saveDocument(PiisDocumentPO documentPO) throws Exception;
+    int saveDocument(PiisDocumentPO documentPO) throws BaseException;
+
+    /**
+     * 删除文件
+     * @param docId
+     * @return
+     */
+    int deleteDocumentById(Long docId);
 }

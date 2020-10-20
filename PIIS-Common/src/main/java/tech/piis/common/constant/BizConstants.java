@@ -11,4 +11,11 @@ package tech.piis.common.constant;
 public class BizConstants {
 
     public static final String PARAMS_NULL = "PARAM IS NULL!";
+
+    public static final String PIIS_TYPE_NULL = "巡视类型不能为空！";
+
+    public static final String COMPANY_ID_NULL = "巡视公司ID不能为空！";
+
+    public static final String SPECIAL_REPORT_ID_NULL = "听取专题报告ID不能为空！";
+
 }

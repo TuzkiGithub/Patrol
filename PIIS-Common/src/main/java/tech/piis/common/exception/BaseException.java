@@ -6,7 +6,6 @@ import tech.piis.common.utils.StringUtils;
 /**
  * 基础异常
  * 
- * @author Kevin<EastascendWang@gmail.com>
  */
 public class BaseException extends RuntimeException
 {

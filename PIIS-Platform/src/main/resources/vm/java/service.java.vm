@@ -1,12 +1,54 @@
 package ${packageName}.service;
 
+import tech.piis.common.exception.BaseException;
+import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import ${packageName}.domain.po.${ClassName}PO;
+import java.util.List;
 
 /**
  * ${functionName}Service接口
- * 
+ *
  * @author ${author}
  * @date ${datetime}
  */
 public interface I${ClassName}Service {
 
+    /**
+     * 统计巡视方案下被巡视单位${ClassName}次数
+     * @param planId 巡视计划ID
+     *
+     */
+    List<UnitsBizCountVO> select${ClassName}Count(String planId) throws BaseException;
+
+    /**
+     * 查询${functionName}列表
+     * @param ${className}
+     * @return
+     * @throws BaseException
+     */
+    List<${ClassName}PO> select${ClassName}List(${ClassName}PO ${className}) throws BaseException;
+
+    /**
+    * 新增${functionName}
+    * @param ${className}
+    * @return
+    * @throws BaseException
+    */
+    int save(${ClassName}PO ${className}) throws BaseException;
+
+    /**
+     * 根据ID修改${functionName}
+     * @param ${className}
+     * @return
+     * @throws BaseException
+     */
+    int update(${ClassName}PO ${className}) throws BaseException;
+
+    /**
+     * 根据ID批量删除${functionName}
+     * @param ${pkColumn.javaField}s ${functionName}编号
+     *
+     * @return
+     */
+    int deleteBy${ClassName}Ids(${pkColumn.javaType}[] ${pkColumn.javaField}s);
 }

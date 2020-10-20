@@ -78,10 +78,10 @@
         <if test="phonenumber != null and phonenumber != ''">
             AND u.phonenumber like concat('%', #{phonenumber}, '%')
         </if>
-        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+        <if test="beginTime != null"><!-- 开始时间检索 -->
             AND date_format(u.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
         </if>
-        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+        <if test="endTime != null"><!-- 结束时间检索 -->
             AND date_format(u.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
         </if>
     </select>

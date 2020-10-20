@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
+import tech.piis.common.constant.PiisConstants;
 import tech.piis.common.constant.ResultEnum;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.StringUtils;
@@ -46,6 +47,17 @@ public class InspectionPlanController extends BaseController {
                 inspectionPlanPO.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
                 inspectionPlanPO.setPageSize(GenConstants.MAX_PAGE_SIZE);
             }
+
+            Integer planType = inspectionPlanPO.getPlanType();
+            if(null == planType){
+                return new TableDataInfo()
+                        .setCode(ResultEnum.FAILED.getCode())
+                        .setMsg(BizConstants.PIIS_TYPE_NULL);
+            } else if(planType == PiisConstants.PIIS_TYPE && null == inspectionPlanPO.getPlanCompanyId()){
+                return new TableDataInfo()
+                        .setCode(ResultEnum.FAILED.getCode())
+                        .setMsg(BizConstants.COMPANY_ID_NULL);
+            }
             if (null == inspectionPlanPO.getPageNum() || null == inspectionPlanPO.getPageSize()) {
                 inspectionPlanPO.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
                 inspectionPlanPO.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
@@ -57,13 +69,17 @@ public class InspectionPlanController extends BaseController {
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
                 .setRows(inspectionPlanService.selectPlanList(inspectionPlanPO))
-                .setTotal(inspectionPlanService.selectCount());
+                .setTotal(inspectionPlanService.selectCount(inspectionPlanPO));
     }
 
+    /**
+     * 统计一级子公司巡察情况
+     * @return
+     */
     @PreAuthorize("@ss.hasPermi('piis:plan:query')")
-    @GetMapping("/analysis")
-    public AjaxResult countCompany() {
-        return AjaxResult.success(inspectionPlanService.selectCountByCompany());
+    @RequestMapping(value = "/statistics", method = RequestMethod.GET)
+    public AjaxResult countCompany(InspectionPlanPO planPO) {
+        return AjaxResult.success(inspectionPlanService.selectCountByCompany(planPO));
     }
 
     /**

@@ -1,13 +1,13 @@
 package ${packageName}.domain.po;
 
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableName;
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import tech.piis.framework.web.domain.BaseEntity;
+
+import javax.validation.constraints.NotBlank;
 #if($table.crud)
 #elseif($table.tree)
 #end
@@ -30,9 +30,8 @@ import ${import};
 @TableName("${tableName}")
 @Data
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class ${ClassName}PO extends ${Entity}
+public class ${ClassName}PO extends PIBaseEntity
 {
 #foreach ($column in $columns)
 #if(!$table.isSuperColumn($column.javaField))

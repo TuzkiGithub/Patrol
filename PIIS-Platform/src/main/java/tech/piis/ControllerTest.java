@@ -13,15 +13,19 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tech.piis.framework.job.SyncData;
 import tech.piis.framework.security.LoginBody;
 import tech.piis.framework.web.domain.AjaxResult;
+import tech.piis.modules.core.service.impl.InspectionPlanServiceImpl;
 import tech.piis.modules.system.domain.SysDept;
 import tech.piis.modules.system.domain.SysUser;
 import tech.piis.modules.system.mapper.SysDeptMapper;
+import tech.piis.modules.system.mapper.SysPostMapper;
+import tech.piis.modules.system.mapper.SysRoleMapper;
 import tech.piis.modules.system.mapper.SysUserDetailMapper;
 
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +48,16 @@ public class ControllerTest {
 
     @Autowired
     private SysUserDetailMapper sysUserDetailMapper;
+
+    @Autowired
+    private SysPostMapper postMapper;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
+
+    @Autowired
+    private InspectionPlanServiceImpl planService;
+
 
     @Autowired
     private SyncData syncData;
@@ -100,5 +114,12 @@ public class ControllerTest {
     @GetMapping("/userDeptPost")
     public AjaxResult selectUserDeptPost(SysUser user) {
         return AjaxResult.success(sysUserDetailMapper.selectUserDeptPost(user));
+    }
+
+
+    @GetMapping("transaction")
+    public int testTransaction() throws Exception{
+        planService.testTransaction();
+        return 0;
     }
 }

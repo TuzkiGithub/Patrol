@@ -96,7 +96,7 @@ pagehelper:
 gen: 
   author: Kevin
   # Package Name
-  packageName: tech.piis.modules.system
+  packageName: tech.piis.modules.core
   # Auto Remove Prefix
   autoRemovePre: false
   # Table Prefix (xx_,xx_,xx_)
@@ -116,3 +116,21 @@ logging:
   level:
     tech.kevinwong: debug
     org.springframework: warn
+
+
+#IAM config
+iam:
+  code:
+    url: localhost:8080
+  token:
+    url: localhost:8080
+  user:
+    url: localhost:8080
+  redirect:
+    url: localhost:8080
+  clientId: clientId
+  clientSecret: clientSecret
+  responseType: responseType
+  scope: scope
+  state: piis
+  grantType: grantType

@@ -20,7 +20,7 @@ public interface SysUserDetailMapper {
      * @param userId
      * @return
      */
-    UserVO selectUserAllByUserId(Long userId);
+    UserVO selectUserAllByUserId(String userId);
 
     /**
      * 根据userId查询用户、部门数据
@@ -28,7 +28,7 @@ public interface SysUserDetailMapper {
      * @param userId
      * @return
      */
-    UserVO selectUserDeptByUserId(Long userId);
+    UserVO selectUserDeptByUserId(String userId);
 
     /**
      * 根据userId查询用户、部门、角色数据
@@ -36,7 +36,7 @@ public interface SysUserDetailMapper {
      * @param userId
      * @return
      */
-    UserVO selectUserDeptRoleByUserId(Long userId);
+    UserVO selectUserDeptRoleByUserId(String userId);
 
     /**
      * 根据dept查看用户
@@ -44,7 +44,7 @@ public interface SysUserDetailMapper {
      * @param deptId
      * @return
      */
-    List<UserVO> selectUserDeptByDeptId(Long deptId);
+    List<UserVO> selectUserDeptByDeptId(String deptId);
 
     /**
      * 查询用户-部门-角色

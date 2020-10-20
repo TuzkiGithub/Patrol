@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.system.mapper.SysPostHistoryMapper">
+
+	<resultMap type="tech.piis.modules.system.domain.SysPostHistory" id="SysPostHistoryResult">
+		<id     property="postHistoryId"        column="post_history_id"       />
+		<result property="userId"      column="user_id"     />
+		<result property="postName"      column="post_name"     />
+		<result property="createdTime"    column="created_time"   />
+		<result property="updatedTime"    column="updated_time"   />
+	</resultMap>
+
+	<insert id="insertPostHistoryBatch" parameterType="tech.piis.modules.system.domain.SysPost">
+		insert into sys_post_history(user_id,post_name,created_time)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.userId},#{item.postName},#{item.createdTime})
+		</foreach>
+	</insert>
+</mapper> 

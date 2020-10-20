@@ -3,6 +3,7 @@ package tech.piis.modules.core.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.framework.utils.SecurityUtils;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
@@ -28,10 +29,10 @@ public class PiisDocumentServiceImpl implements IPiisDocumentService {
      *
      * @param bizId 业务ID
      * @return
-     * @throws Exception
+     * @throws BaseException
      */
     @Override
-    public List<PiisDocumentPO> getFileListByBizId(String bizId) throws Exception {
+    public List<PiisDocumentPO> getFileListByBizId(String bizId) throws BaseException {
         QueryWrapper<PiisDocumentPO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("OBJECT_ID", bizId);
         return piisDocumentMapper.selectList(queryWrapper);
@@ -42,10 +43,10 @@ public class PiisDocumentServiceImpl implements IPiisDocumentService {
      *
      * @param bizIds 业务ID
      * @return
-     * @throws Exception
+     * @throws BaseException
      */
     @Override
-    public List<PiisDocumentPO> getFileListByBizIds(List<String> bizIds) throws Exception {
+    public List<PiisDocumentPO> getFileListByBizIds(List<String> bizIds) throws BaseException {
         return piisDocumentMapper.selectBatchIds(bizIds);
     }
 
@@ -54,10 +55,10 @@ public class PiisDocumentServiceImpl implements IPiisDocumentService {
      *
      * @param documentPO
      * @return
-     * @throws Exception
+     * @throws BaseException
      */
     @Override
-    public int updateDocumentById(PiisDocumentPO documentPO) throws Exception {
+    public int updateDocumentById(PiisDocumentPO documentPO) throws BaseException {
         documentPO.setUpdatedBy(SecurityUtils.getUsername());
         documentPO.setUpdatedTime(DateUtils.getNowDate());
         return piisDocumentMapper.updateById(documentPO);
@@ -68,13 +69,24 @@ public class PiisDocumentServiceImpl implements IPiisDocumentService {
      *
      * @param documentPO
      * @return
-     * @throws Exception
+     * @throws BaseException
      */
     @Override
-    public int saveDocument(PiisDocumentPO documentPO) throws Exception {
+    public int saveDocument(PiisDocumentPO documentPO) throws BaseException {
         documentPO.setCreatedBy(SecurityUtils.getUsername());
         documentPO.setCreatedTime(DateUtils.getNowDate());
         return piisDocumentMapper.insert(documentPO);
+    }
+
+    /**
+     * 删除文件
+     *
+     * @param docId
+     * @return
+     */
+    @Override
+    public int deleteDocumentById(Long docId) {
+        return piisDocumentMapper.deleteById(docId);
     }
 
 }

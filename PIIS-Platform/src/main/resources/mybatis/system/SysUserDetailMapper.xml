@@ -111,7 +111,7 @@
         <result property="status" column="role_status"/>
     </resultMap>
 
-    <select id="selectUserAllByUserId" parameterType="Long" resultMap="SysUserResult">
+    <select id="selectUserAllByUserId" parameterType="String" resultMap="SysUserResult">
         SELECT
             u.user_id,
             u.user_name,
@@ -150,7 +150,7 @@
             WHERE u.user_id = #{userId}
     </select>
 
-    <select id="selectUserDeptByUserId" parameterType="Long" resultMap="SysUserDeptResult">
+    <select id="selectUserDeptByUserId" parameterType="String" resultMap="SysUserDeptResult">
         SELECT
             u.user_id,
             u.user_name,
@@ -178,7 +178,7 @@
             WHERE u.user_id = #{userId}
     </select>
 
-    <select id="selectUserDeptRoleByUserId" parameterType="Long" resultMap="SysUserDeptRoleResult">
+    <select id="selectUserDeptRoleByUserId" parameterType="String" resultMap="SysUserDeptRoleResult">
         SELECT
             u.user_id,
             u.user_name,
@@ -274,7 +274,7 @@
         </if>
     </select>
 
-    <select id="selectUserDeptByDeptId" parameterType="Long" resultMap="SysUserDeptResult">
+    <select id="selectUserDeptByDeptId" parameterType="String" resultMap="SysUserDeptResult">
         SELECT
             u.user_id,
             u.user_name,
@@ -330,6 +330,8 @@
             <if test="userName != null and userName != ''">
                 AND u.user_name like concat('%', #{userName}, '%')
             </if>
+            AND p.status = '0'
+            AND d.status = '0'
         </where>
     </select>
 </mapper> 

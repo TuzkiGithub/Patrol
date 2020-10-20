@@ -1,5 +1,6 @@
 package tech.piis.modules.core.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import static tech.piis.common.constant.OperationConstants.*;
  * @author Kevin
  * @date 2020-09-27
  */
+@Slf4j
 @Service
 public class InspectionMobilizeServiceImpl implements IInspectionMobilizeService {
     @Autowired
@@ -119,9 +121,6 @@ public class InspectionMobilizeServiceImpl implements IInspectionMobilizeService
         if (!CollectionUtils.isEmpty(inspectionMobilizeAttendeeList)) {
             for (InspectionMobilizeAttendeePO mobilizeAttendee : inspectionMobilizeAttendeeList) {
                 BizUtils.setCreatedOperation(InspectionMobilizeAttendeePO.class, mobilizeAttendee);
-//                inspectionMobilizeAttendeeMapper.insert(mobilizeAttendee);
-//                mobilizeAttendee.getDocuments()
-//
             }
         }
         return inspectionMobilizeAttendeeMapper.saveMobilizeAttendeeBatch(inspectionMobilizeAttendeeList);
@@ -162,12 +161,12 @@ public class InspectionMobilizeServiceImpl implements IInspectionMobilizeService
                     switch (operationType) {
                         case INSERT: {
                             BizUtils.setCreatedOperation(InspectionMobilizeAttendeePO.class, mobilizeAttendee);
-                            inspectionMobilizeAttendeeMapper.insert(mobilizeAttendee.setDocuments(null));
+                            inspectionMobilizeAttendeeMapper.insert(mobilizeAttendee);
                             break;
                         }
                         case UPDATE: {
                             BizUtils.setUpdatedOperation(InspectionMobilizeAttendeePO.class, mobilizeAttendee);
-                            inspectionMobilizeAttendeeMapper.updateById(mobilizeAttendee.setDocuments(null));
+                            inspectionMobilizeAttendeeMapper.updateById(mobilizeAttendee);
                             break;
                         }
                         case DELETE: {

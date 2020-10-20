@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionOrganizationMeetingsMapper">
+
+    <resultMap type="InspectionOrganizationMeetingsPO" id="InspectionOrganizationMeetingsResult">
+        <result property="organizationMeetingsId" column="ORGANIZATION_MEETINGS_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="meetingsName" column="MEETINGS_NAME"/>
+        <result property="meetingsTime" column="MEETINGS_TIME"/>
+        <result property="meetingsPlace" column="MEETINGS_PLACE"/>
+        <result property="participantsId" column="PARTICIPANTS_ID"/>
+        <result property="participantsName" column="PARTICIPANTS_NAME"/>
+        <result property="organizationType" column="ORGANIZATION_TYPE"/>
+        <result property="meetingsContent" column="MEETINGS_CONTENT"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+    </resultMap>
+
+    <sql id="selectInspectionOrganizationMeetingsVo">
+        select ORGANIZATION_MEETINGS_ID, PLAN_ID, MEETINGS_NAME, MEETINGS_TIME, MEETINGS_PLACE, PARTICIPANTS_ID, PARTICIPANTS_NAME, ORGANIZATION_TYPE, MEETINGS_CONTENT, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_organization_meetings
+    </sql>
+
+    <select id="selectInspectionOrganizationMeetingsCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(o.UNITS_ID) as count
+        from inspection_units u, inspection_Organization_Meetings o
+        where u.UNITS_ID = o.UNITS_ID
+        and u.plan_id = #{planId}
+        group by o.UNITS_ID
+    </select>
+
+</mapper>

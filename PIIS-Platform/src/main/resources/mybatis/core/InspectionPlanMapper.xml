@@ -20,7 +20,8 @@
         <result property="updatedBy" column="UPDATED_BY"/>
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
-        <association property="inspectionMobilize" javaType="InspectionMobilizePO" column="planId" resultMap="inspectionMobilizeResultMap"/>
+        <association property="inspectionMobilize" javaType="InspectionMobilizePO" column="planId"
+                     resultMap="inspectionMobilizeResultMap"/>
 
         <collection property="inspectionGroupList" javaType="java.util.List" resultMap="InspectionGroupResultMap"/>
     </resultMap>
@@ -48,6 +49,8 @@
         <result property="inspectionTime" column="INSPECTION_TIME"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="orgName" column="ORG_NAME"/>
+        <collection property="groupMemberList" javaType="java.util.List"
+                    resultMap="inspectionGroupMemberResultMap"/>
     </resultMap>
 
     <!--巡视组组员ResultMap-->
@@ -98,9 +101,9 @@
 
     <resultMap id="selectPlanCompanyTotalResultMap"
                type="PlanCompanyCountVO">
-        <result property="companyId" column="companyId"/>
-        <result property="companyName" column="companyName"/>
-        <result property="count" column="companyName"/>
+        <result property="companyId" column="PLAN_COMPANY_ID"/>
+        <result property="companyName" column="PLAN_COMPANY_NAME"/>
+        <result property="count" column="count"/>
     </resultMap>
 
 
@@ -159,22 +162,35 @@
         PLAN_DESC
         from
         inspection_plan
+        <where>
+            <if test="planName!=null and planName!=''">
+                AND plan_name like concat('%', #{planName}, '%')
+            </if>
+
+            <if test="planCompanyId!=null and planCompanyId!=''">
+                AND PLAN_COMPANY_ID = #{planCompanyId}
+            </if>
+        </where>
         limit #{pageNum},#{pageSize}
         ) p
         left join inspection_group g on p.PLAN_ID = g.PLAN_ID
         left join inspection_group_member m on g.GROUP_ID = m.GROUP_ID
-        left join inspection_units u on u.GROUP_ID = g.GROUP_ID
+        left join inspection_group_member_units gmn on gmn.group_member_id = m.GROUP_MEMBER_ID
+        left join inspection_units u on u.UNITS_ID = gmn.units_id
         left join inspection_mobilize mb on mb.PLAN_ID = p.PLAN_ID
         left join inspection_mobilize_attendee mba on mba.MOBILIZE_ID = mb.MOBILIZE_ID
-        <where>
-            <if test="planName!=null and planName!=''">
-                AND plan_name like concat('%', #{planName}, '%')
-        </if>
-        </where>
     </select>
 
     <select id="selectPlanCompanyTotal" resultMap="selectPlanCompanyTotalResultMap">
-        select PLAN_COMPANY_ID,PLAN_COMPANY_NAME,count(PLAN_COMPANY_ID)
+        select PLAN_COMPANY_ID,PLAN_COMPANY_NAME,count(PLAN_COMPANY_ID) as count
         from inspection_plan
+        where PLAN_COMPANY_ID is not null
+        <if test="beginTime != null"><!-- 开始时间检索 -->
+            AND date_format(begin_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null"><!-- 结束时间检索 -->
+            AND date_format(begin_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+        group by PLAN_COMPANY_ID
     </select>
 </mapper> 

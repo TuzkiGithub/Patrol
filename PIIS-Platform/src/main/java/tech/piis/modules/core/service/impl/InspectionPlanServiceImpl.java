@@ -1,25 +1,31 @@
 package tech.piis.modules.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
+import tech.piis.common.core.lang.UUID;
 import tech.piis.common.enums.FileEnum;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
 import tech.piis.common.utils.StringUtils;
-import tech.piis.framework.config.PIISConfig;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.file.FileUploadUtils;
 import tech.piis.modules.core.domain.po.*;
 import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
 import tech.piis.modules.core.mapper.*;
 import tech.piis.modules.core.service.IInspectionPlanService;
+import tech.piis.modules.system.domain.SysPost;
+import tech.piis.modules.system.domain.SysRole;
+import tech.piis.modules.system.mapper.SysPostMapper;
+import tech.piis.modules.system.mapper.SysRoleMapper;
 
+import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.*;
 
@@ -29,7 +35,9 @@ import static tech.piis.common.constant.OperationConstants.*;
  * @author Tuzki
  * @date 2020-09-14
  */
+@Slf4j
 @Service
+@Transactional
 public class InspectionPlanServiceImpl implements IInspectionPlanService {
     @Autowired
     private InspectionPlanMapper planMapper;
@@ -39,6 +47,9 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
 
     @Autowired
     private InspectionGroupMemberMapper groupMemberMapper;
+
+    @Autowired
+    private InspectionGroupMemberUnitsMapper groupMemberUnitsMapper;
 
     @Autowired
     private InspectionUnitsMapper unitsMapper;
@@ -60,6 +71,32 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     public List<InspectionPlanPO> selectPlanList(InspectionPlanPO inspectionPlanPO) {
         return planMapper.selectPlanList(inspectionPlanPO);
     }
+
+    /**
+     * 查询总记录数
+     *
+     * @return
+     */
+    @Override
+    public int selectCount(InspectionPlanPO plan) {
+        if (null != plan && null != plan.getPlanCompanyId()) {
+            QueryWrapper<InspectionPlanPO> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("PLAN_COMPANY_ID", plan.getPlanCompanyId());
+            return planMapper.selectCount(queryWrapper);
+        }
+        return planMapper.selectCount(null);
+    }
+
+    /**
+     * 统计公司巡察次数
+     *
+     * @return
+     */
+    @Override
+    public List<PlanCompanyCountVO> selectCountByCompany(InspectionPlanPO plan) {
+        return this.planMapper.selectPlanCompanyTotal(plan);
+    }
+
 
     /**
      * 新增巡视计划
@@ -100,29 +137,33 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         if (!CollectionUtils.isEmpty(groupList)) {
             groupList.forEach(group -> {
                 group.setPlanId(inspectionPlanPO.getPlanId());
-                int operationType = group.getOperationType();
-                switch (operationType) {
-                    case INSERT: {
-                        List<InspectionGroupPO> groups = new ArrayList<>();
-                        groups.add(group);
-                        saveGroups(groups);
-                        break;
+                Integer operationType = group.getOperationType();
+                if (null != operationType) {
+                    switch (operationType) {
+                        case INSERT: {
+                            List<InspectionGroupPO> groups = new ArrayList<>();
+                            groups.add(group);
+                            saveGroups(groups);
+                            break;
+                        }
+                        case UPDATE: {
+                            //删除关联巡视组组员、被巡视单位
+                            delGroupRelation(group);
+                            //新增关联巡视组组员、被巡视单位
+                            List<InspectionGroupPO> groups = new ArrayList<>();
+                            groups.add(group);
+                            saveGroupRelation(groups, false);
+                            //更新巡视组信息
+                            groupMapper.updateById(group.setInspectionGroupMemberList(null).setInspectionUnitsList(null).setOperationType(null));
+                            break;
+                        }
+                        case DELETE: {
+                            delGroup(group);
+                            break;
+                        }
                     }
-                    case UPDATE: {
-                        //删除关联巡视组组员、被巡视单位
-                        delGroupRelation(group);
-                        //新增关联巡视组组员、被巡视单位
-                        List<InspectionGroupPO> groups = new ArrayList<>();
-                        groups.add(group);
-                        saveGroupRelation(groups, false);
-                        //更新巡视组信息
-                        groupMapper.updateById(group.setInspectionGroupMemberList(null).setInspectionUnitsList(null).setOperationType(null));
-                        break;
-                    }
-                    case DELETE: {
-                        delGroup(group);
-                        break;
-                    }
+                } else {
+                    log.warn("documents operationType is null! group = {}", group);
                 }
             });
         }
@@ -159,6 +200,8 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                             break;
                         }
                     }
+                } else {
+                    log.warn("documents operationType is null! documents = {}", document);
                 }
             });
         }
@@ -176,6 +219,15 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     }
 
     /**
+     * 批量新增巡视组组员
+     */
+    public void saveGroupMembers(List<InspectionGroupMemberPO> groupMemberList) {
+        if (!CollectionUtils.isEmpty(groupMemberList)) {
+            groupMemberMapper.insertBatch(groupMemberList);
+        }
+    }
+
+    /**
      * 批量新增被巡视单位
      */
     public void saveUnits(List<InspectionUnitsPO> unitsList) {
@@ -184,12 +236,21 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         }
     }
 
+    /**
+     * 批量新增被巡视单位-组员关系
+     */
+    public void saveGroupMemberUnits(List<InspectionGroupMemberUnitsPO> groupMemberUnitsList) {
+        if (!CollectionUtils.isEmpty(groupMemberUnitsList)) {
+            groupMemberUnitsList = groupMemberUnitsList.stream().filter(var -> null == var.getGroupMemberUnitsId()).collect(Collectors.toList());
+            groupMemberUnitsMapper.insertGroupMemberUnitsBatch(groupMemberUnitsList);
+        }
+    }
 
     /**
-     * 批量新增巡视组组员、被巡视单位
+     * 批量新增/修改巡视组组员、被巡视单位、巡视组组员-被巡视单位关系
      *
      * @param groupList 巡视组列表
-     * @param isSave    是否是新增巡视计划
+     * @param isSave    是否是新增
      */
     private void saveGroupRelation(List<InspectionGroupPO> groupList, boolean isSave) {
         if (!CollectionUtils.isEmpty(groupList)) {
@@ -199,36 +260,56 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                     String groupId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6) + i;
                     group.setGroupId(groupId);
                 }
-                //新增巡视组成员
+                String planId = group.getPlanId();
+                String groupId = group.getGroupId();
+
+                //批量新增巡视组成员
                 List<InspectionGroupMemberPO> groupMemberList = group.getInspectionGroupMemberList();
                 if (!CollectionUtils.isEmpty(groupMemberList)) {
                     groupMemberList.forEach(groupMember -> {
-                        groupMember.setPlanId(group.getPlanId());
-                        groupMember.setGroupId(group.getGroupId());
+                        groupMember.setGroupId(groupId);
+                        groupMember.setPlanId(planId);
                     });
                     saveGroupMembers(groupMemberList);
                 }
-                //新增被巡视单位
+
+                List<InspectionGroupMemberUnitsPO> groupMemberUnitsList = new ArrayList<>();
+                //批量新增被巡视单位
                 List<InspectionUnitsPO> unitsList = group.getInspectionUnitsList();
                 if (!CollectionUtils.isEmpty(unitsList)) {
+                    List<Long> groupMemberIds = new ArrayList<>();
                     unitsList.forEach(units -> {
-                        units.setPlanId(group.getPlanId());
-                        units.setGroupId(group.getGroupId());
+                        units.setPlanId(planId);
+                        units.setGroupId(groupId);
+                        List<InspectionGroupMemberPO> groupMembers = units.getGroupMemberList();
+                        unitsMapper.insert(units.setGroupMemberList(null));
+                        Long unitsId = units.getUnitsId();
+                        if (!CollectionUtils.isEmpty(groupMembers)) {
+                            for (InspectionGroupMemberPO groupMember : groupMembers) {
+                                for (InspectionGroupMemberPO aGroupMemberList : groupMemberList) {
+                                    //设置组员ID字段
+                                    if (Objects.equals(groupMember.getMemberId(), aGroupMemberList.getMemberId())) {
+                                        groupMemberIds.add(aGroupMemberList.getGroupMemberId());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        groupMemberIds.forEach(var -> {
+                            InspectionGroupMemberUnitsPO groupMemberUnits = new InspectionGroupMemberUnitsPO();
+                            groupMemberUnits.setUnitsId(unitsId);
+                            groupMemberUnits.setGroupMemberId(var);
+                            groupMemberUnits.setGroupId(groupId);
+                            groupMemberUnitsList.add(groupMemberUnits);
+                        });
+
                     });
-                    saveUnits(unitsList);
                 }
+
+                //批量新增巡视组组员-被巡视单位关系
+                saveGroupMemberUnits(groupMemberUnitsList);
             }
-        }
-    }
-
-
-    /**
-     * 批量新增巡视组组员
-     */
-    @Transactional
-    public void saveGroupMembers(List<InspectionGroupMemberPO> groupMemberList) {
-        if (!CollectionUtils.isEmpty(groupMemberList)) {
-            groupMemberMapper.insertBatch(groupMemberList);
         }
     }
 
@@ -240,7 +321,6 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
      * @desc 循环删除效率低，向工时妥协
      */
     @Override
-    @Transactional
     public int delPlanByIds(String[] planIds) {
         List<String> planIdList = Arrays.asList(planIds);
         if (!CollectionUtils.isEmpty(planIdList)) {
@@ -258,25 +338,6 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         return planMapper.deleteBatchIds(planIdList);
     }
 
-    /**
-     * 查询总记录数
-     *
-     * @return
-     */
-    @Override
-    public int selectCount() {
-        return planMapper.selectCount(null);
-    }
-
-    /**
-     * 统计公司巡察次数
-     *
-     * @return
-     */
-    @Override
-    public List<PlanCompanyCountVO> selectCountByCompany() {
-        return this.planMapper.selectPlanCompanyTotal();
-    }
 
     /**
      * 删除巡视组
@@ -294,9 +355,8 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     }
 
     /**
-     * 删除巡视组组员和被巡视单位信息
+     * 删除巡视组组员和被巡视单位信息以及其中关系
      */
-    @Transactional
     public void delGroupRelation(InspectionGroupPO group) {
         Map<String, Object> params = new HashMap<>();
         params.put("GROUP_ID", group.getGroupId());
@@ -304,5 +364,35 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         groupMemberMapper.deleteByMap(params);
         //删除关联被巡视单位
         unitsMapper.deleteByMap(params);
+        //删除组员和被巡视单位关系
+        groupMemberUnitsMapper.deleteByMap(params);
+    }
+
+
+    @Autowired
+    private SysPostMapper postMapper;
+
+    @Autowired
+    private SysRoleMapper roleMapper;
+
+    @Transactional
+    public int testTransaction() throws FileNotFoundException {
+        A();
+        B();
+        return 0;
+    }
+
+    public void A() {
+        SysPost post = new SysPost();
+        post.setPostId(UUID.fastUUID().toString());
+        post.setPostName("test");
+        postMapper.insertPost(post);
+    }
+
+    //    @Transactional
+    public void B() {
+        SysRole role = new SysRole();
+        role.setRoleName("test");
+        roleMapper.insertRole(role);
     }
 }

@@ -24,4 +24,9 @@ public class PiisConstants {
      */
     public static final int MOBILIZE_PERSON_LEADER = 2;
 
+    /**
+     * 巡察类型
+     */
+    public static final int PIIS_TYPE = 1;
+
 }

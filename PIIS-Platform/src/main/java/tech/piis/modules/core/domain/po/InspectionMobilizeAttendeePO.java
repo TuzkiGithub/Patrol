@@ -115,5 +115,6 @@ public class InspectionMobilizeAttendeePO extends PIBaseEntity {
     /**
      * 文件信息
      */
+    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
 }

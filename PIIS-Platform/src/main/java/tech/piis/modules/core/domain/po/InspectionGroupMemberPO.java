@@ -1,6 +1,7 @@
 package tech.piis.modules.core.domain.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -66,16 +68,22 @@ public class InspectionGroupMemberPO extends PIBaseEntity {
 //    @NotBlank(message = "组员联系方式不能为空！")
     private String contact;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof InspectionGroupMemberPO) {
-            return Objects.equals(((InspectionGroupMemberPO) obj).getGroupMemberId(), this.groupMemberId);
-        }
-        return false;
-    }
+    /**
+     * 被巡视单位
+     */
+    @TableField(exist = false)
+    private List<InspectionUnitsPO> unitsList;
 
-    public int hashCode() {
-        return Long.hashCode(groupMemberId);
-    }
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (obj instanceof InspectionGroupMemberPO) {
+//            return Objects.equals(((InspectionGroupMemberPO) obj).getGroupMemberId(), this.groupMemberId);
+//        }
+//        return false;
+//    }
+//
+//    public int hashCode() {
+//        return Long.hashCode(groupMemberId);
+//    }
 
 }

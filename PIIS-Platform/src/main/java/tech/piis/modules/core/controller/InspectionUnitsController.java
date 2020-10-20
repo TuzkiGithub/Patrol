@@ -24,49 +24,18 @@ import tech.piis.modules.core.service.IInspectionUnitsService;
  * @date 2020-09-14
  */
 @RestController
-@RequestMapping("/system/units")
+@RequestMapping("/piis/units")
 public class InspectionUnitsController extends BaseController
 {
     @Autowired
     private IInspectionUnitsService inspectionUnitsService;
 
     /**
-     * 查询被巡视单位 列表
+     * 查询被巡视单位-组员列表
      */
-    @PreAuthorize("@ss.hasPermi('system:units:list')")
-    @GetMapping("/list")
-    public AjaxResult list(InspectionUnitsPO inspectionUnitsPO) {
-        return null;
-    }
-
-
-    /**
-     * 新增被巡视单位 
-     */
-    @PreAuthorize("@ss.hasPermi('system:units:add')")
-    @Log(title = "被巡视单位 ", businessType = BusinessType.INSERT)
-    @PostMapping
-    public AjaxResult add(@RequestBody InspectionUnitsPO inspectionUnitsPO) {
-        return toAjax(0);
-    }
-
-    /**
-     * 修改被巡视单位 
-     */
-    @PreAuthorize("@ss.hasPermi('system:units:edit')")
-    @Log(title = "被巡视单位 ", businessType = BusinessType.UPDATE)
-    @PutMapping
-    public AjaxResult edit(@RequestBody InspectionUnitsPO inspectionUnitsPO) {
-        return toAjax(0);
-    }
-
-    /**
-     * 删除被巡视单位 
-     */
-    @PreAuthorize("@ss.hasPermi('system:units:remove')")
-    @Log(title = "被巡视单位 ", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids) {
-        return toAjax(0);
+    @PreAuthorize("@ss.hasPermi('piis:units:list')")
+    @GetMapping("/group")
+    public AjaxResult selectUnitsGroupList(Long unitsId) {
+        return AjaxResult.success(inspectionUnitsService.selectUnitsMember(unitsId));
     }
 }

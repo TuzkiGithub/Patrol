@@ -50,12 +50,12 @@ public interface IInspectionPlanService {
      * 查询总记录数
      * @return
      */
-    int selectCount();
+    int selectCount(InspectionPlanPO plan);
 
     /**
      * 统计公司巡察次数
      * @return
      */
-    List<PlanCompanyCountVO> selectCountByCompany();
+    List<PlanCompanyCountVO> selectCountByCompany(InspectionPlanPO plan);
 
 }

@@ -26,5 +26,5 @@ public interface InspectionPlanMapper extends BaseMapper<InspectionPlanPO> {
      * 统计各公司巡察次数
      * @return
      */
-    List<PlanCompanyCountVO> selectPlanCompanyTotal();
+    List<PlanCompanyCountVO> selectPlanCompanyTotal(InspectionPlanPO plan);
 }

@@ -16,4 +16,12 @@ public interface InspectionUnitsMapper extends BaseMapper<InspectionUnitsPO> {
 
     public int insertBatch(List<InspectionUnitsPO> unitsList);
 
+    /**
+     * 根据被巡视单位ID查询被巡视单位下的组员信息
+     *
+     * @param unitsId
+     * @return
+     */
+    public List<InspectionUnitsPO> selectUnitsMember(Long unitsId);
+
 }

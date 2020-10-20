@@ -12,12 +12,36 @@
         <result property="inspectionTime" column="INSPECTION_TIME"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="orgName" column="ORG_NAME"/>
+        <collection property="groupMemberList" javaType="java.util.List"
+                    resultMap="inspectionGroupMemberResultMap"/>
     </resultMap>
+
+    <!--巡视组组员ResultMap-->
+    <resultMap id="inspectionGroupMemberResultMap" type="tech.piis.modules.core.domain.po.InspectionGroupMemberPO">
+        <id property="groupMemberId" column="GROUP_MEMBER_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="groupId" column="GROUP_ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="memberName" column="MEMBER_NAME"/>
+        <result property="memberCompany" column="MEMBER_COMPANY"/>
+        <result property="memberCompanyName" column="MEMBER_COMPANY_NAME"/>
+        <result property="memberPost" column="MEMBER_POST"/>
+        <result property="contact" column="CONTACT"/>
+    </resultMap>
+
 
     <insert id="insertBatch" parameterType="InspectionUnitsPO">
         insert into inspection_units(PLAN_ID,GROUP_ID,ORG_ID,ORG_NAME,INSPECTION_TIME) values
         <foreach item="item" index="index" collection="list" separator=",">
             (#{item.planId},#{item.groupId},#{item.orgId},#{item.orgName},#{item.inspectionTime})
-    </foreach>
+        </foreach>
     </insert>
+
+    <select id="selectUnitsMember" resultMap="inspectionUnitsResultMap" parameterType="java.lang.Long">
+        select u.UNITS_ID,u.ORG_NAME,u.ORG_ID,u.INSPECTION_TIME,m.GROUP_MEMBER_ID,m.MEMBER_ID,m.MEMBER_NAME
+        from inspection_units u
+        left join inspection_group_member_units gmu on gmu.units_id = u.units_id
+        left join inspection_group_member m on m.GROUP_MEMBER_ID = gmu.group_member_id
+        where u.UNITS_ID = #{unitsId}
+    </select>
 </mapper> 

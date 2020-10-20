@@ -86,9 +86,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  		where post_id = #{postId}
 	</update>
  	
- 	<insert id="insertPost" parameterType="tech.piis.modules.system.domain.SysPost" useGeneratedKeys="true" keyProperty="postId">
+ 	<insert id="insertPost" parameterType="tech.piis.modules.system.domain.SysPost" >
  		insert into sys_post(
- 			<if test="postId != null and postId != 0">post_id,</if>
+ 			<if test="postId != null and postId != ''">post_id,</if>
  			<if test="postCode != null and postCode != ''">post_code,</if>
  			<if test="postName != null and postName != ''">post_name,</if>
  			<if test="postSort != null and postSort != ''">post_sort,</if>
@@ -97,7 +97,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="createBy != null and createBy != ''">create_by,</if>
  			create_time
  		)values(
- 			<if test="postId != null and postId != 0">#{postId},</if>
+ 			<if test="postId != null and postId != ''">#{postId},</if>
  			<if test="postCode != null and postCode != ''">#{postCode},</if>
  			<if test="postName != null and postName != ''">#{postName},</if>
  			<if test="postSort != null and postSort != ''">#{postSort},</if>

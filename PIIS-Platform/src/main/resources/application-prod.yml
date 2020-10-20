@@ -1,13 +1,22 @@
 # Production Datasource Setting
+piis:
+  # Upload Path
+  profile: /piis/file
+  ##
+  serverAddr: 25.2.16.160:8181
+
+server:
+  # HTTP Port
+  port: 18081
 spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.cj.jdbc.Driver
         druid:
             master:
-                url: jdbc:mysql://118.24.83.170:3306/king?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-                username: root
-                password: Wds18730453283@mysql_kevin
+                url: jdbc:mysql://192.168.0.220:13309/piis_sys?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+                username: check
+                password: check@2020
             slave:
                 enabled: false
                 url: 

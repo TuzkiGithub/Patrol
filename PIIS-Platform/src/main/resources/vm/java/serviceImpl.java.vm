@@ -1,21 +1,128 @@
 package ${packageName}.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.service.IPiisDocumentService;
+import org.springframework.util.CollectionUtils;
+import tech.piis.framework.utils.BizUtils;
+import java.util.List;
+import java.util.Arrays;
+import tech.piis.common.exception.BaseException;
+import tech.piis.framework.utils.file.FileUploadUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import static tech.piis.common.constant.OperationConstants.DELETE;
+import static tech.piis.common.constant.OperationConstants.INSERT;
 import ${packageName}.mapper.${ClassName}Mapper;
-import ${packageName}.domain.${ClassName};
+import ${packageName}.domain.po.${ClassName}PO;
 import ${packageName}.service.I${ClassName}Service;
 
 /**
  * ${functionName}Service业务层处理
- * 
+ *
  * @author ${author}
  * @date ${datetime}
  */
+@Transactional
 @Service
 public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     @Autowired
     private ${ClassName}Mapper ${className}Mapper;
 
+    @Autowired
+    private IPiisDocumentService documentService;
 
+    @Value("${piis.profile}")
+    private String baseFileUrl;
+
+    /**
+     * 统计巡视方案下被巡视单位${ClassName}次数
+     * @param planId 巡视计划ID
+     *
+     */
+    public List<UnitsBizCountVO> select${ClassName}Count(String planId) throws BaseException {
+        return ${className}Mapper.select${ClassName}Count(planId);
+    }
+
+    /**
+     * 查询${functionName}列表
+     * @param ${className}
+     * @return
+     * @throws BaseException
+     */
+    public List<${ClassName}PO> select${ClassName}List(${ClassName}PO ${className}) throws BaseException {
+        QueryWrapper<${ClassName}PO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("units_id", ${className}.getUnitsId());
+        queryWrapper.eq("plan_id", ${className}.getPlanId());
+        return ${className}Mapper.selectList(queryWrapper);
+    }
+
+    /**
+     * 新增${functionName}
+     * @param ${className}
+     * @return
+     * @throws BaseException
+     */
+    public int save(${ClassName}PO ${className}) throws BaseException {
+        int result = ${className}Mapper.insert(${className});
+        List<PiisDocumentPO> documents = ${className}.getDocuments();
+        if (!CollectionUtils.isEmpty(documents)) {
+            for (PiisDocumentPO document : documents) {
+                BizUtils.setUpdatedOperation(PiisDocumentPO.class, document);
+                documentService.updateDocumentById(document.setObjectId(null).setFileDictId(null));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 根据ID修改${functionName}
+     * @param ${className}
+     * @return
+     * @throws BaseException
+     */
+    public int update(${ClassName}PO ${className}) throws BaseException {
+        List<PiisDocumentPO> documents = ${className}.getDocuments();
+        if (!CollectionUtils.isEmpty(documents)) {
+            for (PiisDocumentPO document : documents) {
+                Integer operationType = document.getOperationType();
+                if (null != operationType) {
+                    switch (operationType) {
+                        case INSERT: {
+                            //将业务字段赋予文件表
+                            document.setFileDictId(null)
+                                    .setObjectId(String.valueOf(null));
+                            documentService.updateDocumentById(document);
+                            break;
+                        }
+                        case DELETE: {
+                            //删除服务器上文件以及文件表数据
+                            documentService.deleteDocumentById(document.getPiisDocId());
+                            String filePath = document.getFilePath();
+                            if (!StringUtils.isEmpty(filePath)) {
+                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return ${className}Mapper.updateById(${className});
+    }
+
+    /**
+     * 根据ID批量删除${functionName}
+     * @param ${pkColumn.javaField}s ${functionName}编号
+     *
+     * @return
+     */
+    public int deleteBy${ClassName}Ids(${pkColumn.javaType}[] ${pkColumn.javaField}s) {
+        List<Long> list = Arrays.asList(${pkColumn.javaField}s);
+        return ${className}Mapper.deleteBatchIds(list);
+    }
 }
