@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * 巡视附件 Service接口
- * 
+ *
  * @author Tuzki
  * @date 2020-09-14
  */
@@ -16,6 +16,7 @@ public interface IPiisDocumentService {
 
     /**
      * 获取巡视动员文件
+     *
      * @param bizId 业务ID
      * @return
      * @throws Exception
@@ -24,6 +25,7 @@ public interface IPiisDocumentService {
 
     /**
      * 获取巡视动员文件
+     *
      * @param bizIds 业务ID
      * @return
      * @throws Exception
@@ -32,6 +34,7 @@ public interface IPiisDocumentService {
 
     /**
      * 根据ID更新文件对象
+     *
      * @param documentPO
      * @return
      * @throws Exception
@@ -39,7 +42,19 @@ public interface IPiisDocumentService {
     int updateDocumentById(PiisDocumentPO documentPO) throws BaseException;
 
     /**
+     * 批量更新文件对象
+     *
+     * @param documents  文件对象
+     * @param objectId   业务主键
+     * @param fileDictId 文件字典Id
+     * @return
+     * @throws BaseException
+     */
+    void updateDocumentBatch(List<PiisDocumentPO> documents, String objectId, Long fileDictId) throws BaseException;
+
+    /**
      * 新增文件对象
+     *
      * @param documentPO
      * @return
      * @throws Exception
@@ -48,8 +63,18 @@ public interface IPiisDocumentService {
 
     /**
      * 删除文件
+     *
      * @param docId
      * @return
      */
     int deleteDocumentById(Long docId);
+
+    /**
+     * 删除文件对象以及文件
+     *
+     * @param docId
+     * @param filePath
+     * @return
+     */
+    int deleteDocumentById(Long docId, String filePath);
 }

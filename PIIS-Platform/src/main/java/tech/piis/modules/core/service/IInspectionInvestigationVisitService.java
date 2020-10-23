@@ -51,4 +51,10 @@ public interface IInspectionInvestigationVisitService {
      * @return
      */
     int deleteByInspectionInvestigationVisitIds(String[] investigationVisitIds);
+
+    /**
+     * 查询总数
+     * @return
+     */
+    int count() throws BaseException;
 }

@@ -51,4 +51,10 @@ public interface I${ClassName}Service {
      * @return
      */
     int deleteBy${ClassName}Ids(${pkColumn.javaType}[] ${pkColumn.javaField}s);
+
+    /**
+     * 统计总数
+     * @return
+     */
+    int count();
 }

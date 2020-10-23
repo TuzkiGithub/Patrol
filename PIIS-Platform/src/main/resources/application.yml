@@ -4,7 +4,7 @@ piis:
   version: V1.0.0
   copyright: 2020
   # Upload Path
-  profile: D:/file/upload
+  profile: E:/file/upload
   serverAddr: piis.file.com:81
   # Get IP Address
   ipAddress: true

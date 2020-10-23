@@ -12,10 +12,11 @@
 
     <select id="selectInspectionAttendanceCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
         select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(a.UNITS_ID) as count
-        from inspection_units u,inspection_attendance a
-        where u.UNITS_ID = a.UNITS_ID
-        and u.plan_id = #{planId}
-        group by a.UNITS_ID
+        from inspection_units u
+        left join inspection_attendance a on u.UNITS_ID = a.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
+        order by count desc
     </select>
 
 </mapper>

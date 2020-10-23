@@ -35,20 +35,8 @@ public class TEST {
 //            newStr += s + ",";
 //        }
 //        System.out.println(newStr.substring(0,newStr.lastIndexOf(",")));
-        String userIds = "18000462,18000453,18000444";
-        String userNames = "张喆,姜天傲,杨栋楠";
-        List<UserBriefVO> userBriefs = new ArrayList<>();
-        userBriefs.add(new UserBriefVO().setUserId("18000462").setUserName("张喆"));
-        userBriefs.add(new UserBriefVO().setUserId("18000453").setUserName("杨栋楠"));
-        List<UserBriefVO> userBriefVOS = paramsCovert2List(userIds, userNames);
-        List<String> strings = paramsCovert2String(userBriefs);
-        for (UserBriefVO userBriefVO : userBriefVOS) {
-            System.out.println(userBriefVO);
-        }
+        String fileUrl = "piis.file.com:81/upload/2020/10/20/授课2.txt";
 
-        for (String string : strings) {
-            System.out.println(string);
-        }
     }
 
 

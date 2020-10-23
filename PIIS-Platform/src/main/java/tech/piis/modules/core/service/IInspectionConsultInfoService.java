@@ -51,4 +51,10 @@ public interface IInspectionConsultInfoService {
      * @return
      */
     int deleteByInspectionConsultInfoIds(String[] consultInfoIds);
+
+    /**
+     * 统计总数
+     * @return
+     */
+    int count();
 }

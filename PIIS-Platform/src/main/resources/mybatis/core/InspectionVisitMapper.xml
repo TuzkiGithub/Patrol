@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionVisitMapper">
+
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+        <result property="visitCount" column="visitCount"/>
+        <result property="callCount" column="callCount"/>
+    </resultMap>
+
+    <select id="selectInspectionVisitCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
+        select
+          u.UNITS_ID,
+          u.ORG_ID,
+          u.ORG_NAME,
+          ifnull ((select count(v.VISIT_ID)
+                from inspection_visit v
+                where v.PLAN_ID = #{planId}
+                      and v.UNITS_ID = u.UNITS_ID
+                group by v.VISIT_ID),0)
+            as visitCount,
+          ifnull ((select count(c.CALL_VISIT_ID)
+           from inspection_call_visit c
+           where c.PLAN_ID = #{planId}
+                 and c.UNITS_ID = u.UNITS_ID
+           group by c.CALL_VISIT_ID),0)
+            as callCount
+        from inspection_units u
+        where PLAN_ID = #{planId}
+        order by visitCount,callCount desc
+    </select>
+
+</mapper>

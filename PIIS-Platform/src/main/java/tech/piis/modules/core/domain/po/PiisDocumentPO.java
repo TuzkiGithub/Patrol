@@ -29,7 +29,7 @@ public class PiisDocumentPO extends PIBaseEntity {
     private Long piisDocId;
 
     /**
-     * 巡视编号
+     * 业务编号
      */
     private String objectId;
 

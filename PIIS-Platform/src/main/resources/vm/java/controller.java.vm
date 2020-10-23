@@ -61,7 +61,7 @@ public class ${ClassName}Controller extends BaseController
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
     @GetMapping("/file")
     public AjaxResult find${ClassName}File(String ${className}Id) throws BaseException {
-        return AjaxResult.success(documentService.getFileListByBizId(${className}Id));
+        return AjaxResult.success(documentService.getFileListByBizId("${ClassName}" + ${className}Id));
     }
 
     /**
@@ -85,6 +85,7 @@ public class ${ClassName}Controller extends BaseController
         if (null == ${className}) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        BizUtils.setCreatedOperation(${ClassName}PO.class, ${className});
         return toAjax(${className}Service.save(${className}));
     }
 
@@ -119,7 +120,7 @@ public class ${ClassName}Controller extends BaseController
     *
     * @param ${className}
     */
-    private void specialReportCovert2String(${ClassName}PO ${className}){
+    private void ${className}Covert2String(${ClassName}PO ${className}){
 
     }
 
@@ -129,7 +130,7 @@ public class ${ClassName}Controller extends BaseController
     *
     * @param ${className}List
     */
-    private void specialReportCovert2List(List<${ClassName}PO> ${className}List){
+    private void ${className}Covert2List(List<${ClassName}PO> ${className}List){
 
     }
 }

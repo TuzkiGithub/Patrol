@@ -12,14 +12,17 @@ import tech.piis.common.exception.BaseException;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.file.FileUploadUtils;
 import tech.piis.modules.core.domain.po.InspectionOrganizationMeetingsPO;
+import tech.piis.modules.core.domain.po.InspectionUnitsPO;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 import tech.piis.modules.core.mapper.InspectionOrganizationMeetingsMapper;
+import tech.piis.modules.core.mapper.InspectionUnitsMapper;
 import tech.piis.modules.core.service.IInspectionOrganizationMeetingsService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.DELETE;
 import static tech.piis.common.constant.OperationConstants.INSERT;
@@ -37,10 +40,16 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
     private InspectionOrganizationMeetingsMapper inspectionOrganizationMeetingsMapper;
 
     @Autowired
+    private InspectionUnitsMapper unitsMapper;
+
+    @Autowired
     private IPiisDocumentService documentService;
 
     @Value("${piis.profile}")
     private String baseFileUrl;
+
+    @Value("${piis.serverAddr}")
+    private String serverAddr;
 
     /**
      * 组织类型
@@ -51,11 +60,24 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
     /**
      * 统计巡视方案下被巡视单位InspectionOrganizationMeetings次数
      *
-     * @param planId 巡视计划ID
+     * @param planId           巡视计划ID
      * @param organizationType 组织类型
      */
     public List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(String planId, Integer organizationType) throws BaseException {
-        return inspectionOrganizationMeetingsMapper.selectInspectionOrganizationMeetingsCount(planId, organizationType);
+        QueryWrapper<InspectionUnitsPO> params = new QueryWrapper<>();
+        params.eq("PLAN_ID", planId);
+        List<InspectionUnitsPO> unitsList = unitsMapper.selectList(params);
+        List<UnitsBizCountVO> unitsBizCountVOS = inspectionOrganizationMeetingsMapper.selectInspectionOrganizationMeetingsCount(planId, organizationType);
+        unitsBizCountVOS = unitsBizCountVOS.stream().filter(var -> organizationType.equals(var.getOrganizationType())).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(unitsList)) {
+            for (InspectionUnitsPO units : unitsList) {
+                boolean flag = isContainUnits(units, unitsBizCountVOS);
+                if (!flag) {
+                    unitsBizCountVOS.add(new UnitsBizCountVO().setUnitsId(units.getUnitsId()).setOrgId(units.getOrgId()).setOrgName(units.getOrgName()).setCount(0));
+                }
+            }
+        }
+        return unitsBizCountVOS;
     }
 
     /**
@@ -121,7 +143,7 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
                             documentService.deleteDocumentById(document.getPiisDocId());
                             String filePath = document.getFilePath();
                             if (!StringUtils.isEmpty(filePath)) {
-                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                                FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
                             }
                             break;
                         }
@@ -157,5 +179,24 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
             dictId = FileEnum.BRANCH_OTHER_FILE.getCode();
         }
         return dictId;
+    }
+
+
+    /**
+     * 判断集合是否包含当前对象
+     *
+     * @param units
+     * @param unitsBizCountVOS
+     * @return
+     */
+    private boolean isContainUnits(InspectionUnitsPO units, List<UnitsBizCountVO> unitsBizCountVOS) {
+        if (!CollectionUtils.isEmpty(unitsBizCountVOS)) {
+            for (UnitsBizCountVO unitsBizCountVO : unitsBizCountVOS) {
+                if (unitsBizCountVO.getUnitsId().equals(units.getUnitsId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

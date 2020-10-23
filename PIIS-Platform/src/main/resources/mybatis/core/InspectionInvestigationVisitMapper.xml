@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionInvestigationVisitMapper">
+
+
+    <resultMap type="InspectionInvestigationVisitPO" id="InspectionInvestigationVisitResult">
+        <result property="investigationVisitId" column="INVESTIGATION_VISIT_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="visitCompanyId" column="VISIT_COMPANY_ID"/>
+        <result property="visitCompanyName" column="VISIT_COMPANY_NAME"/>
+        <result property="visitTime" column="VISIT_TIME"/>
+        <result property="recordPersonId" column="RECORD_PERSON_ID"/>
+        <result property="recordPersonName" column="RECORD_PERSON_NAME"/>
+        <result property="recordContent" column="RECORD_CONTENT"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+        <collection property="investigationVisitPersonList" javaType="java.util.List"
+                    resultMap="inspectionInvestigationVisitPersonResult"/>
+    </resultMap>
+
+    <resultMap type="InspectionInvestigationVisitPersonPO" id="inspectionInvestigationVisitPersonResult">
+        <result property="investigationVisitPersonId" column="INVESTIGATION_VISIT_PERSON_ID"/>
+        <result property="personId" column="PERSON_ID"/>
+        <result property="personName" column="PERSON_NAME"/>
+        <result property="postName" column="POST_NAME"/>
+        <result property="personType" column="PERSON_TYPE"/>
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+    </resultMap>
+
+    <select id="selectInvestigationVisitList" parameterType="InspectionInvestigationVisitPO"
+            resultMap="InspectionInvestigationVisitResult">
+        select
+          v.INVESTIGATION_VISIT_ID,
+          PLAN_ID,
+          VISIT_COMPANY_ID,
+          VISIT_COMPANY_NAME,
+          VISIT_TIME,
+          RECORD_PERSON_ID,
+          RECORD_PERSON_NAME,
+          RECORD_CONTENT,
+          v.CREATED_BY,
+          v.CREATED_TIME,
+          v.UPDATED_BY,
+          v.UPDATED_TIME,
+          v.ENT_ID,
+          INVESTIGATION_VISIT_PERSON_ID,
+          PERSON_ID,
+          PERSON_NAME,
+          POST_NAME,
+          PERSON_TYPE
+        from (
+               select
+                 INVESTIGATION_VISIT_ID,
+                 PLAN_ID,
+                 VISIT_COMPANY_ID,
+                 VISIT_COMPANY_NAME,
+                 VISIT_TIME,
+                 RECORD_PERSON_ID,
+                 RECORD_PERSON_NAME,
+                 RECORD_CONTENT,
+                 CREATED_BY,
+                 CREATED_TIME,
+                 UPDATED_BY,
+                 UPDATED_TIME,
+                 ENT_ID
+               from inspection_investigation_visit
+               where PLAN_ID = #{planId}
+                     and UNITS_ID = #{unitsId}
+               limit #{pageNum}, #{pageSize}
+             ) v
+          left join inspection_investigation_visit_person p on v.INVESTIGATION_VISIT_ID = p.INVESTIGATION_VISIT_ID
+        order by v.CREATED_TIME desc
+    </select>
+
+
+    <select id="selectInspectionInvestigationVisitCount" parameterType="java.lang.String"
+            resultMap="unitsBizCountResultMap">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(v.UNITS_ID) as count
+        from inspection_units u
+        left join inspection_investigation_visit v on u.UNITS_ID = v.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
+        order by count desc
+    </select>
+</mapper>

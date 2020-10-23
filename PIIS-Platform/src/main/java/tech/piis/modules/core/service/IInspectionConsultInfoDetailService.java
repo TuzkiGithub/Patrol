@@ -13,12 +13,6 @@ import java.util.List;
  */
 public interface IInspectionConsultInfoDetailService {
 
-    /**
-     * 统计巡视方案下被巡视单位InspectionConsultInfoDetail次数
-     * @param planId 巡视计划ID
-     *
-     */
-    List<UnitsBizCountVO> selectInspectionConsultInfoDetailCount(String planId) throws BaseException;
 
     /**
      * 查询查阅资料详情列表

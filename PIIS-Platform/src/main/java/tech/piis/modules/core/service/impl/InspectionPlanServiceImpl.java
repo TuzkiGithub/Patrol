@@ -60,6 +60,9 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     @Value("${piis.profile}")
     private String baseFileUrl;
 
+    @Value("${piis.serverAddr}")
+    private String serverAddr;
+
 
     /**
      * 查询巡视计划列表
@@ -195,7 +198,7 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                             documentMapper.deleteById(document.getPiisDocId());
                             String filePath = document.getFilePath();
                             if (!StringUtils.isEmpty(filePath)) {
-                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                                FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
                             }
                             break;
                         }

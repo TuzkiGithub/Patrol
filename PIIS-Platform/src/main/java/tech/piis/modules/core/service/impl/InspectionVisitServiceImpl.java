@@ -1,25 +1,26 @@
 package tech.piis.modules.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tech.piis.modules.core.domain.po.PiisDocumentPO;
-import tech.piis.modules.core.service.IPiisDocumentService;
 import org.springframework.util.CollectionUtils;
-import tech.piis.framework.utils.BizUtils;
-import java.util.List;
-import java.util.Arrays;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.utils.file.FileUploadUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
+import tech.piis.modules.core.domain.po.InspectionVisitPO;
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import tech.piis.modules.core.mapper.InspectionVisitMapper;
+import tech.piis.modules.core.service.IInspectionVisitService;
+import tech.piis.modules.core.service.IPiisDocumentService;
+
+import java.util.Arrays;
+import java.util.List;
+
 import static tech.piis.common.constant.OperationConstants.DELETE;
 import static tech.piis.common.constant.OperationConstants.INSERT;
-import tech.piis.modules.core.mapper.InspectionVisitMapper;
-import tech.piis.modules.core.domain.po.InspectionVisitPO;
-import tech.piis.modules.core.service.IInspectionVisitService;
 
 /**
  * 来访Service业务层处理
@@ -39,10 +40,13 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService {
     @Value("${piis.profile}")
     private String baseFileUrl;
 
+    @Value("${piis.serverAddr}")
+    private String serverAddr;
+
     /**
      * 统计巡视方案下被巡视单位InspectionVisit次数
-     * @param planId 巡视计划ID
      *
+     * @param planId 巡视计划ID
      */
     public List<UnitsBizCountVO> selectInspectionVisitCount(String planId) throws BaseException {
         return inspectionVisitMapper.selectInspectionVisitCount(planId);
@@ -50,6 +54,7 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService {
 
     /**
      * 查询来访列表
+     *
      * @param inspectionVisit
      * @return
      * @throws BaseException
@@ -63,6 +68,7 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService {
 
     /**
      * 新增来访
+     *
      * @param inspectionVisit
      * @return
      * @throws BaseException
@@ -72,8 +78,7 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService {
         List<PiisDocumentPO> documents = inspectionVisit.getDocuments();
         if (!CollectionUtils.isEmpty(documents)) {
             for (PiisDocumentPO document : documents) {
-                BizUtils.setUpdatedOperation(PiisDocumentPO.class, document);
-                documentService.updateDocumentById(document.setObjectId(null).setFileDictId(null));
+                documentService.updateDocumentById(document.setObjectId("Visit" + inspectionVisit.getVisitId()));
             }
         }
         return result;
@@ -81,6 +86,7 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService {
 
     /**
      * 根据ID修改来访
+     *
      * @param inspectionVisit
      * @return
      * @throws BaseException
@@ -94,8 +100,7 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService {
                     switch (operationType) {
                         case INSERT: {
                             //将业务字段赋予文件表
-                            document.setFileDictId(null)
-                                    .setObjectId(String.valueOf(null));
+                            document.setObjectId("Visit" + inspectionVisit.getVisitId());
                             documentService.updateDocumentById(document);
                             break;
                         }
@@ -104,7 +109,7 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService {
                             documentService.deleteDocumentById(document.getPiisDocId());
                             String filePath = document.getFilePath();
                             if (!StringUtils.isEmpty(filePath)) {
-                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                                FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
                             }
                             break;
                         }
@@ -117,8 +122,8 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService {
 
     /**
      * 根据ID批量删除来访
-     * @param callVisitIds 来访编号
      *
+     * @param callVisitIds 来访编号
      * @return
      */
     public int deleteByInspectionVisitIds(String[] callVisitIds) {

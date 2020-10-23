@@ -133,13 +133,13 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUser user) {
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
-            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
-            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
-            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-        }
+//        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
+//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+//        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+//        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+//        }
         user.setCreateBy(SecurityUtils.getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         return toAjax(userService.insertUser(user));
@@ -152,12 +152,12 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysUser user) {
-        userService.checkUserAllowed(user);
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
-            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
-            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-        }
+//        userService.checkUserAllowed(user);
+//        if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+//            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+//        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+//            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+//        }
         user.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(userService.updateUser(user));
     }

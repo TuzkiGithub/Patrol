@@ -26,6 +26,7 @@
         <result property="orgId" column="org_id"/>
         <result property="orgName" column="org_name"/>
         <result property="count" column="count"/>
+        <result property="organizationType" column="organizationType"/>
     </resultMap>
 
     <sql id="selectInspectionOrganizationMeetingsVo">
@@ -33,12 +34,17 @@
     </sql>
 
     <select id="selectInspectionOrganizationMeetingsCount" resultMap="unitsBizCountResultMap" >
-        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(o.UNITS_ID) as count
-        from inspection_units u, inspection_Organization_Meetings o
-        where u.UNITS_ID = o.UNITS_ID
-        and u.plan_id = #{planId}
-        and o.ORGANIZATION_TYPE = #{organizationType}
-        group by o.UNITS_ID
+        select
+          u.UNITS_ID,
+          u.PLAN_ID,
+          u.ORG_ID,
+          u.ORG_NAME,
+          count(o.UNITS_ID)              AS count,
+          ifnull(o.ORGANIZATION_TYPE, 0) as organizationType
+        from inspection_units u
+          left join inspection_Organization_Meetings o on u.UNITS_ID = o.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
     </select>
 
 </mapper>

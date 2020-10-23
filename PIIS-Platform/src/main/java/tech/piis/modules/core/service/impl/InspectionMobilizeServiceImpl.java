@@ -50,6 +50,9 @@ public class InspectionMobilizeServiceImpl implements IInspectionMobilizeService
     @Value("${piis.profile}")
     private String baseFileUrl;
 
+    @Value("${piis.serverAddr}")
+    private String serverAddr;
+
     /**
      * 定义文件字典ID映射字段
      */
@@ -202,7 +205,7 @@ public class InspectionMobilizeServiceImpl implements IInspectionMobilizeService
                     documentMapper.deleteById(meetingsFile.getPiisDocId());
                     String filePath = meetingsFile.getFilePath();
                     if (!StringUtils.isEmpty(filePath)) {
-                        FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                        FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
                     }
 
                 }

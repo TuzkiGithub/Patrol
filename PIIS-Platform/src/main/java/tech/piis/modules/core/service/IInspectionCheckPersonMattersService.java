@@ -28,6 +28,15 @@ public interface IInspectionCheckPersonMattersService {
      */
     List<InspectionCheckPersonMattersPO> selectInspectionCheckPersonMattersList(InspectionCheckPersonMattersPO inspectionCheckPersonMatters) throws BaseException;
 
+
+    /**
+     * 查询总数
+     * @param unitsId 被巡视单位
+     * @return
+     * @throws BaseException
+     */
+    int count(Long unitsId) throws BaseException;
+
     /**
     * 新增抽查个人事项报告
     * @param inspectionCheckPersonMatters

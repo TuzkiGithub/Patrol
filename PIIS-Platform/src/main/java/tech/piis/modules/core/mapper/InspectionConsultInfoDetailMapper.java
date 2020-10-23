@@ -14,9 +14,9 @@ import java.util.List;
 public interface InspectionConsultInfoDetailMapper extends BaseMapper<InspectionConsultInfoDetailPO> {
 
     /**
-     * 统计巡视方案下被巡视单位InspectionConsultInfoDetail次数
-     * @param planId 巡视计划ID
-     *
+     * 批量新增
+     * @param consultInfoDetailList
+     * @return
      */
-    List<UnitsBizCountVO> selectInspectionConsultInfoDetailCount(String planId) throws BaseException;
+    int insertBatch(List<InspectionConsultInfoDetailPO> consultInfoDetailList);
 }

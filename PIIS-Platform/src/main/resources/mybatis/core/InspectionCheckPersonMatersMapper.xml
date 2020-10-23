@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionCheckPersonMattersMapper">
+
+    <resultMap type="InspectionCheckPersonMattersPO" id="inspectionCheckPersonMattersResult">
+        <result property="checkPersonMattersId" column="CHECK_PERSON_MATTERS_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="checkerId" column="CHECKER_ID"/>
+        <result property="checkerName" column="CHECKER_NAME"/>
+        <result property="checkName" column="CHECK_NAME"/>
+        <result property="checkTime" column="CHECK_TIME"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="documentResultMap"/>
+    </resultMap>
+
+    <resultMap id="documentResultMap" type="PiisDocumentPO">
+        <id property="piisDocId" column="PIIS_DOC_ID"/>
+        <result property="objectId" column="OBJECT_ID"/>
+        <result property="fileDictId" column="FILE_DICT_ID"/>
+        <result property="fileName" column="FILE_NAME"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+        <result property="filePath" column="FILE_PATH"/>
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+    </resultMap>
+
+    <select id="selectInspectionCheckPersonMattersList" parameterType="InspectionCheckPersonMattersPO"
+            resultMap="inspectionCheckPersonMattersResult">
+        select
+        cpm.CHECK_PERSON_MATTERS_ID,
+        cpm.PLAN_ID,
+        cpm.UNITS_ID,
+        cpm.CHECKER_ID,
+        cpm.CHECKER_NAME,
+        cpm.CHECK_NAME,
+        cpm.CHECK_TIME,
+        cpm.CREATED_BY,
+        cpm.CREATED_TIME,
+        cpm.UPDATED_BY,
+        cpm.UPDATED_TIME,
+        cpm.ENT_ID,
+        d.PIIS_DOC_ID,
+        d.FILE_DICT_ID,
+        d.FILE_NAME,
+        d.FILE_PATH,
+        d.FILE_SIZE
+        from
+        (
+        select
+        CHECK_PERSON_MATTERS_ID,
+        PLAN_ID,
+        UNITS_ID,
+        CHECKER_ID,
+        CHECKER_NAME,
+        CHECK_NAME,
+        CHECK_TIME,
+        CREATED_BY,
+        CREATED_TIME,
+        UPDATED_BY,
+        UPDATED_TIME,
+        ENT_ID
+        from
+        inspection_check_person_matters m
+        limit #{pageNum},#{pageSize}
+        ) cpm
+        left join piis_document d on concat('CheckPersonMatters', cpm.CHECK_PERSON_MATTERS_ID) = d.OBJECT_ID
+        <where>
+            <if test="planId !=null and planId !=''">
+                AND PLAN_ID = #{planId}
+            </if>
+
+            <if test="unitsId !=null and unitsId !=''">
+                AND UNITS_ID = #{unitsId}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectInspectionCheckPersonMattersCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(cpm.UNITS_ID) as count
+        from inspection_units u
+        left join inspection_check_person_matters cpm on u.UNITS_ID = cpm.UNITS_ID
+        where u.plan_id = #{planId}
+        group by cpm.UNITS_ID
+        order by count desc
+    </select>
+
+</mapper>

@@ -42,6 +42,9 @@ public class InspectionAttendanceServiceImpl implements IInspectionAttendanceSer
     @Value("${piis.profile}")
     private String baseFileUrl;
 
+    @Value("${piis.serverAddr}")
+    private String serverAddr;
+
     /**
      * 统计巡视方案下被巡视单位InspectionAttendance次数
      *
@@ -110,7 +113,7 @@ public class InspectionAttendanceServiceImpl implements IInspectionAttendanceSer
                             documentService.deleteDocumentById(document.getPiisDocId());
                             String filePath = document.getFilePath();
                             if (!StringUtils.isEmpty(filePath)) {
-                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                                FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
                             }
                             break;
                         }

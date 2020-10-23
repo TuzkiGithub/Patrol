@@ -62,4 +62,11 @@ public class InspectionConsultInfoDetailPO extends PIBaseEntity
     @NotEmpty(message = "文件不能为空！")
     @TableField(exist = false)
     private List<PiisDocumentPO> documents;
+
+    /**
+     * 操作类型
+     *
+     */
+    @TableField(exist = false)
+    private Integer operationType;
 }

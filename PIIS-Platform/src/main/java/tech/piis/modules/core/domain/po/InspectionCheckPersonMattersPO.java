@@ -35,7 +35,7 @@ public class InspectionCheckPersonMattersPO extends PIBaseEntity
     /**
      * 被巡视单位ID
      */
-    private String unitsId;
+    private Long unitsId;
     /** 被抽查人ID */
     private String checkerId;
     /** 被抽查人姓名 */
@@ -47,11 +47,9 @@ public class InspectionCheckPersonMattersPO extends PIBaseEntity
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date checkTime;
 
-
     /**
      * 文件信息
      */
     @NotEmpty(message = "文件不能为空！")
-    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
 }

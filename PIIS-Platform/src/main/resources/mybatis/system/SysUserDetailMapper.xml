@@ -187,6 +187,7 @@
             u.avatar,
             u.phonenumber,
             u.sex,
+            U.password,
             u. STATUS,
             u.del_flag,
             u.login_ip,
@@ -206,7 +207,7 @@
             r.data_scope,
             r. STATUS AS role_status
             FROM (
-            select u.user_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.password, u.sex,
+            select u.user_id, u.nick_name, u.user_name, u.email, u.password, u.avatar, u.phonenumber, u.password, u.sex,
             u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark
             from sys_user u
             where u.del_flag = '0'

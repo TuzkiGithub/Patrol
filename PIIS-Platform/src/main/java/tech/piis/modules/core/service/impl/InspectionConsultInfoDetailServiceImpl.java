@@ -39,14 +39,8 @@ public class InspectionConsultInfoDetailServiceImpl implements IInspectionConsul
     @Value("${piis.profile}")
     private String baseFileUrl;
 
-    /**
-     * 统计巡视方案下被巡视单位InspectionConsultInfoDetail次数
-     * @param planId 巡视计划ID
-     *
-     */
-    public List<UnitsBizCountVO> selectInspectionConsultInfoDetailCount(String planId) throws BaseException {
-        return inspectionConsultInfoDetailMapper.selectInspectionConsultInfoDetailCount(planId);
-    }
+    @Value("${piis.serverAddr}")
+    private String serverAddr;
 
     /**
      * 查询查阅资料详情列表
@@ -104,7 +98,7 @@ public class InspectionConsultInfoDetailServiceImpl implements IInspectionConsul
                             documentService.deleteDocumentById(document.getPiisDocId());
                             String filePath = document.getFilePath();
                             if (!StringUtils.isEmpty(filePath)) {
-                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                                FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
                             }
                             break;
                         }

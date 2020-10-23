@@ -40,6 +40,9 @@ public class InspectionSpecialReportServiceImpl implements IInspectionSpecialRep
     @Value("${piis.profile}")
     private String baseFileUrl;
 
+    @Value("${piis.serverAddr}")
+    private String serverAddr;
+
 
     /**
      * 统计巡视方案下被巡视单位的听取报告次数
@@ -81,7 +84,7 @@ public class InspectionSpecialReportServiceImpl implements IInspectionSpecialRep
                             documentService.deleteDocumentById(document.getPiisDocId());
                             String filePath = document.getFilePath();
                             if (!StringUtils.isEmpty(filePath)) {
-                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
+                                FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
                             }
                             break;
                         }

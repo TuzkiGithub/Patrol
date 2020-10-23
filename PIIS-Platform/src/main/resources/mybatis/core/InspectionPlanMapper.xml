@@ -117,6 +117,7 @@
         p.PLAN_TYPE,
         P.PLAN_COMPANY_ID,
         P.PLAN_COMPANY_NAME,
+        p.created_time,
         p.PLAN_DESC,
         g.GROUP_ID,
         g.GROUP_NAME,
@@ -159,7 +160,8 @@
         PLAN_TYPE,
         PLAN_COMPANY_ID,
         PLAN_COMPANY_NAME,
-        PLAN_DESC
+        PLAN_DESC,
+        CREATED_TIME
         from
         inspection_plan
         <where>
@@ -179,6 +181,7 @@
         left join inspection_units u on u.UNITS_ID = gmn.units_id
         left join inspection_mobilize mb on mb.PLAN_ID = p.PLAN_ID
         left join inspection_mobilize_attendee mba on mba.MOBILIZE_ID = mb.MOBILIZE_ID
+        order by p.CREATED_TIME desc
     </select>
 
     <select id="selectPlanCompanyTotal" resultMap="selectPlanCompanyTotalResultMap">

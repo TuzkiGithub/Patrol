@@ -1,25 +1,26 @@
 package tech.piis.modules.core.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tech.piis.modules.core.domain.po.PiisDocumentPO;
-import tech.piis.modules.core.service.IPiisDocumentService;
 import org.springframework.util.CollectionUtils;
-import tech.piis.framework.utils.BizUtils;
-import java.util.List;
-import java.util.Arrays;
+import tech.piis.common.enums.FileEnum;
 import tech.piis.common.exception.BaseException;
-import tech.piis.framework.utils.file.FileUploadUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
-import static tech.piis.common.constant.OperationConstants.DELETE;
-import static tech.piis.common.constant.OperationConstants.INSERT;
-import tech.piis.modules.core.mapper.InspectionSinkingUnderstandingMapper;
+import tech.piis.common.utils.DateUtils;
+import tech.piis.common.utils.IdUtils;
+import tech.piis.modules.core.domain.po.InspectionSinkingUnderstandingDetailPO;
 import tech.piis.modules.core.domain.po.InspectionSinkingUnderstandingPO;
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import tech.piis.modules.core.mapper.InspectionSinkingUnderstandingDetailMapper;
+import tech.piis.modules.core.mapper.InspectionSinkingUnderstandingMapper;
 import tech.piis.modules.core.service.IInspectionSinkingUnderstandingService;
+import tech.piis.modules.core.service.IPiisDocumentService;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static tech.piis.common.constant.OperationConstants.*;
 
 /**
  * 下沉了解Service业务层处理
@@ -34,15 +35,15 @@ public class InspectionSinkingUnderstandingServiceImpl implements IInspectionSin
     private InspectionSinkingUnderstandingMapper inspectionSinkingUnderstandingMapper;
 
     @Autowired
-    private IPiisDocumentService documentService;
+    private InspectionSinkingUnderstandingDetailMapper inspectionSinkingUnderstandingDetailMapper;
 
-    @Value("${piis.profile}")
-    private String baseFileUrl;
+    @Autowired
+    private IPiisDocumentService documentService;
 
     /**
      * 统计巡视方案下被巡视单位InspectionSinkingUnderstanding次数
-     * @param planId 巡视计划ID
      *
+     * @param planId 巡视计划ID
      */
     public List<UnitsBizCountVO> selectInspectionSinkingUnderstandingCount(String planId) throws BaseException {
         return inspectionSinkingUnderstandingMapper.selectInspectionSinkingUnderstandingCount(planId);
@@ -50,79 +51,92 @@ public class InspectionSinkingUnderstandingServiceImpl implements IInspectionSin
 
     /**
      * 查询下沉了解列表
+     *
      * @param inspectionSinkingUnderstanding
      * @return
      * @throws BaseException
      */
     public List<InspectionSinkingUnderstandingPO> selectInspectionSinkingUnderstandingList(InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding) throws BaseException {
-        QueryWrapper<InspectionSinkingUnderstandingPO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("units_id", inspectionSinkingUnderstanding.getUnitsId());
-        queryWrapper.eq("plan_id", inspectionSinkingUnderstanding.getPlanId());
-        return inspectionSinkingUnderstandingMapper.selectList(queryWrapper);
+        return inspectionSinkingUnderstandingMapper.selectInspectionSinkingUnderstandingList(inspectionSinkingUnderstanding);
     }
 
     /**
      * 新增下沉了解
+     *
      * @param inspectionSinkingUnderstanding
      * @return
      * @throws BaseException
      */
     public int save(InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding) throws BaseException {
-        int result = inspectionSinkingUnderstandingMapper.insert(inspectionSinkingUnderstanding);
+        //设置主键
+        String id = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
+        inspectionSinkingUnderstanding.setSinkingUnderstandingId(id);
+
         List<PiisDocumentPO> documents = inspectionSinkingUnderstanding.getDocuments();
-        if (!CollectionUtils.isEmpty(documents)) {
-            for (PiisDocumentPO document : documents) {
-                BizUtils.setUpdatedOperation(PiisDocumentPO.class, document);
-                documentService.updateDocumentById(document.setObjectId(null).setFileDictId(null));
-            }
+        documents.forEach(document -> document.setOperationType(INSERT));
+        documentService.updateDocumentBatch(documents, "SinkingUnderstanding" + id, FileEnum.SINKING_OTHER_FILE.getCode());
+
+        //新增下沉了解详情
+        List<InspectionSinkingUnderstandingDetailPO> sinkingUnderstandingDetails = inspectionSinkingUnderstanding.getSinkingUnderstandingDetailList();
+        if (!CollectionUtils.isEmpty(sinkingUnderstandingDetails)) {
+            sinkingUnderstandingDetails.forEach(var -> inspectionSinkingUnderstandingDetailMapper.insert(var.setSinkingUnderstandingId(id)));
         }
-        return result;
+        return inspectionSinkingUnderstandingMapper.insert(inspectionSinkingUnderstanding.setSinkingUnderstandingDetailList(null));
     }
 
     /**
      * 根据ID修改下沉了解
+     *
      * @param inspectionSinkingUnderstanding
      * @return
      * @throws BaseException
      */
     public int update(InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding) throws BaseException {
-        List<PiisDocumentPO> documents = inspectionSinkingUnderstanding.getDocuments();
-        if (!CollectionUtils.isEmpty(documents)) {
-            for (PiisDocumentPO document : documents) {
-                Integer operationType = document.getOperationType();
+        //更新下沉了解文件
+        documentService.updateDocumentBatch(inspectionSinkingUnderstanding.getDocuments(), "SinkingUnderstanding" + inspectionSinkingUnderstanding.getSinkingUnderstandingId(), FileEnum.SINKING_OTHER_FILE.getCode());
+
+        //更新下沉了解详情
+        List<InspectionSinkingUnderstandingDetailPO> sinkingUnderstandingDetailList = inspectionSinkingUnderstanding.getSinkingUnderstandingDetailList();
+        if (!CollectionUtils.isEmpty(sinkingUnderstandingDetailList)) {
+            sinkingUnderstandingDetailList.forEach(var -> var.setSinkingUnderstandingId(inspectionSinkingUnderstanding.getSinkingUnderstandingId()));
+            for (InspectionSinkingUnderstandingDetailPO sinkingUnderstandingDetail : sinkingUnderstandingDetailList) {
+                Integer operationType = sinkingUnderstandingDetail.getOperationType();
                 if (null != operationType) {
                     switch (operationType) {
-                        case INSERT: {
-                            //将业务字段赋予文件表
-                            document.setFileDictId(null)
-                                    .setObjectId(String.valueOf(null));
-                            documentService.updateDocumentById(document);
+                        case INSERT:
+                            inspectionSinkingUnderstandingDetailMapper.insert(sinkingUnderstandingDetail);
                             break;
-                        }
-                        case DELETE: {
-                            //删除服务器上文件以及文件表数据
-                            documentService.deleteDocumentById(document.getPiisDocId());
-                            String filePath = document.getFilePath();
-                            if (!StringUtils.isEmpty(filePath)) {
-                                FileUploadUtils.deleteServerFile(filePath.replace(filePath, baseFileUrl));
-                            }
+                        case UPDATE:
+                            inspectionSinkingUnderstandingDetailMapper.updateById(sinkingUnderstandingDetail);
                             break;
-                        }
+                        case DELETE:
+                            inspectionSinkingUnderstandingDetailMapper.deleteById(sinkingUnderstandingDetail.getSinkingUnderstandingDetailId());
+                            break;
                     }
                 }
             }
         }
-        return inspectionSinkingUnderstandingMapper.updateById(inspectionSinkingUnderstanding);
+        return inspectionSinkingUnderstandingMapper.updateById(inspectionSinkingUnderstanding.setSinkingUnderstandingDetailList(null));
     }
 
     /**
      * 根据ID批量删除下沉了解
-     * @param sinkngUnderstandingIds 下沉了解编号
+     *
+     * @param sinkingUnderstandingIds 下沉了解编号
+     * @return
+     */
+    public int deleteByInspectionSinkingUnderstandingIds(String[] sinkingUnderstandingIds) {
+        List<String> list = Arrays.asList(sinkingUnderstandingIds);
+        return inspectionSinkingUnderstandingMapper.deleteBatchIds(list);
+    }
+
+    /**
+     * 查询总数
      *
      * @return
      */
-    public int deleteByInspectionSinkingUnderstandingIds(String[] sinkngUnderstandingIds) {
-        List<String> list = Arrays.asList(sinkngUnderstandingIds);
-        return inspectionSinkingUnderstandingMapper.deleteBatchIds(list);
+    @Override
+    public int count() {
+        return inspectionSinkingUnderstandingMapper.selectCount(null);
     }
 }

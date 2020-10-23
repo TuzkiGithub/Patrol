@@ -19,4 +19,11 @@ public interface InspectionConsultInfoMapper extends BaseMapper<InspectionConsul
      *
      */
     List<UnitsBizCountVO> selectInspectionConsultInfoCount(String planId) throws BaseException;
+
+    /**
+     * 查询查阅资料
+     * @param inspectionConsultInfo
+     * @return
+     */
+    List<InspectionConsultInfoPO> selectInspectionConsultInfoList(InspectionConsultInfoPO inspectionConsultInfo);
 }

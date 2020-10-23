@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionConsultInfoDetailMapper">
+
+    <resultMap type="InspectionConsultInfoDetailPO" id="InspectionConsultInfoDetailResult">
+        <result property="consultInfoDetailId" column="CONSULT_INFO_DETAIL_ID"/>
+        <result property="consultInfoId" column="CONSULT_INFO_ID"/>
+        <result property="checkInfoName" column="CHECK_INFO_NAME"/>
+        <result property="checkInfoCount" column="CHECK_INFO_COUNT"/>
+        <result property="checkInfoMaterialType" column="CHECK_INFO_MATERIAL_TYPE"/>
+        <result property="checkInfoOriginType" column="CHECK_INFO_ORIGIN_TYPE"/>
+        <result property="timeLimit" column="TIME_LIMIT"/>
+        <result property="providerId" column="PROVIDER_ID"/>
+        <result property="providerName" column="PROVIDER_NAME"/>
+        <result property="providerTime" column="PROVIDER_TIME"/>
+        <result property="returnStatus" column="RETURN_STATUS"/>
+        <result property="returnPersonId" column="RETURN_PERSON_ID"/>
+        <result property="returnPersonName" column="RETURN_PERSON_NAME"/>
+        <result property="returnTime" column="RETURN_TIME"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+
+    <insert id="insertBatch" parameterType="InspectionConsultInfoDetailPO" useGeneratedKeys="true"
+            keyProperty="consultInfoDetailId">
+        insert into inspection_consult_info_detail(CONSULT_INFO_ID, CHECK_INFO_NAME, CHECK_INFO_COUNT,
+        CHECK_INFO_MATERIAL_TYPE, CHECK_INFO_ORIGIN_TYPE, TIME_LIMIT, PROVIDER_ID, PROVIDER_NAME, PROVIDER_TIME,
+        RETURN_STATUS, RETURN_PERSON_ID, RETURN_PERSON_NAME, RETURN_TIME, CREATED_BY, CREATED_TIME) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.consultInfoId},
+            #{item.checkInfoName},#{item.checkInfoCount},#{item.checkInfoMaterialType},#{item.checkInfoOriginType},#{item.timeLimit},#{item.providerId},#{item.providerName},#{item.providerTime},#{item.returnStatus},#{item.returnPersonId},#{item.returnPersonName},#{item.returnTime},#{item.createdBy},#{item.createdTime})
+        </foreach>
+    </insert>
+
+
+</mapper>

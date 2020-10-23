@@ -1,28 +1,24 @@
 package tech.piis.modules.core.controller;
 
-import java.util.List;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.*;
+import tech.piis.common.constant.BizConstants;
+import tech.piis.common.enums.FileEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
 import tech.piis.framework.aspectj.lang.enums.BusinessType;
-import tech.piis.modules.core.domain.po.InspectionVisitPO;
-import tech.piis.modules.core.service.IInspectionVisitService;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.web.controller.BaseController;
 import tech.piis.framework.web.domain.AjaxResult;
-import tech.piis.common.constant.BizConstants;
 import tech.piis.framework.web.page.TableDataInfo;
+import tech.piis.modules.core.domain.po.InspectionVisitPO;
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.service.IInspectionVisitService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
+import java.util.List;
 
 
 /**
@@ -33,8 +29,7 @@ import tech.piis.modules.core.service.IPiisDocumentService;
  */
 @RestController
 @RequestMapping("/piis/visit")
-public class InspectionVisitController extends BaseController
-{
+public class InspectionVisitController extends BaseController {
     @Autowired
     private IInspectionVisitService inspectionVisitService;
 
@@ -42,13 +37,19 @@ public class InspectionVisitController extends BaseController
     private IPiisDocumentService documentService;
 
     /**
-     *
+     * 与前端接口定义文件类型
+     */
+    private static final Long TEMP_VISIT_OTHER_FILE = 1L;
+    private static final Long TEMP_VISIT_SEAL_FILE = 0L;
+
+    /**
      * 查询来访列表
-     * @param  inspectionVisit
+     *
+     * @param inspectionVisit
      */
     @PreAuthorize("@ss.hasPermi('piis:visit:list')")
     @GetMapping("/list")
-    public TableDataInfo list(InspectionVisitPO inspectionVisit) throws BaseException{
+    public TableDataInfo list(InspectionVisitPO inspectionVisit) throws BaseException {
         startPage();
         List<InspectionVisitPO> data = inspectionVisitService.selectInspectionVisitList(inspectionVisit);
         return getDataTable(data);
@@ -56,27 +57,32 @@ public class InspectionVisitController extends BaseController
 
     /**
      * 查询来访文件
-     * @param  inspectionVisitId 文件关联ID
+     *
+     * @param visitId 文件关联ID
      */
     @PreAuthorize("@ss.hasPermi('piis:visit:query')")
     @GetMapping("/file")
-    public AjaxResult findInspectionVisitFile(String inspectionVisitId) throws BaseException {
-        return AjaxResult.success(documentService.getFileListByBizId(inspectionVisitId));
+    public AjaxResult findInspectionVisitFile(String visitId) throws BaseException {
+        List<PiisDocumentPO> documents = documentService.getFileListByBizId("Visit" + visitId);
+        convertTempDict(documents);
+        return AjaxResult.success(documents);
     }
 
     /**
      * 查询来访总览列表
      *
      * @param planId 巡视计划ID
-    */
+     */
     @PreAuthorize("@ss.hasPermi('piis:visit:query')")
     @GetMapping("/count")
-    public AjaxResult countInspectionVisitList(String planId) throws BaseException{
+    public AjaxResult countInspectionVisitList(String planId) throws BaseException {
         return AjaxResult.success(inspectionVisitService.selectInspectionVisitCount(planId));
     }
+
     /**
      * 新增来访
-     * @param  inspectionVisit
+     *
+     * @param inspectionVisit
      */
     @PreAuthorize("@ss.hasPermi('piis:visit:add')")
     @Log(title = "来访", businessType = BusinessType.INSERT)
@@ -85,20 +91,24 @@ public class InspectionVisitController extends BaseController
         if (null == inspectionVisit) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        convertFileDict(inspectionVisit);
+        BizUtils.setCreatedOperation(InspectionVisitPO.class, inspectionVisit);
         return toAjax(inspectionVisitService.save(inspectionVisit));
     }
 
     /**
      * 修改来访
-     * @param  inspectionVisit
+     *
+     * @param inspectionVisit
      */
     @PreAuthorize("@ss.hasPermi('piis:visit:edit')")
     @Log(title = "来访", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody InspectionVisitPO inspectionVisit) throws BaseException{
+    public AjaxResult edit(@RequestBody InspectionVisitPO inspectionVisit) throws BaseException {
         if (null == inspectionVisit) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        convertFileDict(inspectionVisit);
         BizUtils.setUpdatedOperation(InspectionVisitPO.class, inspectionVisit);
         return toAjax(inspectionVisitService.update(inspectionVisit));
     }
@@ -109,27 +119,46 @@ public class InspectionVisitController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('piis:visit:remove')")
     @Log(title = "来访", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{callVisitIds}")
-    public AjaxResult remove(@PathVariable String[] callVisitIds) throws BaseException{
+    @DeleteMapping("/{callVisitIds}")
+    public AjaxResult remove(@PathVariable String[] callVisitIds) throws BaseException {
         return toAjax(inspectionVisitService.deleteByInspectionVisitIds(callVisitIds));
     }
 
     /**
-    * 参数类型转换
-    *
-    * @param inspectionVisit
-    */
-    private void specialReportCovert2String(InspectionVisitPO inspectionVisit){
-
+     * 临时文件字典 -》 实际文件字典
+     *
+     * @param inspectionVisit
+     */
+    private void convertFileDict(InspectionVisitPO inspectionVisit) {
+        List<PiisDocumentPO> documents = inspectionVisit.getDocuments();
+        if (!CollectionUtils.isEmpty(documents)) {
+            documents.forEach(document -> {
+                Long tempDictId = document.getFileDictId();
+                if (TEMP_VISIT_OTHER_FILE.equals(tempDictId)) {
+                    document.setFileDictId(FileEnum.VISIT_OTHER_FILE.getCode());
+                } else if (TEMP_VISIT_SEAL_FILE.equals(tempDictId)) {
+                    document.setFileDictId(FileEnum.VISIT_SEAL_FILE.getCode());
+                }
+            });
+        }
     }
 
 
     /**
-    * 参数类型转换
-    *
-    * @param inspectionVisitList
-    */
-    private void specialReportCovert2List(List<InspectionVisitPO> inspectionVisitList){
-
+     * 实际文件字典 -》 临时文件字典
+     *
+     * @param documents
+     */
+    private void convertTempDict(List<PiisDocumentPO> documents) {
+        if (!CollectionUtils.isEmpty(documents)) {
+            documents.forEach(document -> {
+                Long DictId = document.getFileDictId();
+                if (FileEnum.VISIT_OTHER_FILE.getCode().equals(DictId)) {
+                    document.setFileDictId(TEMP_VISIT_OTHER_FILE);
+                } else if (FileEnum.VISIT_SEAL_FILE.getCode().equals(DictId)) {
+                    document.setFileDictId(TEMP_VISIT_SEAL_FILE);
+                }
+            });
+        }
     }
 }

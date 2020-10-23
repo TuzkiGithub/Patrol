@@ -35,4 +35,21 @@ public class UnitsBizCountVO {
      * 被巡视单位-次数
      */
     private Integer count;
+
+    /**
+     * 来访次数
+     */
+    private Integer visitCount;
+
+    /**
+     * 来电次数
+     */
+    private Integer callCount;
+
+    /**
+     * 组织类型
+     * 0 组务会
+     * 1 支部会
+     */
+    private Integer organizationType;
 }

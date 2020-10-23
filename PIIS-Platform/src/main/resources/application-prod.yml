@@ -1,7 +1,7 @@
 # Production Datasource Setting
 piis:
   # Upload Path
-  profile: /piis/file
+  profile: /piis/file/upload
   ##
   serverAddr: 25.2.16.160:8181
 

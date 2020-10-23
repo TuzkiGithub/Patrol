@@ -46,9 +46,15 @@ public interface IInspectionSinkingUnderstandingService {
 
     /**
      * 根据ID批量删除下沉了解
-     * @param sinkngUnderstandingIds 下沉了解编号
+     * @param sinkingUnderstandingIds 下沉了解编号
      *
      * @return
      */
-    int deleteByInspectionSinkingUnderstandingIds(String[] sinkngUnderstandingIds);
+    int deleteByInspectionSinkingUnderstandingIds(String[] sinkingUnderstandingIds);
+
+    /**
+     * 查询总数
+     * @return
+     */
+    int count();
 }

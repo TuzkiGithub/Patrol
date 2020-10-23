@@ -16,7 +16,7 @@ public enum FileEnum {
     SPEECH_DRAFT_FILE("演讲稿", 33L),
     SPECIAL_REPORT_FILE("专题报告相关附件", 34L),
     CONSULT_INFO_FILE("查阅资料相关附件", 35L),
-    CONSULT_MATERIALS_FILE("调阅材料", 36L),
+    CONSULT_DETAIL_FILE("查阅资料详情相关附件", 36L),
     ORG_OTHER_FILE("组务会相关附件", 37L),
     BRANCH_OTHER_FILE("支部会相关附件", 38L),
     ATTENDEE_OTHER_FILE("参会情况相关附件", 39L),

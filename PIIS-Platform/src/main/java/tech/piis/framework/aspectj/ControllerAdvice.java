@@ -16,7 +16,7 @@ import tech.piis.framework.web.domain.AjaxResult;
  * Description:
  */
 @Slf4j
-@org.springframework.web.bind.annotation.ControllerAdvice
+//@org.springframework.web.bind.annotation.ControllerAdvice
 public class ControllerAdvice {
 
     /**
