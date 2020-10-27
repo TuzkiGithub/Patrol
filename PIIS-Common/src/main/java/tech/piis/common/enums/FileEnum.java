@@ -27,7 +27,15 @@ public enum FileEnum {
     VISIT_OTHER_FILE("来访材料", 44L),
     CALL_SEAL_FILE("来电盖章版文件", 45L),
     CALL_OTHER_FILE("来电材料", 46L),
-    PERSONAL_OTHER_FILE("个人事项", 47L);
+    PERSONAL_OTHER_FILE("个人事项", 47L),
+    PIIS_INFORMATION_FILE("巡视巡察了解情况文件", 48L),
+    SUPPORTING_MATERIALS_FILE("支撑材料目录", 49L),
+    PROBLEM_DRAFT_FILE("问题底稿其他材料", 50L),
+    LEGISLATION_REFORM_FILE("立行立改相关附件", 51L),
+    IMPORTANT_SPORT_FILE("重要报告相关附件", 52L),
+    APPROVAL_FILE("审批表", 53L),
+    HANDOVER_FILE("交接单", 54L),
+    COMMITTEE_OTHER_FILE("党委会相关附件", 55L);
 
 
     private String name;

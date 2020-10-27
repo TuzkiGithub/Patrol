@@ -14,7 +14,6 @@ import tech.piis.framework.web.controller.BaseController;
 import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.framework.web.page.TableDataInfo;
 import tech.piis.modules.core.domain.po.InspectionConsultInfoPO;
-import tech.piis.modules.core.domain.po.InspectionInvestigationVisitPO;
 import tech.piis.modules.core.service.IInspectionConsultInfoService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
@@ -45,19 +44,21 @@ public class InspectionConsultInfoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('piis:consult/info:list')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionConsultInfoPO inspectionConsultInfo) throws BaseException {
+        Long unitsId = null;
         if (null != inspectionConsultInfo) {
+            unitsId = Long.valueOf(inspectionConsultInfo.getUnitsId());
             if (null == inspectionConsultInfo.getPageNum() || null == inspectionConsultInfo.getPageNum()) {
                 inspectionConsultInfo.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
                 inspectionConsultInfo.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
             }
-            inspectionConsultInfo.setPageNum(inspectionConsultInfo.getPageNum() + inspectionConsultInfo.getPageNum() * inspectionConsultInfo.getPageSize());
+            inspectionConsultInfo.setPageNum(inspectionConsultInfo.getPageNum() * inspectionConsultInfo.getPageSize());
         }
         List<InspectionConsultInfoPO> data = inspectionConsultInfoService.selectInspectionConsultInfoList(inspectionConsultInfo);
         return new TableDataInfo()
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
                 .setRows(data)
-                .setTotal(inspectionConsultInfoService.count());
+                .setTotal(inspectionConsultInfoService.count(unitsId));
     }
 
     /**

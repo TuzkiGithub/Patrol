@@ -39,7 +39,7 @@ public class HttpClientUtils {
      * @return
      */
     @SuppressWarnings("deprecation")
-    public static String postParamToUrl(String url, String data) {
+    public static String doPostParamToUrl(String url, String data) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(url);
         String context = StringUtils.EMPTY;
@@ -78,7 +78,7 @@ public class HttpClientUtils {
      * @param mapData
      * @return
      */
-    public static String postParamToBody(String url, Map<String, String> mapData) {
+    public static String doPostParamToBody(String url, Map<String, String> mapData) {
         CloseableHttpResponse response = null;
         CloseableHttpClient httpClient = HttpClients.createDefault();
         // 创建httppost
@@ -120,7 +120,7 @@ public class HttpClientUtils {
      * @param url 请求地址加参数
      * @return
      */
-    public static String get(String url) throws URISyntaxException {
+    public static String doGet(String url) throws URISyntaxException {
         String result = null;
         CloseableHttpClient httpClient = HttpClients.createDefault();
 

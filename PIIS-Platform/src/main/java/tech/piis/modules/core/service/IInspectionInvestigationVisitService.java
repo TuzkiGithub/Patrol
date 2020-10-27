@@ -56,5 +56,5 @@ public interface IInspectionInvestigationVisitService {
      * 查询总数
      * @return
      */
-    int count() throws BaseException;
+    int count(Long unitsId) throws BaseException;
 }

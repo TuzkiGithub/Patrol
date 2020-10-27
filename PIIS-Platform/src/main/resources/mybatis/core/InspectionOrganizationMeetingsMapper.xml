@@ -27,6 +27,7 @@
         <result property="orgName" column="org_name"/>
         <result property="count" column="count"/>
         <result property="organizationType" column="organizationType"/>
+        <result property="createdTime" column="CREATED_TIME"/>
     </resultMap>
 
     <sql id="selectInspectionOrganizationMeetingsVo">
@@ -39,12 +40,14 @@
           u.PLAN_ID,
           u.ORG_ID,
           u.ORG_NAME,
+          u.created_time,
           count(o.UNITS_ID)              AS count,
           ifnull(o.ORGANIZATION_TYPE, 0) as organizationType
         from inspection_units u
           left join inspection_Organization_Meetings o on u.UNITS_ID = o.UNITS_ID
         where u.plan_id = #{planId}
-        group by u.UNITS_ID
+        group by u.UNITS_ID, organizationType
+        order by u.created_time desc
     </select>
 
 </mapper>

@@ -35,6 +35,7 @@
         <result property="orgId" column="org_id"/>
         <result property="orgName" column="org_name"/>
         <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
     </resultMap>
 
     <sql id="selectInspectionSinkingUnderstandingVo">
@@ -85,12 +86,12 @@
 
     <select id="selectInspectionSinkingUnderstandingCount" parameterType="java.lang.String"
             resultMap="unitsBizCountResultMap">
-        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(d.UNITS_ID) as count
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
         from inspection_units u
         left join inspection_sinking_understanding d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by count desc
+        order by u.created_time desc
     </select>
 
 

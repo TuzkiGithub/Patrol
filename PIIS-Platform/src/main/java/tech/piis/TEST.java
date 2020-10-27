@@ -1,6 +1,7 @@
 package tech.piis;
 
 import org.springframework.util.CollectionUtils;
+import tech.piis.common.utils.DateUtils;
 import tech.piis.modules.core.domain.vo.UserBriefVO;
 
 import java.util.ArrayList;
@@ -35,8 +36,9 @@ public class TEST {
 //            newStr += s + ",";
 //        }
 //        System.out.println(newStr.substring(0,newStr.lastIndexOf(",")));
-        String fileUrl = "piis.file.com:81/upload/2020/10/20/授课2.txt";
+//        String fileUrl = "piis.file.com:81/upload/2020/10/20/授课2.txt";
 
+        System.out.println(DateUtils.dateTimeNow("yyyyMMdd"));
     }
 
 

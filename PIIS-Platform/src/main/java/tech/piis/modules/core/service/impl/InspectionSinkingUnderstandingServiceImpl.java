@@ -1,5 +1,6 @@
 package tech.piis.modules.core.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +9,7 @@ import tech.piis.common.enums.FileEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
+import tech.piis.modules.core.domain.po.InspectionConsultInfoPO;
 import tech.piis.modules.core.domain.po.InspectionSinkingUnderstandingDetailPO;
 import tech.piis.modules.core.domain.po.InspectionSinkingUnderstandingPO;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
@@ -136,7 +138,9 @@ public class InspectionSinkingUnderstandingServiceImpl implements IInspectionSin
      * @return
      */
     @Override
-    public int count() {
-        return inspectionSinkingUnderstandingMapper.selectCount(null);
+    public int count(Long unitsId) {
+        QueryWrapper<InspectionSinkingUnderstandingPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("UNITS_ID", unitsId);
+        return inspectionSinkingUnderstandingMapper.selectCount(queryWrapper);
     }
 }

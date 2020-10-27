@@ -53,6 +53,16 @@ public interface IPiisDocumentService {
     void updateDocumentBatch(List<PiisDocumentPO> documents, String objectId, Long fileDictId) throws BaseException;
 
     /**
+     * 批量更新文件对象
+     *
+     * @param documents  文件对象
+     * @param objectId   业务主键
+     * @return
+     * @throws BaseException
+     */
+    void updateDocumentBatch(List<PiisDocumentPO> documents, String objectId) throws BaseException;
+
+    /**
      * 新增文件对象
      *
      * @param documentPO

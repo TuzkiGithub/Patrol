@@ -1,5 +1,6 @@
 package tech.piis.modules.core.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -146,7 +147,9 @@ public class InspectionInvestigationVisitServiceImpl implements IInspectionInves
      * @return
      */
     @Override
-    public int count() throws BaseException {
-        return inspectionInvestigationVisitMapper.selectCount(null);
+    public int count(Long unitsId) throws BaseException {
+        QueryWrapper<InspectionInvestigationVisitPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("UNITS_ID", unitsId);
+        return inspectionInvestigationVisitMapper.selectCount(queryWrapper);
     }
 }

@@ -29,6 +29,7 @@
         <result property="orgId" column="org_id"/>
         <result property="orgName" column="org_name"/>
         <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
     </resultMap>
 
     <sql id="selectInspectionSpecialReportVo">
@@ -68,12 +69,12 @@
     </select>
 
     <select id="selectSpecialReportCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
-        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(r.UNITS_ID) as count
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(r.UNITS_ID) as count
         from inspection_units u
         left join inspection_special_report r on u.UNITS_ID = r.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by count desc
+        order by u.created_time desc
     </select>
 
 </mapper>

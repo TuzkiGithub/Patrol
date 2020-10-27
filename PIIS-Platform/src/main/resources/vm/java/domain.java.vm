@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
 import java.util.List;
@@ -32,6 +33,7 @@ import ${import};
 
 @TableName("${tableName}")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Accessors(chain = true)
 public class ${ClassName}PO extends PIBaseEntity

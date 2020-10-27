@@ -76,7 +76,7 @@ public class InspectionConsultInfoServiceImpl implements IInspectionConsultInfoS
 
         //更新查阅资料文件业务字段
         List<PiisDocumentPO> documents = inspectionConsultInfo.getDocuments();
-        if(!CollectionUtils.isEmpty(documents)){
+        if (!CollectionUtils.isEmpty(documents)) {
             documents.forEach(document -> document.setOperationType(INSERT));
         }
         documentService.updateDocumentBatch(documents, "ConsultInfo" + consultInfoId, FileEnum.CONSULT_INFO_FILE.getCode());
@@ -159,8 +159,10 @@ public class InspectionConsultInfoServiceImpl implements IInspectionConsultInfoS
      * @return
      */
     @Override
-    public int count() {
-        return consultInfoMapper.selectCount(null);
+    public int count(Long unitsId) {
+        QueryWrapper<InspectionConsultInfoPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("UNITS_ID", unitsId);
+        return consultInfoMapper.selectCount(queryWrapper);
     }
 
     /**

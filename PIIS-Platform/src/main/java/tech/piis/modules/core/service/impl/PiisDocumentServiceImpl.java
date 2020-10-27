@@ -120,6 +120,43 @@ public class PiisDocumentServiceImpl implements IPiisDocumentService {
     }
 
     /**
+     * 批量更新文件对象
+     *
+     * @param documents 文件对象
+     * @param objectId  业务主键
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public void updateDocumentBatch(List<PiisDocumentPO> documents, String objectId) throws BaseException {
+        if (!CollectionUtils.isEmpty(documents)) {
+            for (PiisDocumentPO document : documents) {
+                Integer operationType = document.getOperationType();
+                if (null != operationType) {
+                    switch (operationType) {
+                        case INSERT: {
+                            //将业务字段赋予文件表
+                            document.setObjectId(objectId);
+                            BizUtils.setUpdatedOperation(PiisDocumentPO.class, document);
+                            updateDocumentById(document);
+                            break;
+                        }
+                        case DELETE: {
+                            //删除服务器上文件以及文件表数据
+                            deleteDocumentById(document.getPiisDocId());
+                            String filePath = document.getFilePath();
+                            if (!StringUtils.isEmpty(filePath)) {
+                                FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 新增文件对象
      *
      * @param documentPO

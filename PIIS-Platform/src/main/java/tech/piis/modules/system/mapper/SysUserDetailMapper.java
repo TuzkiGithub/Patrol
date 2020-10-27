@@ -58,4 +58,11 @@ public interface SysUserDetailMapper {
      * @return
      */
     List<UserVO> selectUserDeptPost(SysUser user);
+
+    /**
+     * 根据部门ID查询用户详情
+     * @param deptId
+     * @return
+     */
+    int selectCount(String deptId);
 }

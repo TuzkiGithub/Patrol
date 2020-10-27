@@ -49,6 +49,7 @@
         <result property="inspectionTime" column="INSPECTION_TIME"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="orgName" column="ORG_NAME"/>
+        <result property="createdTime" column="CREATED_TIME"/>
         <collection property="groupMemberList" javaType="java.util.List"
                     resultMap="inspectionGroupMemberResultMap"/>
     </resultMap>
@@ -137,6 +138,7 @@
         u.INSPECTION_TIME,
         u.ORG_ID,
         u.ORG_NAME,
+        u.CREATED_TIME,
         mb.MOBILIZE_ID,
         mb.MEET_NAME,
         mb.MEET_PLACE,
@@ -172,7 +174,7 @@
             <if test="planCompanyId!=null and planCompanyId!=''">
                 AND PLAN_COMPANY_ID = #{planCompanyId}
             </if>
-        </where>
+        </where>逆序
         limit #{pageNum},#{pageSize}
         ) p
         left join inspection_group g on p.PLAN_ID = g.PLAN_ID
@@ -181,7 +183,7 @@
         left join inspection_units u on u.UNITS_ID = gmn.units_id
         left join inspection_mobilize mb on mb.PLAN_ID = p.PLAN_ID
         left join inspection_mobilize_attendee mba on mba.MOBILIZE_ID = mb.MOBILIZE_ID
-        order by p.CREATED_TIME desc
+        order by p.CREATED_TIME, u.CREATED_TIME desc
     </select>
 
     <select id="selectPlanCompanyTotal" resultMap="selectPlanCompanyTotalResultMap">

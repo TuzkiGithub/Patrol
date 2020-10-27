@@ -1,5 +1,6 @@
 package tech.piis.modules.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,10 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public List<UserVO> selectUserList(SysUser user) {
+        String deptIdStr = user.getDeptIdStr();
+        if (!StringUtils.isEmpty(deptIdStr)) {
+            return userDetailsMapper.selectUserDeptByDeptId(deptIdStr);
+        }
         return userDetailsMapper.selectUserDeptRole(user);
     }
 
@@ -112,6 +117,21 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public String checkUserNameUnique(String userName) {
         int count = userMapper.checkUserNameUnique(userName);
+        if (count > 0) {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
+    }
+
+    /**
+     * 校验用户ID是否唯一
+     *
+     * @param userId 用户名称
+     * @return 结果
+     */
+    @Override
+    public String checkUserIdUnique(String userId) {
+        int count = userMapper.checkUserIdUnique(userId);
         if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
@@ -200,10 +220,9 @@ public class SysUserServiceImpl implements ISysUserService {
         insertUserRole(user);
 
         //删除用户与部门关系
-//        Wrapper<SysUserDept> delSysUserDeptCondition = new EntityWrapper<>();
-//        delSysUserDeptCondition.where("where user_id = {0}", userId);
-//        userDeptMapper.delete(delSysUserDeptCondition);
-        userDeptMapper.deleteById(userId);
+        QueryWrapper<SysUserDept> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        userDeptMapper.delete(queryWrapper);
 
         //新增用户与部门关系
         insertUserDept(user);
@@ -398,8 +417,12 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return
      */
     @Override
-    public int selectCount() {
-        return this.userMapper.selectCount();
+    public int selectCount(SysUser user) {
+        String deptId = user.getDeptIdStr();
+        if (!StringUtils.isEmpty(deptId)) {
+            return userDetailsMapper.selectCount(deptId);
+        }
+        return this.userMapper.selectCount(user);
     }
 
     /**

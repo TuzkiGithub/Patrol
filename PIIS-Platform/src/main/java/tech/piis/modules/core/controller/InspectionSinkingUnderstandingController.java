@@ -43,19 +43,21 @@ public class InspectionSinkingUnderstandingController extends BaseController {
     @PreAuthorize("@ss.hasPermi('piis:sinking/understanding:list')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding) throws BaseException {
+        Long unitsId = null;
         if (null != inspectionSinkingUnderstanding) {
+            unitsId = Long.parseLong(inspectionSinkingUnderstanding.getUnitsId());
             if (null == inspectionSinkingUnderstanding.getPageNum() || null == inspectionSinkingUnderstanding.getPageNum()) {
                 inspectionSinkingUnderstanding.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
                 inspectionSinkingUnderstanding.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
             }
-            inspectionSinkingUnderstanding.setPageNum(inspectionSinkingUnderstanding.getPageNum() + inspectionSinkingUnderstanding.getPageNum() * inspectionSinkingUnderstanding.getPageSize());
+            inspectionSinkingUnderstanding.setPageNum(inspectionSinkingUnderstanding.getPageNum() * inspectionSinkingUnderstanding.getPageSize());
         }
         List<InspectionSinkingUnderstandingPO> data = inspectionSinkingUnderstandingService.selectInspectionSinkingUnderstandingList(inspectionSinkingUnderstanding);
         return new TableDataInfo()
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
                 .setRows(data)
-                .setTotal(inspectionSinkingUnderstandingService.count());
+                .setTotal(inspectionSinkingUnderstandingService.count(unitsId));
     }
 
     /**

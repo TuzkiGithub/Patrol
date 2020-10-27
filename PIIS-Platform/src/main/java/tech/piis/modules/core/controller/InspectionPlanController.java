@@ -62,7 +62,7 @@ public class InspectionPlanController extends BaseController {
                 inspectionPlanPO.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
                 inspectionPlanPO.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
             } else {
-                inspectionPlanPO.setPageNum(inspectionPlanPO.getPageNum() + inspectionPlanPO.getPageNum() * inspectionPlanPO.getPageSize());
+                inspectionPlanPO.setPageNum(inspectionPlanPO.getPageNum() * inspectionPlanPO.getPageSize());
             }
         }
         return new TableDataInfo()

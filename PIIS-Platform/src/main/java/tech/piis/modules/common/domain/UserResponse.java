@@ -21,7 +21,7 @@ import java.util.List;
 public class UserResponse extends UserExternal{
     private int code;
 
-    private String msg;
+    private String message;
 
     private List<UserExternal> data;
 }

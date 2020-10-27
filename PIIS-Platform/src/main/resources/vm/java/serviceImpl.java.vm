@@ -105,7 +105,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     * @return
     */
     @Override
-    int count() {
+    public int count() {
         return ${className}Mapper.selectCount(null);
     }
 }

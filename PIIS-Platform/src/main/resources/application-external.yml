@@ -1,0 +1,26 @@
+##数据港参数
+data:
+  dept:
+  ##增量数据 http://25.2.16.40:17121/org/chg/std?etl_dt=
+    url: http://25.2.16.40:17121/org/id/tree/std?grpOrgId=0000000000
+  user:
+  ##增量数据 http://25.2.16.40:17121/emp/chg/std?etl_dt=
+    url: http://25.2.16.40:17121/org/id/emp?emp_range=1&grpOrgId=0000000000
+
+
+#IAM参数
+iam:
+  code:
+    url: http://25.2.18.133:50080/4a-app/oauth/authorize
+  token:
+    url: http://25.2.18.133:50080/4a-app/oauth/token
+  user:
+    url: http://25.2.18.133:50080/4a-app/oauth2-service/sso-account
+  redirect:
+    url: http://25.2.16.160:18081/iam/auth
+  clientId: 2d89cdeb-a84a-43cd-a33d-757364a174b1
+  clientSecret: 591b874d-b374-4c42-9412-26459aeda7ac
+  responseType: code
+  scope: sso:*
+  state: piis
+  grantType: authorization_code

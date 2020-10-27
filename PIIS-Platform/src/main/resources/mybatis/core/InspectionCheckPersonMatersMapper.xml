@@ -36,6 +36,7 @@
         <result property="orgId" column="org_id"/>
         <result property="orgName" column="org_name"/>
         <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
     </resultMap>
 
     <select id="selectInspectionCheckPersonMattersList" parameterType="InspectionCheckPersonMattersPO"
@@ -91,12 +92,12 @@
 
 
     <select id="selectInspectionCheckPersonMattersCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
-        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,count(cpm.UNITS_ID) as count
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(cpm.UNITS_ID) as count
         from inspection_units u
         left join inspection_check_person_matters cpm on u.UNITS_ID = cpm.UNITS_ID
         where u.plan_id = #{planId}
-        group by cpm.UNITS_ID
-        order by count desc
+        group by u.UNITS_ID
+        order by u.created_time desc
     </select>
 
 </mapper>

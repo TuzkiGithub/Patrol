@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionFeedbackMapper">
+    
+    <resultMap type="InspectionFeedbackPO" id="InspectionFeedbackResult">
+        <result property="feedbackId"    column="FEEDBACK_ID"    />
+        <result property="planId"    column="PLAN_ID"    />
+        <result property="unitsId"    column="UNITS_ID"    />
+        <result property="fileName"    column="FILE_NAME"    />
+        <result property="fileCode"    column="FILE_CODE"    />
+        <result property="mainCompanyId"    column="MAIN_COMPANY_ID"    />
+        <result property="mainCompanyName"    column="MAIN_COMPANY_NAME"    />
+        <result property="copyCompanyId"    column="COPY_COMPANY_ID"    />
+        <result property="copyCompanyName"    column="COPY_COMPANY_NAME"    />
+        <result property="toDoTime"    column="TO_DO_TIME"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="createdTime"    column="CREATED_TIME"    />
+        <result property="updatedBy"    column="UPDATED_BY"    />
+        <result property="updatedTime"    column="UPDATED_TIME"    />
+        <result property="entId"    column="ENT_ID"    />
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+    </resultMap>
+
+    <sql id="selectInspectionFeedbackVo">
+        select FEEDBACK_ID, PLAN_ID, UNITS_ID, FILE_NAME, FILE_CODE, MAIN_COMPANY_ID, MAIN_COMPANY_NAME, COPY_COMPANY_ID, COPY_COMPANY_NAME, TO_DO_TIME, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_feedback
+    </sql>
+
+    <select id="selectInspectionFeedbackList" parameterType="InspectionFeedbackPO" resultMap="InspectionFeedbackResult">
+        <include refid="selectInspectionFeedbackVo"/>
+        <where>  
+            <if test="planId != null  and planId != ''"> and PLAN_ID = #{planId}</if>
+            <if test="unitsId != null "> and UNITS_ID = #{unitsId}</if>
+            <if test="fileName != null  and fileName != ''"> and FILE_NAME like concat('%', #{fileName}, '%')</if>
+            <if test="fileCode != null  and fileCode != ''"> and FILE_CODE = #{fileCode}</if>
+            <if test="mainCompanyId != null  and mainCompanyId != ''"> and MAIN_COMPANY_ID = #{mainCompanyId}</if>
+            <if test="mainCompanyName != null  and mainCompanyName != ''"> and MAIN_COMPANY_NAME like concat('%', #{mainCompanyName}, '%')</if>
+            <if test="copyCompanyId != null  and copyCompanyId != ''"> and COPY_COMPANY_ID = #{copyCompanyId}</if>
+            <if test="copyCompanyName != null  and copyCompanyName != ''"> and COPY_COMPANY_NAME like concat('%', #{copyCompanyName}, '%')</if>
+            <if test="toDoTime != null "> and TO_DO_TIME = #{toDoTime}</if>
+            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
+            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
+            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
+            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
+        </where>
+    </select>
+    
+    <select id="selectInspectionFeedbackById" parameterType="String" resultMap="InspectionFeedbackResult">
+        <include refid="selectInspectionFeedbackVo"/>
+        where FEEDBACK_ID = #{feedbackId}
+    </select>
+        
+    <insert id="insertInspectionFeedback" parameterType="InspectionFeedbackPO">
+        insert into inspection_feedback
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="feedbackId != null  and feedbackId != ''">FEEDBACK_ID,</if>
+            <if test="planId != null  and planId != ''">PLAN_ID,</if>
+            <if test="unitsId != null ">UNITS_ID,</if>
+            <if test="fileName != null  and fileName != ''">FILE_NAME,</if>
+            <if test="fileCode != null  and fileCode != ''">FILE_CODE,</if>
+            <if test="mainCompanyId != null  and mainCompanyId != ''">MAIN_COMPANY_ID,</if>
+            <if test="mainCompanyName != null  and mainCompanyName != ''">MAIN_COMPANY_NAME,</if>
+            <if test="copyCompanyId != null  and copyCompanyId != ''">COPY_COMPANY_ID,</if>
+            <if test="copyCompanyName != null  and copyCompanyName != ''">COPY_COMPANY_NAME,</if>
+            <if test="toDoTime != null ">TO_DO_TIME,</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
+            <if test="createdTime != null ">CREATED_TIME,</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
+            <if test="updatedTime != null ">UPDATED_TIME,</if>
+            <if test="entId != null  and entId != ''">ENT_ID,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="feedbackId != null  and feedbackId != ''">#{feedbackId},</if>
+            <if test="planId != null  and planId != ''">#{planId},</if>
+            <if test="unitsId != null ">#{unitsId},</if>
+            <if test="fileName != null  and fileName != ''">#{fileName},</if>
+            <if test="fileCode != null  and fileCode != ''">#{fileCode},</if>
+            <if test="mainCompanyId != null  and mainCompanyId != ''">#{mainCompanyId},</if>
+            <if test="mainCompanyName != null  and mainCompanyName != ''">#{mainCompanyName},</if>
+            <if test="copyCompanyId != null  and copyCompanyId != ''">#{copyCompanyId},</if>
+            <if test="copyCompanyName != null  and copyCompanyName != ''">#{copyCompanyName},</if>
+            <if test="toDoTime != null ">#{toDoTime},</if>
+            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
+            <if test="createdTime != null ">#{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
+            <if test="updatedTime != null ">#{updatedTime},</if>
+            <if test="entId != null  and entId != ''">#{entId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateInspectionFeedback" parameterType="InspectionFeedbackPO">
+        update inspection_feedback
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="planId != null  and planId != ''">PLAN_ID = #{planId},</if>
+            <if test="unitsId != null ">UNITS_ID = #{unitsId},</if>
+            <if test="fileName != null  and fileName != ''">FILE_NAME = #{fileName},</if>
+            <if test="fileCode != null  and fileCode != ''">FILE_CODE = #{fileCode},</if>
+            <if test="mainCompanyId != null  and mainCompanyId != ''">MAIN_COMPANY_ID = #{mainCompanyId},</if>
+            <if test="mainCompanyName != null  and mainCompanyName != ''">MAIN_COMPANY_NAME = #{mainCompanyName},</if>
+            <if test="copyCompanyId != null  and copyCompanyId != ''">COPY_COMPANY_ID = #{copyCompanyId},</if>
+            <if test="copyCompanyName != null  and copyCompanyName != ''">COPY_COMPANY_NAME = #{copyCompanyName},</if>
+            <if test="toDoTime != null ">TO_DO_TIME = #{toDoTime},</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
+            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
+            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
+            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
+        </trim>
+        where FEEDBACK_ID = #{feedbackId}
+    </update>
+
+    <delete id="deleteInspectionFeedbackById" parameterType="String">
+        delete from inspection_feedback where FEEDBACK_ID = #{feedbackId}
+    </delete>
+
+    <delete id="deleteInspectionFeedbackByIds" parameterType="String">
+        delete from inspection_feedback where FEEDBACK_ID in 
+        <foreach item="feedbackId" collection="array" open="(" separator="," close=")">
+            #{feedbackId}
+        </foreach>
+    </delete>
+    
+</mapper>

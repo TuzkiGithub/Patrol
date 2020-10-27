@@ -1,4 +1,4 @@
-package tech.piis.auth;
+package tech.piis.ex_service.auth;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -8,12 +8,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tech.piis.framework.utils.HttpUtils;
+import tech.piis.common.utils.http.HttpClientUtils;
 import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.modules.system.mapper.SysUserDetailMapper;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,7 +22,7 @@ import java.util.Map;
  */
 @RestController
 @Slf4j
-@RequestMapping("auth")
+@RequestMapping("iam")
 public class IAMAuth {
 
     /**
@@ -93,26 +90,34 @@ public class IAMAuth {
      **/
     private static final String and = "&";
     private static final String con = "?";
-
+    private static final String eq = "=";
 
     @Autowired
     private SysUserDetailMapper sysUserDetailMapper;
 
+
     /**
-     * 拼接url获取code
-     *
+     * 获取code
+     * @param code code
+     * @param state 应用系统标识
+     * @return
      * @throws Exception
      */
     @RequestMapping("auth")
-    public void getCode() throws Exception {
-        String url = code_url +
-                and + redirectUrl +
-                and + scope +
-                and + clientId +
-                and + response_type +
-                and + state;
-        log.info("######Get code url = {}", url);
-        HttpUtils.get(url);
+    public AjaxResult getCode(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "state", required = false) String state) throws Exception {
+        if (StringUtils.isEmpty(code)) {
+            String url = code_url +
+                    con + "client_id" + eq + clientId +
+                    and + "redirect_uri" + eq + redirectUrl +
+                    and + "scope" + eq + scope +
+                    and + "response_type" + eq + response_type +
+                    and + "state" + eq + state;
+            log.info("###IAM认证### Get code url = {}", url);
+            HttpClientUtils.doGet(url);
+            return AjaxResult.success("###IAM认证###获取code start");
+        }
+        log.info("###IAM认证### code = {}, state = {}", code, state);
+        return getUserInfo(code, state);
     }
 
 
@@ -122,20 +127,20 @@ public class IAMAuth {
      * @return
      */
     private String getAccess_token(String code) throws Exception {
-        log.info("######Get accessToken code = {}", code);
+        log.info("###IAM认证 Get accessToken code = {}", code);
         String url = access_token_url +
-                con + clientId +
-                and + clientSecret +
-                and + code +
-                and + grantType +
-                and + redirectUrl;
-        String result = HttpUtils.get(url);
+                con + "client_id" + eq + clientId +
+                and + "client_secret" + eq + clientSecret +
+                and + "code" + eq + code +
+                and + "grant_type" + eq + grantType +
+                and + "redirect_uri" + eq + redirectUrl;
+        String result = HttpClientUtils.doPostParamToUrl(url, null);
         String access_token = null;
         if (!StringUtils.isEmpty(result)) {
             JSONObject resultJson = JSONObject.parseObject(result);
             access_token = resultJson.getString("access_token");
         }
-        log.info("######Get accessToken = {}", access_token);
+        log.info("###IAM认证 Get accessToken = {}", access_token);
         return access_token;
     }
 
@@ -147,24 +152,19 @@ public class IAMAuth {
      * @return
      * @throws Exception
      */
-    @RequestMapping("user")
-    public AjaxResult getUserInfo(@RequestParam("code") String code, @RequestParam("state") String state) throws Exception {
-        log.info("######Auth getUserInfo code = {}, state = {}", code, state);
+    private AjaxResult getUserInfo(String code, String state) throws Exception {
+        log.info("###IAM认证 getUserInfo code = {}, state = {}", code, state);
         //获取Token
         String access_token = getAccess_token(code);
         if (StringUtils.isEmpty(access_token)) {
             return AjaxResult.error("token is null!");
         }
 
-        String url = userInfo_url +
-                con + code +
-                and + access_token;
+        String url = userInfo_url + con + "access_token" + eq + access_token;
         //获取用户基本信息
-        log.info("######Get userInfo url = {}", url);
-        Map<String, String> params = new HashMap<>();
-        params.put("access_token", access_token);
-        String userInfo = HttpUtils.postParamToBody(url, params);
-        log.info("######Get userInfo = {}", userInfo);
+        log.info("###IAM认证 userInfo url = {}", url);
+        String userInfo = HttpClientUtils.doPostParamToUrl(url, null);
+        log.info("###IAM认证 userInfo = {}", userInfo);
 
         if (StringUtils.isEmpty(userInfo)) {
             return AjaxResult.error("userInfo is null!");
@@ -172,7 +172,7 @@ public class IAMAuth {
         String userId;
         JSONObject resultJson = JSONObject.parseObject(userInfo);
         userId = resultJson.getString("username");
-        log.info("######Get userId = {}", userId);
+        log.info("###IAM认证 userId = {}", userId);
         return AjaxResult.success(sysUserDetailMapper.selectUserAllByUserId(userId));
     }
 

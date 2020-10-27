@@ -181,7 +181,6 @@
         ON DUPLICATE KEY UPDATE
         dept_id = values(dept_id),parent_id = values(parent_id),dept_name = values(dept_name),
         ancestors = values(ancestors),leaf = values(leaf),order_num = values(order_num),leader = values(leader),phone =
-        values(phone),email = values(email),status = values(status),update_by= values(update_by),create_time =
-        sysdate()
+        values(phone),email = values(email),status = values(status),update_time = sysdate()
     </insert>
 </mapper> 

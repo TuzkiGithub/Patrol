@@ -20,7 +20,7 @@ import java.util.List;
 public class DeptResponse extends DeptExternal{
     private int code;
 
-    private String msg;
+    private String message;
 
     private List<DeptExternal> data;
 }

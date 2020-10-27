@@ -28,6 +28,7 @@ spring:
   # dev|test|prod
   profiles:
     active: dev
+    include: external
   # Resource Messages
   messages:
     # I18N Resource Path
@@ -94,13 +95,13 @@ pagehelper:
   
 # Code Generate Setting
 gen: 
-  author: Kevin
+  author: Tuzki
   # Package Name
   packageName: tech.piis.modules.core
   # Auto Remove Prefix
   autoRemovePre: false
   # Table Prefix (xx_,xx_,xx_)
-  tablePrefix: sys_
+  tablePrefix: inspection_
 
 # XSS Setting
 xss:
@@ -118,19 +119,3 @@ logging:
     org.springframework: warn
 
 
-#IAM config
-iam:
-  code:
-    url: localhost:8080
-  token:
-    url: localhost:8080
-  user:
-    url: localhost:8080
-  redirect:
-    url: localhost:8080
-  clientId: clientId
-  clientSecret: clientSecret
-  responseType: responseType
-  scope: scope
-  state: piis
-  grantType: grantType

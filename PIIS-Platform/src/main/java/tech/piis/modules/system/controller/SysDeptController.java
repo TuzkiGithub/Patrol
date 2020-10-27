@@ -11,6 +11,7 @@ import tech.piis.framework.utils.DeptInitUtils;
 import tech.piis.framework.utils.SecurityUtils;
 import tech.piis.framework.web.controller.BaseController;
 import tech.piis.framework.web.domain.AjaxResult;
+import tech.piis.framework.web.page.TableDataInfo;
 import tech.piis.modules.system.domain.SysDept;
 import tech.piis.modules.system.service.ISysDeptService;
 
@@ -35,9 +36,10 @@ public class SysDeptController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list")
-    public AjaxResult list(SysDept dept) {
+    public TableDataInfo list(SysDept dept) {
+        startPage();
         List<SysDept> depts = deptService.selectDeptList(dept);
-        return AjaxResult.success(depts);
+        return getDataTable(depts);
     }
 
     /**
@@ -55,7 +57,7 @@ public class SysDeptController extends BaseController {
     /**
      * 根据部门编号获取详细信息
      *
-     * unKnown
+     *
      */
     @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping(value = "/{deptId}")

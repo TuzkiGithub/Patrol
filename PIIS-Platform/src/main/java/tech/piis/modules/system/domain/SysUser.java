@@ -28,7 +28,13 @@ public class SysUser extends BaseEntity {
     /**
      * 部门ID
      */
+    @Deprecated
     private String[] deptId;
+
+    /**
+     * 部门ID
+     */
+    private String deptIdStr;
 
     /**
      * 用户账号
@@ -129,6 +135,14 @@ public class SysUser extends BaseEntity {
 
     public SysUser() {
 
+    }
+
+    public String getDeptIdStr() {
+        return deptIdStr;
+    }
+
+    public void setDeptIdStr(String deptIdStr) {
+        this.deptIdStr = deptIdStr;
     }
 
     public SysUser(String userId) {
@@ -305,8 +319,9 @@ public class SysUser extends BaseEntity {
     @Override
     public String toString() {
         return "SysUser{" +
-                "userId=" + userId +
+                "userId='" + userId + '\'' +
                 ", deptId=" + Arrays.toString(deptId) +
+                ", deptIdStr='" + deptIdStr + '\'' +
                 ", userName='" + userName + '\'' +
                 ", nickName='" + nickName + '\'' +
                 ", email='" + email + '\'' +

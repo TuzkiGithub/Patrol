@@ -46,11 +46,19 @@ public interface ISysUserService
 
     /**
      * 校验用户名称是否唯一
-     * 
+     *
      * @param userName 用户名称
      * @return 结果
      */
     public String checkUserNameUnique(String userName);
+
+    /**
+     * 校验用户ID是否唯一
+     *
+     * @param userId 用户Id
+     * @return 结果
+     */
+    public String checkUserIdUnique(String userId);
 
     /**
      * 校验手机号码是否唯一
@@ -163,7 +171,7 @@ public interface ISysUserService
      * 查询总条数
      * @return
      */
-    public int selectCount();
+    public int selectCount(SysUser user);
 
 
     /**

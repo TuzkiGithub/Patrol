@@ -43,19 +43,21 @@ public class InspectionInvestigationVisitController extends BaseController {
     @PreAuthorize("@ss.hasPermi('piis:investigation/visit:list')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionInvestigationVisitPO inspectionInvestigationVisit) throws BaseException {
+        Long unitsId = null;
         if (null != inspectionInvestigationVisit) {
+            unitsId = Long.valueOf(inspectionInvestigationVisit.getUnitsId());
             if (null == inspectionInvestigationVisit.getPageNum() || null == inspectionInvestigationVisit.getPageNum()) {
                 inspectionInvestigationVisit.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
                 inspectionInvestigationVisit.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
             }
-            inspectionInvestigationVisit.setPageNum(inspectionInvestigationVisit.getPageNum() + inspectionInvestigationVisit.getPageNum() * inspectionInvestigationVisit.getPageSize());
+            inspectionInvestigationVisit.setPageNum(inspectionInvestigationVisit.getPageNum() * inspectionInvestigationVisit.getPageSize());
         }
         List<InspectionInvestigationVisitPO> data = inspectionInvestigationVisitService.selectInspectionInvestigationVisitList(inspectionInvestigationVisit);
         return new TableDataInfo()
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
                 .setRows(data)
-                .setTotal(inspectionInvestigationVisitService.count());
+                .setTotal(inspectionInvestigationVisitService.count(unitsId));
     }
 
     /**

@@ -100,6 +100,10 @@
 		select count(1) from sys_user where user_name = #{userName}
 	</select>
 
+    <select id="checkUserIdUnique" parameterType="String" resultType="int">
+		select count(1) from sys_user where user_id = #{userId}
+	</select>
+
     <select id="checkPhoneUnique" parameterType="String" resultMap="SysUserResult">
 		select user_id, phonenumber from sys_user where phonenumber = #{phonenumber}
 	</select>
@@ -108,10 +112,9 @@
 		select user_id, email from sys_user where email = #{email}
 	</select>
 
-    <insert id="insertUser" parameterType="tech.piis.modules.system.domain.SysUser" useGeneratedKeys="true"
-            keyProperty="userId">
+    <insert id="insertUser" parameterType="tech.piis.modules.system.domain.SysUser">
         insert into sys_user(
-        <if test="userId != null and userId != 0">user_id,</if>
+        <if test="userId != null and userId != ''">user_id,</if>
         <if test="userName != null and userName != ''">user_name,</if>
         <if test="nickName != null and nickName != ''">nick_name,</if>
         <if test="email != null and email != ''">email,</if>
@@ -182,10 +185,19 @@
         </foreach>
     </delete>
 
-    <select id="selectCount" resultType="int">
+    <select id="selectCount" resultType="int" parameterType="tech.piis.modules.system.domain.SysUser">
         SELECT count(0)
         FROM sys_user u
         where del_flag != '2'
+        <if test="userId != null and userId != ''">
+            AND u.user_id = #{userId}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND u.user_name like concat('%', #{userName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND u.status = #{status}
+        </if>
 	</select>
 
     <insert id="insertBatch" parameterType="tech.piis.modules.system.domain.SysUser">

@@ -2,6 +2,7 @@ package tech.piis.modules.system.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,14 +27,13 @@ import tech.piis.modules.system.service.ISysRoleService;
 import tech.piis.modules.system.service.ISysUserService;
 
 import java.util.List;
+import java.util.Objects;
 
 import static tech.piis.common.constant.GenConstants.DEFAULT_PAGE_NUM;
 import static tech.piis.common.constant.GenConstants.DEFAULT_PAGE_SIZE;
 
 /**
  * 用户信息
- *
- * @author Kevin<EastascendWang                                                                                                                               @                                                                                                                               gmail.com>
  */
 @RestController
 @RequestMapping("/system/user")
@@ -56,17 +56,23 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysUser user) {
-        if (null == user.getPageSize() || null == user.getPageNum()) {
-            user.setPageNum(0);
-            user.setPageSize(10);
-        }
-        user.setPageNum(user.getPageNum() * user.getPageSize());
+        int count = userService.selectCount(user);
         List<UserVO> list = userService.selectUserList(user);
+        Integer pageNum = user.getPageNum() * user.getPageSize();
+        Integer pageSize = pageNum + user.getPageSize();
+        if (!CollectionUtils.isEmpty(list)) {
+            if (list.size() != 1) {
+                if (pageSize > list.size()) {
+                    pageSize = list.size();
+                }
+                list = list.subList(pageNum, pageSize);
+            }
+        }
         return new TableDataInfo()
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
                 .setRows(list)
-                .setTotal(userService.selectCount());
+                .setTotal(count);
     }
 
     /**
@@ -132,14 +138,16 @@ public class SysUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:user:add')")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@Validated @RequestBody SysUser user) {
-//        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
-//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-//        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
-//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-//        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
-//            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-//        }
+    public AjaxResult add(@RequestBody SysUser user) {
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkUserIdUnique(user.getUserId()))) {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，用户账号已存在");
+        }
         user.setCreateBy(SecurityUtils.getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         return toAjax(userService.insertUser(user));
@@ -152,12 +160,22 @@ public class SysUserController extends BaseController {
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysUser user) {
-//        userService.checkUserAllowed(user);
-//        if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
-//            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-//        } else if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
-//            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-//        }
+        SysUser currentUser = userService.selectUserById(user.getUserId());
+        if (!Objects.equals(user.getPhonenumber(), currentUser.getPhonenumber())) {
+            if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+                return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+            }
+        }
+
+        if (!Objects.equals(user.getEmail(), currentUser.getEmail())) {
+            if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+                return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+            }
+        }
+
+        if (null != user.getPassword()) {
+            user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        }
         user.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(userService.updateUser(user));
     }

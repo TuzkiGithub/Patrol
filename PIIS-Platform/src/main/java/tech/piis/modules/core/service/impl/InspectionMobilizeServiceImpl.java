@@ -173,7 +173,7 @@ public class InspectionMobilizeServiceImpl implements IInspectionMobilizeService
                             break;
                         }
                         case DELETE: {
-                            inspectionMobilizeAttendeeMapper.deleteById(mobilizeAttendee.getAttendeeId());
+                            inspectionMobilizeAttendeeMapper.deleteById(mobilizeAttendee.getMobilizeAttendeeId());
                             break;
                         }
                     }
@@ -251,7 +251,6 @@ public class InspectionMobilizeServiceImpl implements IInspectionMobilizeService
 
                         //根据文件操作字段更新/删除文件
                         if (operationType == OperationEnum.INSERT.getCode()) {
-
                             //更新文件表
                             document.setObjectId(String.valueOf(mobilizeAttendee.getMobilizeAttendeeId()))
                                     .setFileDictId(dictId)

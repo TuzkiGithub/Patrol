@@ -21,6 +21,7 @@ import tech.piis.modules.core.service.IInspectionOrganizationMeetingsService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,10 +74,11 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
             for (InspectionUnitsPO units : unitsList) {
                 boolean flag = isContainUnits(units, unitsBizCountVOS);
                 if (!flag) {
-                    unitsBizCountVOS.add(new UnitsBizCountVO().setUnitsId(units.getUnitsId()).setOrgId(units.getOrgId()).setOrgName(units.getOrgName()).setCount(0));
+                    unitsBizCountVOS.add(new UnitsBizCountVO().setUnitsId(units.getUnitsId()).setOrgId(units.getOrgId()).setOrgName(units.getOrgName()).setCreatedTime(units.getCreatedTime()).setCount(0));
                 }
             }
         }
+        unitsBizCountVOS = unitsBizCountVOS.stream().sorted(Comparator.comparing(UnitsBizCountVO::getCreatedTime).reversed()).collect(Collectors.toList());
         return unitsBizCountVOS;
     }
 

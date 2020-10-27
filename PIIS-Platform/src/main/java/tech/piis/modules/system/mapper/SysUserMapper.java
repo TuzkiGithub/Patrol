@@ -89,11 +89,19 @@ public interface SysUserMapper
 
     /**
      * 校验用户名称是否唯一
-     * 
+     *
      * @param userName 用户名称
      * @return 结果
      */
     public int checkUserNameUnique(String userName);
+
+    /**
+     * 校验用户ID是否唯一
+     *
+     * @param userName 用户名称
+     * @return 结果
+     */
+    public int checkUserIdUnique(String userName);
 
     /**
      * 校验手机号码是否唯一
@@ -115,7 +123,7 @@ public interface SysUserMapper
      * 查询总条数
      * @return
      */
-    public int selectCount();
+    public int selectCount(SysUser sysUser);
 
     /**
      * 批量新增用户

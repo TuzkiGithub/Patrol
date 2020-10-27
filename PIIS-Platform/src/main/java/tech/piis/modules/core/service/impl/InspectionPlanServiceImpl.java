@@ -218,6 +218,11 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
      */
     private void saveGroups(List<InspectionGroupPO> groupList) {
         saveGroupRelation(groupList, true);
+        if (!CollectionUtils.isEmpty(groupList)) {
+            for (InspectionGroupPO var : groupList) {
+                BizUtils.setCreatedOperation(InspectionGroupPO.class, var);
+            }
+        }
         groupMapper.insertBatch(groupList);
     }
 
@@ -226,6 +231,9 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
      */
     public void saveGroupMembers(List<InspectionGroupMemberPO> groupMemberList) {
         if (!CollectionUtils.isEmpty(groupMemberList)) {
+            for (InspectionGroupMemberPO var : groupMemberList) {
+                BizUtils.setCreatedOperation(InspectionGroupMemberPO.class, var);
+            }
             groupMemberMapper.insertBatch(groupMemberList);
         }
     }
@@ -235,6 +243,9 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
      */
     public void saveUnits(List<InspectionUnitsPO> unitsList) {
         if (!CollectionUtils.isEmpty(unitsList)) {
+            for (InspectionUnitsPO var : unitsList) {
+                BizUtils.setCreatedOperation(InspectionUnitsPO.class, var);
+            }
             unitsMapper.insertBatch(unitsList);
         }
     }
@@ -285,6 +296,7 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                         units.setPlanId(planId);
                         units.setGroupId(groupId);
                         List<InspectionGroupMemberPO> groupMembers = units.getGroupMemberList();
+                        BizUtils.setCreatedOperation(InspectionUnitsPO.class, units);
                         unitsMapper.insert(units.setGroupMemberList(null));
                         Long unitsId = units.getUnitsId();
                         if (!CollectionUtils.isEmpty(groupMembers)) {

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionIndividualTalkMapper">
+    
+    <resultMap type="InspectionIndividualTalkPO" id="InspectionIndividualTalkResult">
+        <result property="individualTalkId"    column="INDIVIDUAL_TALK_ID"    />
+        <result property="planId"    column="PLAN_ID"    />
+        <result property="unitsId"    column="UNITS_ID"    />
+        <result property="talkObjId"    column="TALK_OBJ_ID"    />
+        <result property="talkObjName"    column="TALK_OBJ_NAME"    />
+        <result property="talkObjPost"    column="TALK_OBJ_POST"    />
+        <result property="talkCompanyId"    column="TALK_COMPANY_ID"    />
+        <result property="talkCompanyName"    column="TALK_COMPANY_NAME"    />
+        <result property="talkPersonId"    column="TALK_PERSON_ID"    />
+        <result property="talkPersonName"    column="TALK_PERSON_NAME"    />
+        <result property="recordPersonId"    column="RECORD_PERSON_ID"    />
+        <result property="recordPersonName"    column="RECORD_PERSON_NAME"    />
+        <result property="talkTime"    column="TALK_TIME"    />
+        <result property="abstractClassification"    column="ABSTRACT_CLASSIFICATION"    />
+        <result property="abstractContent"    column="ABSTRACT_CONTENT"    />
+        <result property="talkPlace"    column="TALK_PLACE"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="createdTime"    column="CREATED_TIME"    />
+        <result property="updatedBy"    column="UPDATED_BY"    />
+        <result property="updatedTime"    column="UPDATED_TIME"    />
+        <result property="entId"    column="ENT_ID"    />
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+    </resultMap>
+
+    <sql id="selectInspectionIndividualTalkVo">
+        select INDIVIDUAL_TALK_ID, PLAN_ID, UNITS_ID, TALK_OBJ_ID, TALK_OBJ_NAME, TALK_OBJ_POST, TALK_COMPANY_ID, TALK_COMPANY_NAME, TALK_PERSON_ID, TALK_PERSON_NAME, RECORD_PERSON_ID, RECORD_PERSON_NAME, TALK_TIME, ABSTRACT_CLASSIFICATION, ABSTRACT_CONTENT, TALK_PLACE, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_individual_talk
+    </sql>
+
+    <select id="selectInspectionIndividualTalkList" parameterType="InspectionIndividualTalkPO" resultMap="InspectionIndividualTalkResult">
+        <include refid="selectInspectionIndividualTalkVo"/>
+        <where>  
+            <if test="planId != null  and planId != ''"> and PLAN_ID = #{planId}</if>
+            <if test="unitsId != null "> and UNITS_ID = #{unitsId}</if>
+            <if test="talkObjId != null  and talkObjId != ''"> and TALK_OBJ_ID = #{talkObjId}</if>
+            <if test="talkObjName != null  and talkObjName != ''"> and TALK_OBJ_NAME like concat('%', #{talkObjName}, '%')</if>
+            <if test="talkObjPost != null  and talkObjPost != ''"> and TALK_OBJ_POST = #{talkObjPost}</if>
+            <if test="talkCompanyId != null  and talkCompanyId != ''"> and TALK_COMPANY_ID = #{talkCompanyId}</if>
+            <if test="talkCompanyName != null  and talkCompanyName != ''"> and TALK_COMPANY_NAME like concat('%', #{talkCompanyName}, '%')</if>
+            <if test="talkPersonId != null  and talkPersonId != ''"> and TALK_PERSON_ID = #{talkPersonId}</if>
+            <if test="talkPersonName != null  and talkPersonName != ''"> and TALK_PERSON_NAME like concat('%', #{talkPersonName}, '%')</if>
+            <if test="recordPersonId != null  and recordPersonId != ''"> and RECORD_PERSON_ID = #{recordPersonId}</if>
+            <if test="recordPersonName != null  and recordPersonName != ''"> and RECORD_PERSON_NAME like concat('%', #{recordPersonName}, '%')</if>
+            <if test="talkTime != null "> and TALK_TIME = #{talkTime}</if>
+            <if test="abstractClassification != null  and abstractClassification != ''"> and ABSTRACT_CLASSIFICATION = #{abstractClassification}</if>
+            <if test="abstractContent != null  and abstractContent != ''"> and ABSTRACT_CONTENT = #{abstractContent}</if>
+            <if test="talkPlace != null  and talkPlace != ''"> and TALK_PLACE = #{talkPlace}</if>
+            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
+            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
+            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
+            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
+        </where>
+    </select>
+    
+    <select id="selectInspectionIndividualTalkById" parameterType="Long" resultMap="InspectionIndividualTalkResult">
+        <include refid="selectInspectionIndividualTalkVo"/>
+        where INDIVIDUAL_TALK_ID = #{individualTalkId}
+    </select>
+        
+    <insert id="insertInspectionIndividualTalk" parameterType="InspectionIndividualTalkPO" useGeneratedKeys="true" keyProperty="individualTalkId">
+        insert into inspection_individual_talk
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="planId != null  and planId != ''">PLAN_ID,</if>
+            <if test="unitsId != null ">UNITS_ID,</if>
+            <if test="talkObjId != null  and talkObjId != ''">TALK_OBJ_ID,</if>
+            <if test="talkObjName != null  and talkObjName != ''">TALK_OBJ_NAME,</if>
+            <if test="talkObjPost != null  and talkObjPost != ''">TALK_OBJ_POST,</if>
+            <if test="talkCompanyId != null  and talkCompanyId != ''">TALK_COMPANY_ID,</if>
+            <if test="talkCompanyName != null  and talkCompanyName != ''">TALK_COMPANY_NAME,</if>
+            <if test="talkPersonId != null  and talkPersonId != ''">TALK_PERSON_ID,</if>
+            <if test="talkPersonName != null  and talkPersonName != ''">TALK_PERSON_NAME,</if>
+            <if test="recordPersonId != null  and recordPersonId != ''">RECORD_PERSON_ID,</if>
+            <if test="recordPersonName != null  and recordPersonName != ''">RECORD_PERSON_NAME,</if>
+            <if test="talkTime != null ">TALK_TIME,</if>
+            <if test="abstractClassification != null  and abstractClassification != ''">ABSTRACT_CLASSIFICATION,</if>
+            <if test="abstractContent != null  and abstractContent != ''">ABSTRACT_CONTENT,</if>
+            <if test="talkPlace != null  and talkPlace != ''">TALK_PLACE,</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
+            <if test="createdTime != null ">CREATED_TIME,</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
+            <if test="updatedTime != null ">UPDATED_TIME,</if>
+            <if test="entId != null  and entId != ''">ENT_ID,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="planId != null  and planId != ''">#{planId},</if>
+            <if test="unitsId != null ">#{unitsId},</if>
+            <if test="talkObjId != null  and talkObjId != ''">#{talkObjId},</if>
+            <if test="talkObjName != null  and talkObjName != ''">#{talkObjName},</if>
+            <if test="talkObjPost != null  and talkObjPost != ''">#{talkObjPost},</if>
+            <if test="talkCompanyId != null  and talkCompanyId != ''">#{talkCompanyId},</if>
+            <if test="talkCompanyName != null  and talkCompanyName != ''">#{talkCompanyName},</if>
+            <if test="talkPersonId != null  and talkPersonId != ''">#{talkPersonId},</if>
+            <if test="talkPersonName != null  and talkPersonName != ''">#{talkPersonName},</if>
+            <if test="recordPersonId != null  and recordPersonId != ''">#{recordPersonId},</if>
+            <if test="recordPersonName != null  and recordPersonName != ''">#{recordPersonName},</if>
+            <if test="talkTime != null ">#{talkTime},</if>
+            <if test="abstractClassification != null  and abstractClassification != ''">#{abstractClassification},</if>
+            <if test="abstractContent != null  and abstractContent != ''">#{abstractContent},</if>
+            <if test="talkPlace != null  and talkPlace != ''">#{talkPlace},</if>
+            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
+            <if test="createdTime != null ">#{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
+            <if test="updatedTime != null ">#{updatedTime},</if>
+            <if test="entId != null  and entId != ''">#{entId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateInspectionIndividualTalk" parameterType="InspectionIndividualTalkPO">
+        update inspection_individual_talk
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="planId != null  and planId != ''">PLAN_ID = #{planId},</if>
+            <if test="unitsId != null ">UNITS_ID = #{unitsId},</if>
+            <if test="talkObjId != null  and talkObjId != ''">TALK_OBJ_ID = #{talkObjId},</if>
+            <if test="talkObjName != null  and talkObjName != ''">TALK_OBJ_NAME = #{talkObjName},</if>
+            <if test="talkObjPost != null  and talkObjPost != ''">TALK_OBJ_POST = #{talkObjPost},</if>
+            <if test="talkCompanyId != null  and talkCompanyId != ''">TALK_COMPANY_ID = #{talkCompanyId},</if>
+            <if test="talkCompanyName != null  and talkCompanyName != ''">TALK_COMPANY_NAME = #{talkCompanyName},</if>
+            <if test="talkPersonId != null  and talkPersonId != ''">TALK_PERSON_ID = #{talkPersonId},</if>
+            <if test="talkPersonName != null  and talkPersonName != ''">TALK_PERSON_NAME = #{talkPersonName},</if>
+            <if test="recordPersonId != null  and recordPersonId != ''">RECORD_PERSON_ID = #{recordPersonId},</if>
+            <if test="recordPersonName != null  and recordPersonName != ''">RECORD_PERSON_NAME = #{recordPersonName},</if>
+            <if test="talkTime != null ">TALK_TIME = #{talkTime},</if>
+            <if test="abstractClassification != null  and abstractClassification != ''">ABSTRACT_CLASSIFICATION = #{abstractClassification},</if>
+            <if test="abstractContent != null  and abstractContent != ''">ABSTRACT_CONTENT = #{abstractContent},</if>
+            <if test="talkPlace != null  and talkPlace != ''">TALK_PLACE = #{talkPlace},</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
+            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
+            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
+            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
+        </trim>
+        where INDIVIDUAL_TALK_ID = #{individualTalkId}
+    </update>
+
+    <delete id="deleteInspectionIndividualTalkById" parameterType="Long">
+        delete from inspection_individual_talk where INDIVIDUAL_TALK_ID = #{individualTalkId}
+    </delete>
+
+    <delete id="deleteInspectionIndividualTalkByIds" parameterType="String">
+        delete from inspection_individual_talk where INDIVIDUAL_TALK_ID in 
+        <foreach item="individualTalkId" collection="array" open="(" separator="," close=")">
+            #{individualTalkId}
+        </foreach>
+    </delete>
+    
+</mapper>

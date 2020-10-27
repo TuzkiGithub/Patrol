@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionClueTransferDetailMapper">
+    
+    <resultMap type="InspectionClueTransferDetailPO" id="InspectionClueTransferDetailResult">
+        <result property="clueTransferDetailId"    column="CLUE_TRANSFER_DETAIL_ID"    />
+        <result property="clueTransferId"    column="CLUE_TRANSFER_ID"    />
+        <result property="reflectedPersonName"    column="REFLECTED_PERSON_NAME"    />
+        <result property="reflectedPersonId"    column="REFLECTED_PERSON_ID"    />
+        <result property="reflectedPersonPost"    column="REFLECTED_PERSON_POST"    />
+        <result property="clueOrigin"    column="CLUE_ORIGIN"    />
+        <result property="acceptTime"    column="ACCEPT_TIME"    />
+        <result property="transferCompanyId"    column="TRANSFER_COMPANY_ID"    />
+        <result property="transferCompanyName"    column="TRANSFER_COMPANY_NAME"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="createdTime"    column="CREATED_TIME"    />
+        <result property="updatedBy"    column="UPDATED_BY"    />
+        <result property="updatedTime"    column="UPDATED_TIME"    />
+        <result property="entId"    column="ENT_ID"    />
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+    </resultMap>
+
+    <sql id="selectInspectionClueTransferDetailVo">
+        select CLUE_TRANSFER_DETAIL_ID, CLUE_TRANSFER_ID, REFLECTED_PERSON_NAME, REFLECTED_PERSON_ID, REFLECTED_PERSON_POST, CLUE_ORIGIN, ACCEPT_TIME, TRANSFER_COMPANY_ID, TRANSFER_COMPANY_NAME, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_clue_transfer_detail
+    </sql>
+
+    <select id="selectInspectionClueTransferDetailList" parameterType="InspectionClueTransferDetailPO" resultMap="InspectionClueTransferDetailResult">
+        <include refid="selectInspectionClueTransferDetailVo"/>
+        <where>  
+            <if test="clueTransferId != null  and clueTransferId != ''"> and CLUE_TRANSFER_ID = #{clueTransferId}</if>
+            <if test="reflectedPersonName != null  and reflectedPersonName != ''"> and REFLECTED_PERSON_NAME like concat('%', #{reflectedPersonName}, '%')</if>
+            <if test="reflectedPersonId != null  and reflectedPersonId != ''"> and REFLECTED_PERSON_ID = #{reflectedPersonId}</if>
+            <if test="reflectedPersonPost != null  and reflectedPersonPost != ''"> and REFLECTED_PERSON_POST = #{reflectedPersonPost}</if>
+            <if test="clueOrigin != null  and clueOrigin != ''"> and CLUE_ORIGIN = #{clueOrigin}</if>
+            <if test="acceptTime != null "> and ACCEPT_TIME = #{acceptTime}</if>
+            <if test="transferCompanyId != null  and transferCompanyId != ''"> and TRANSFER_COMPANY_ID = #{transferCompanyId}</if>
+            <if test="transferCompanyName != null  and transferCompanyName != ''"> and TRANSFER_COMPANY_NAME like concat('%', #{transferCompanyName}, '%')</if>
+            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
+            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
+            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
+            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
+        </where>
+    </select>
+    
+    <select id="selectInspectionClueTransferDetailById" parameterType="Long" resultMap="InspectionClueTransferDetailResult">
+        <include refid="selectInspectionClueTransferDetailVo"/>
+        where CLUE_TRANSFER_DETAIL_ID = #{clueTransferDetailId}
+    </select>
+        
+    <insert id="insertInspectionClueTransferDetail" parameterType="InspectionClueTransferDetailPO" useGeneratedKeys="true" keyProperty="clueTransferDetailId">
+        insert into inspection_clue_transfer_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="clueTransferId != null  and clueTransferId != ''">CLUE_TRANSFER_ID,</if>
+            <if test="reflectedPersonName != null  and reflectedPersonName != ''">REFLECTED_PERSON_NAME,</if>
+            <if test="reflectedPersonId != null  and reflectedPersonId != ''">REFLECTED_PERSON_ID,</if>
+            <if test="reflectedPersonPost != null  and reflectedPersonPost != ''">REFLECTED_PERSON_POST,</if>
+            <if test="clueOrigin != null  and clueOrigin != ''">CLUE_ORIGIN,</if>
+            <if test="acceptTime != null ">ACCEPT_TIME,</if>
+            <if test="transferCompanyId != null  and transferCompanyId != ''">TRANSFER_COMPANY_ID,</if>
+            <if test="transferCompanyName != null  and transferCompanyName != ''">TRANSFER_COMPANY_NAME,</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
+            <if test="createdTime != null ">CREATED_TIME,</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
+            <if test="updatedTime != null ">UPDATED_TIME,</if>
+            <if test="entId != null  and entId != ''">ENT_ID,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="clueTransferId != null  and clueTransferId != ''">#{clueTransferId},</if>
+            <if test="reflectedPersonName != null  and reflectedPersonName != ''">#{reflectedPersonName},</if>
+            <if test="reflectedPersonId != null  and reflectedPersonId != ''">#{reflectedPersonId},</if>
+            <if test="reflectedPersonPost != null  and reflectedPersonPost != ''">#{reflectedPersonPost},</if>
+            <if test="clueOrigin != null  and clueOrigin != ''">#{clueOrigin},</if>
+            <if test="acceptTime != null ">#{acceptTime},</if>
+            <if test="transferCompanyId != null  and transferCompanyId != ''">#{transferCompanyId},</if>
+            <if test="transferCompanyName != null  and transferCompanyName != ''">#{transferCompanyName},</if>
+            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
+            <if test="createdTime != null ">#{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
+            <if test="updatedTime != null ">#{updatedTime},</if>
+            <if test="entId != null  and entId != ''">#{entId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateInspectionClueTransferDetail" parameterType="InspectionClueTransferDetailPO">
+        update inspection_clue_transfer_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="clueTransferId != null  and clueTransferId != ''">CLUE_TRANSFER_ID = #{clueTransferId},</if>
+            <if test="reflectedPersonName != null  and reflectedPersonName != ''">REFLECTED_PERSON_NAME = #{reflectedPersonName},</if>
+            <if test="reflectedPersonId != null  and reflectedPersonId != ''">REFLECTED_PERSON_ID = #{reflectedPersonId},</if>
+            <if test="reflectedPersonPost != null  and reflectedPersonPost != ''">REFLECTED_PERSON_POST = #{reflectedPersonPost},</if>
+            <if test="clueOrigin != null  and clueOrigin != ''">CLUE_ORIGIN = #{clueOrigin},</if>
+            <if test="acceptTime != null ">ACCEPT_TIME = #{acceptTime},</if>
+            <if test="transferCompanyId != null  and transferCompanyId != ''">TRANSFER_COMPANY_ID = #{transferCompanyId},</if>
+            <if test="transferCompanyName != null  and transferCompanyName != ''">TRANSFER_COMPANY_NAME = #{transferCompanyName},</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
+            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
+            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
+            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
+        </trim>
+        where CLUE_TRANSFER_DETAIL_ID = #{clueTransferDetailId}
+    </update>
+
+    <delete id="deleteInspectionClueTransferDetailById" parameterType="Long">
+        delete from inspection_clue_transfer_detail where CLUE_TRANSFER_DETAIL_ID = #{clueTransferDetailId}
+    </delete>
+
+    <delete id="deleteInspectionClueTransferDetailByIds" parameterType="String">
+        delete from inspection_clue_transfer_detail where CLUE_TRANSFER_DETAIL_ID in 
+        <foreach item="clueTransferDetailId" collection="array" open="(" separator="," close=")">
+            #{clueTransferDetailId}
+        </foreach>
+    </delete>
+    
+</mapper>

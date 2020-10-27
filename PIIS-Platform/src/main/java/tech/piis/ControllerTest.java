@@ -13,11 +13,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.piis.framework.job.SyncData;
+import tech.piis.ex_service.job.SyncData;
 import tech.piis.framework.security.LoginBody;
 import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.modules.core.service.impl.InspectionPlanServiceImpl;
@@ -29,6 +28,7 @@ import tech.piis.modules.system.mapper.SysRoleMapper;
 import tech.piis.modules.system.mapper.SysUserDetailMapper;
 
 import javax.servlet.http.HttpServletResponse;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -100,13 +100,13 @@ public class ControllerTest {
     }
 
     @GetMapping("sync/dept")
-    public int syncDept() {
+    public int syncDept() throws Exception {
         syncData.syncDept();
         return 0;
     }
 
     @GetMapping("sync/user")
-    public int syncUser() {
+    public int syncUser() throws URISyntaxException {
         syncData.syncUser();
         return 0;
     }
