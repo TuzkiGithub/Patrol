@@ -63,6 +63,7 @@ public class InspectionCallVisitServiceImpl implements IInspectionCallVisitServi
         QueryWrapper<InspectionCallVisitPO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("units_id", inspectionCallVisit.getUnitsId());
         queryWrapper.eq("plan_id", inspectionCallVisit.getPlanId());
+        queryWrapper.orderByDesc("created_time");
         return inspectionCallVisitMapper.selectList(queryWrapper);
     }
 

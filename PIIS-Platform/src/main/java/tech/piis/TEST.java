@@ -1,9 +1,6 @@
 package tech.piis;
 
-import org.springframework.util.CollectionUtils;
-import tech.piis.common.utils.DateUtils;
-import tech.piis.modules.core.domain.vo.UserBriefVO;
-
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +13,7 @@ import java.util.List;
  * Description:
  */
 public class TEST {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
 //        InspectionGroupMemberPO groupMemberPO1 = new InspectionGroupMemberPO();
 //        InspectionGroupMemberPO groupMemberPO2 = new InspectionGroupMemberPO();
 //
@@ -37,55 +34,61 @@ public class TEST {
 //        }
 //        System.out.println(newStr.substring(0,newStr.lastIndexOf(",")));
 //        String fileUrl = "piis.file.com:81/upload/2020/10/20/授课2.txt";
+//        BASE64Encoder encoder = new BASE64Encoder();
+//        String text = "PIIS:Ceb12345";
+//        byte[] bytes = text.getBytes("UTF-8");
+//        System.out.println(encoder.encode(bytes));
+        List<Student> students = new ArrayList<>();
+        Student student1 = new Student();
+        student1.setAge(11);
+        student1.setName("11");
 
-        System.out.println(DateUtils.dateTimeNow("yyyyMMdd"));
+        Student student2 = new Student();
+        student2.setAge(22);
+        student2.setName("22");
+
+        students.add(student1);
+        students.add(student2);
+
+//        List<Student> copyStudents = students;
+        Student student3 = students.get(0);
+
+        students.get(0).setAge(33);
+        System.out.println("students" + students);
+        System.out.println("student3" + student3);
+
+
     }
 
 
-    /**
-     * 将人员拼接字符串转为List
-     *
-     * @param userId
-     * @param userName
-     */
-    protected static List<UserBriefVO> paramsCovert2List(String userId, String userName) {
-        List<UserBriefVO> result = new ArrayList<>();
-        if (!org.springframework.util.StringUtils.isEmpty(userId) && !org.springframework.util.StringUtils.isEmpty(userName)) {
-            String[] userIdsArr = userId.split(",");
-            String[] userNamesArr = userName.split(",");
-            if (userNamesArr.length != 0 && userIdsArr.length != 0) {
-                int length = userNamesArr.length;
-                for (int i = 0; i < length; i++) {
-                    UserBriefVO userBriefVO = new UserBriefVO();
-                    userBriefVO.setUserName(userNamesArr[i]);
-                    userBriefVO.setUserId(userIdsArr[i]);
-                    result.add(userBriefVO);
-                }
-            }
-        }
-        return result;
+}
+
+
+class Student {
+    private String name;
+    private int age;
+
+    public String getName() {
+        return name;
     }
 
-    /**
-     * 将人员对象数组转为字符串  以，分割
-     *
-     * @param data
-     */
-    @SuppressWarnings("unchecked")
-    protected static List<String> paramsCovert2String(List<UserBriefVO> data) {
-        List<String> result = new ArrayList<>();
-        StringBuilder userId = new StringBuilder();
-        StringBuilder userName = new StringBuilder();
-        if (!CollectionUtils.isEmpty(data)) {
-            data.forEach(var -> {
-                userId.append(var.getUserId()).append(",");
-                userName.append(var.getUserName()).append(",");
-            });
-        }
-        String userIdStr = userId.toString().substring(0, userId.toString().lastIndexOf(","));
-        String userNameStr = userName.toString().substring(0, userName.toString().lastIndexOf(","));
-        result.add(userIdStr);
-        result.add(userNameStr);
-        return result;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
     }
 }

@@ -1,34 +1,59 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tech.piis.modules.core.mapper.InspectionClueTransferMapper">
-    
-    <resultMap type="InspectionClueTransferPO" id="InspectionClueTransferResult">
-        <result property="clueTransferId"    column="CLUE_TRANSFER_ID"    />
-        <result property="planId"    column="PLAN_ID"    />
-        <result property="unitsId"    column="UNITS_ID"    />
-        <result property="clueName"    column="CLUE_NAME"    />
-        <result property="transferId"    column="TRANSFER_ID"    />
-        <result property="transferName"    column="TRANSFER_NAME"    />
-        <result property="transferAgentId"    column="TRANSFER_AGENT_ID"    />
-        <result property="transferAgentName"    column="TRANSFER_AGENT_NAME"    />
-        <result property="transferTime"    column="TRANSFER_TIME"    />
-        <result property="receiverId"    column="RECEIVER_ID"    />
-        <result property="receiverName"    column="RECEIVER_NAME"    />
-        <result property="receiverAgentId"    column="RECEIVER_AGENT_ID"    />
-        <result property="receiverAgentName"    column="RECEIVER_AGENT_NAME"    />
-        <result property="receiverTime"    column="RECEIVER_TIME"    />
-        <result property="feedbackCompanyId"    column="FEEDBACK_COMPANY_ID"    />
-        <result property="feedbackCompanyName"    column="FEEDBACK_COMPANY_NAME"    />
-        <result property="feedbackTime"    column="FEEDBACK_TIME"    />
-        <result property="feedbackContent"    column="FEEDBACK_CONTENT"    />
-        <result property="remark"    column="REMARK"    />
-        <result property="createdBy"    column="CREATED_BY"    />
-        <result property="createdTime"    column="CREATED_TIME"    />
-        <result property="updatedBy"    column="UPDATED_BY"    />
-        <result property="updatedTime"    column="UPDATED_TIME"    />
-        <result property="entId"    column="ENT_ID"    />
+
+    <resultMap type="InspectionClueTransferPO" id="inspectionClueTransferResult">
+        <result property="clueTransferId" column="CLUE_TRANSFER_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="clueName" column="CLUE_NAME"/>
+        <result property="transferCompanyId" column="TRANSFER_COMPANY_ID"/>
+        <result property="transferCompanyName" column="TRANSFER_COMPANY_NAME"/>
+        <result property="transferAgentId" column="TRANSFER_AGENT_ID"/>
+        <result property="transferAgentName" column="TRANSFER_AGENT_NAME"/>
+        <result property="transferTime" column="TRANSFER_TIME"/>
+        <result property="receiverCompanyId" column="RECEIVER_COMPANY_ID"/>
+        <result property="receiverCompanyName" column="RECEIVER_COMPANY_NAME"/>
+        <result property="receiverAgentId" column="RECEIVER_AGENT_ID"/>
+        <result property="receiverAgentName" column="RECEIVER_AGENT_NAME"/>
+        <result property="receiverTime" column="RECEIVER_TIME"/>
+        <result property="feedbackCompanyId" column="FEEDBACK_COMPANY_ID"/>
+        <result property="feedbackCompanyName" column="FEEDBACK_COMPANY_NAME"/>
+        <result property="feedbackTime" column="FEEDBACK_TIME"/>
+        <result property="feedbackContent" column="FEEDBACK_CONTENT"/>
+        <result property="remark" column="REMARK"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+
+        <collection property="clueTransferDetailList" javaType="java.util.List"
+                    resultMap="inspectionClueTransferDetailResult"/>
+    </resultMap>
+
+    <resultMap type="InspectionClueTransferDetailPO" id="inspectionClueTransferDetailResult">
+        <result property="clueTransferDetailId" column="CLUE_TRANSFER_DETAIL_ID"/>
+        <result property="reflectedPersonName" column="REFLECTED_PERSON_NAME"/>
+        <result property="reflectedPersonId" column="REFLECTED_PERSON_ID"/>
+        <result property="reflectedPersonPost" column="REFLECTED_PERSON_POST"/>
+        <result property="clueOrigin" column="CLUE_ORIGIN"/>
+        <result property="acceptTime" column="ACCEPT_TIME"/>
+        <result property="planTransferCompanyId" column="PLAN_TRANSFER_COMPANY_ID"/>
+        <result property="planTransferCompanyName" column="PLAN_TRANSFER_COMPANY_NAME"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="documentResultMap"/>
+    </resultMap>
+
+    <resultMap id="documentResultMap" type="PiisDocumentPO">
+        <id property="piisDocId" column="PIIS_DOC_ID"/>
+        <result property="objectId" column="OBJECT_ID"/>
+        <result property="fileDictId" column="FILE_DICT_ID"/>
+        <result property="fileName" column="FILE_NAME"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+        <result property="filePath" column="FILE_PATH"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -40,138 +65,95 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectInspectionClueTransferVo">
-        select CLUE_TRANSFER_ID, PLAN_ID, UNITS_ID, CLUE_NAME, TRANSFER_ID, TRANSFER_NAME, TRANSFER_AGENT_ID, TRANSFER_AGENT_NAME, TRANSFER_TIME, RECEIVER_ID, RECEIVER_NAME, RECEIVER_AGENT_ID, RECEIVER_AGENT_NAME, RECEIVER_TIME, FEEDBACK_COMPANY_ID, FEEDBACK_COMPANY_NAME, FEEDBACK_TIME, FEEDBACK_CONTENT, REMARK, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_clue_transfer
+        select CLUE_TRANSFER_ID, PLAN_ID, UNITS_ID, CLUE_NAME, TRANSFER_COMPANY_ID, TRANSFER_COMPANY_NAME, TRANSFER_AGENT_ID, TRANSFER_AGENT_NAME, TRANSFER_TIME, RECEIVER_COMPANY_ID, RECEIVER_COMPANY_NAME, RECEIVER_AGENT_ID, RECEIVER_AGENT_NAME, RECEIVER_TIME, FEEDBACK_COMPANY_ID, FEEDBACK_COMPANY_NAME, FEEDBACK_TIME, FEEDBACK_CONTENT, REMARK, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_clue_transfer
     </sql>
 
-    <select id="selectInspectionClueTransferList" parameterType="InspectionClueTransferPO" resultMap="InspectionClueTransferResult">
-        <include refid="selectInspectionClueTransferVo"/>
-        <where>  
-            <if test="planId != null  and planId != ''"> and PLAN_ID = #{planId}</if>
-            <if test="unitsId != null "> and UNITS_ID = #{unitsId}</if>
-            <if test="clueName != null  and clueName != ''"> and CLUE_NAME like concat('%', #{clueName}, '%')</if>
-            <if test="transferId != null  and transferId != ''"> and TRANSFER_ID = #{transferId}</if>
-            <if test="transferName != null  and transferName != ''"> and TRANSFER_NAME like concat('%', #{transferName}, '%')</if>
-            <if test="transferAgentId != null  and transferAgentId != ''"> and TRANSFER_AGENT_ID = #{transferAgentId}</if>
-            <if test="transferAgentName != null  and transferAgentName != ''"> and TRANSFER_AGENT_NAME like concat('%', #{transferAgentName}, '%')</if>
-            <if test="transferTime != null "> and TRANSFER_TIME = #{transferTime}</if>
-            <if test="receiverId != null  and receiverId != ''"> and RECEIVER_ID = #{receiverId}</if>
-            <if test="receiverName != null  and receiverName != ''"> and RECEIVER_NAME like concat('%', #{receiverName}, '%')</if>
-            <if test="receiverAgentId != null  and receiverAgentId != ''"> and RECEIVER_AGENT_ID = #{receiverAgentId}</if>
-            <if test="receiverAgentName != null  and receiverAgentName != ''"> and RECEIVER_AGENT_NAME like concat('%', #{receiverAgentName}, '%')</if>
-            <if test="receiverTime != null "> and RECEIVER_TIME = #{receiverTime}</if>
-            <if test="feedbackCompanyId != null  and feedbackCompanyId != ''"> and FEEDBACK_COMPANY_ID = #{feedbackCompanyId}</if>
-            <if test="feedbackCompanyName != null  and feedbackCompanyName != ''"> and FEEDBACK_COMPANY_NAME like concat('%', #{feedbackCompanyName}, '%')</if>
-            <if test="feedbackTime != null "> and FEEDBACK_TIME = #{feedbackTime}</if>
-            <if test="feedbackContent != null  and feedbackContent != ''"> and FEEDBACK_CONTENT = #{feedbackContent}</if>
-            <if test="remark != null  and remark != ''"> and REMARK = #{remark}</if>
-            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
-            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
-            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
-            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
-        </where>
+    <select id="selectInspectionClueTransferList" parameterType="InspectionClueTransferPO"
+            resultMap="inspectionClueTransferResult">
+        select
+              i.CLUE_TRANSFER_ID,
+              i.PLAN_ID,
+              i.UNITS_ID,
+              i.CLUE_NAME,
+              i.TRANSFER_COMPANY_ID,
+              i.TRANSFER_COMPANY_NAME,
+              i.TRANSFER_AGENT_ID,
+              i.TRANSFER_AGENT_NAME,
+              i.TRANSFER_TIME,
+              i.RECEIVER_COMPANY_ID,
+              i.RECEIVER_COMPANY_NAME,
+              i.RECEIVER_AGENT_ID,
+              i.RECEIVER_AGENT_NAME,
+              i.RECEIVER_TIME,
+              i.FEEDBACK_COMPANY_ID,
+              i.FEEDBACK_COMPANY_NAME,
+              i.FEEDBACK_TIME,
+              i.FEEDBACK_CONTENT,
+              i.REMARK,
+              i.CREATED_BY,
+              i.CREATED_TIME,
+              i.UPDATED_BY,
+              i.UPDATED_TIME,
+              i.ENT_ID,
+              CLUE_TRANSFER_DETAIL_ID,
+              REFLECTED_PERSON_NAME,
+              REFLECTED_PERSON_ID,
+              REFLECTED_PERSON_POST,
+              CLUE_ORIGIN,
+              ACCEPT_TIME,
+              PLAN_TRANSFER_COMPANY_ID,
+              PLAN_TRANSFER_COMPANY_NAME,
+              doc.PIIS_DOC_ID,
+              doc.FILE_DICT_ID,
+              doc.OBJECT_ID,
+              doc.FILE_PATH,
+              doc.FILE_SIZE,
+              doc.FILE_NAME
+            from (
+               select
+                 CLUE_TRANSFER_ID,
+                 PLAN_ID,
+                 UNITS_ID,
+                 CLUE_NAME,
+                 TRANSFER_COMPANY_ID,
+                 TRANSFER_COMPANY_NAME,
+                 TRANSFER_AGENT_ID,
+                 TRANSFER_AGENT_NAME,
+                 TRANSFER_TIME,
+                 RECEIVER_COMPANY_ID,
+                 RECEIVER_COMPANY_NAME,
+                 RECEIVER_AGENT_ID,
+                 RECEIVER_AGENT_NAME,
+                 RECEIVER_TIME,
+                 FEEDBACK_COMPANY_ID,
+                 FEEDBACK_COMPANY_NAME,
+                 FEEDBACK_TIME,
+                 FEEDBACK_CONTENT,
+                 REMARK,
+                 CREATED_BY,
+                 CREATED_TIME,
+                 UPDATED_BY,
+                 UPDATED_TIME,
+                 ENT_ID
+               from inspection_clue_transfer
+               where PLAN_ID =#{planId}
+                     and UNITS_ID = #{unitsId}
+               order by CREATED_TIME desc
+               limit #{pageNum}, #{pageSize}
+           ) i
+  left join inspection_clue_transfer_detail d on i.CLUE_TRANSFER_ID = d.CLUE_TRANSFER_ID
+  left join piis_document doc on concat('ClueTransferDetail', d.CLUE_TRANSFER_DETAIL_ID) = doc.OBJECT_ID
     </select>
-    
-    <select id="selectInspectionClueTransferById" parameterType="String" resultMap="InspectionClueTransferResult">
-        <include refid="selectInspectionClueTransferVo"/>
-        where CLUE_TRANSFER_ID = #{clueTransferId}
+
+    <select id="selectInspectionClueTransferCount" parameterType="InspectionClueTransferPO"
+            resultMap="unitsBizCountResultMap">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time, count(d.UNITS_ID) as count
+        from inspection_units u
+        left join inspection_clue_transfer d on u.UNITS_ID = d.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
+        order by u.created_time desc
     </select>
-        
-    <insert id="insertInspectionClueTransfer" parameterType="InspectionClueTransferPO">
-        insert into inspection_clue_transfer
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="clueTransferId != null  and clueTransferId != ''">CLUE_TRANSFER_ID,</if>
-            <if test="planId != null  and planId != ''">PLAN_ID,</if>
-            <if test="unitsId != null ">UNITS_ID,</if>
-            <if test="clueName != null  and clueName != ''">CLUE_NAME,</if>
-            <if test="transferId != null  and transferId != ''">TRANSFER_ID,</if>
-            <if test="transferName != null  and transferName != ''">TRANSFER_NAME,</if>
-            <if test="transferAgentId != null  and transferAgentId != ''">TRANSFER_AGENT_ID,</if>
-            <if test="transferAgentName != null  and transferAgentName != ''">TRANSFER_AGENT_NAME,</if>
-            <if test="transferTime != null ">TRANSFER_TIME,</if>
-            <if test="receiverId != null  and receiverId != ''">RECEIVER_ID,</if>
-            <if test="receiverName != null  and receiverName != ''">RECEIVER_NAME,</if>
-            <if test="receiverAgentId != null  and receiverAgentId != ''">RECEIVER_AGENT_ID,</if>
-            <if test="receiverAgentName != null  and receiverAgentName != ''">RECEIVER_AGENT_NAME,</if>
-            <if test="receiverTime != null ">RECEIVER_TIME,</if>
-            <if test="feedbackCompanyId != null  and feedbackCompanyId != ''">FEEDBACK_COMPANY_ID,</if>
-            <if test="feedbackCompanyName != null  and feedbackCompanyName != ''">FEEDBACK_COMPANY_NAME,</if>
-            <if test="feedbackTime != null ">FEEDBACK_TIME,</if>
-            <if test="feedbackContent != null  and feedbackContent != ''">FEEDBACK_CONTENT,</if>
-            <if test="remark != null  and remark != ''">REMARK,</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
-            <if test="createdTime != null ">CREATED_TIME,</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
-            <if test="updatedTime != null ">UPDATED_TIME,</if>
-            <if test="entId != null  and entId != ''">ENT_ID,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="clueTransferId != null  and clueTransferId != ''">#{clueTransferId},</if>
-            <if test="planId != null  and planId != ''">#{planId},</if>
-            <if test="unitsId != null ">#{unitsId},</if>
-            <if test="clueName != null  and clueName != ''">#{clueName},</if>
-            <if test="transferId != null  and transferId != ''">#{transferId},</if>
-            <if test="transferName != null  and transferName != ''">#{transferName},</if>
-            <if test="transferAgentId != null  and transferAgentId != ''">#{transferAgentId},</if>
-            <if test="transferAgentName != null  and transferAgentName != ''">#{transferAgentName},</if>
-            <if test="transferTime != null ">#{transferTime},</if>
-            <if test="receiverId != null  and receiverId != ''">#{receiverId},</if>
-            <if test="receiverName != null  and receiverName != ''">#{receiverName},</if>
-            <if test="receiverAgentId != null  and receiverAgentId != ''">#{receiverAgentId},</if>
-            <if test="receiverAgentName != null  and receiverAgentName != ''">#{receiverAgentName},</if>
-            <if test="receiverTime != null ">#{receiverTime},</if>
-            <if test="feedbackCompanyId != null  and feedbackCompanyId != ''">#{feedbackCompanyId},</if>
-            <if test="feedbackCompanyName != null  and feedbackCompanyName != ''">#{feedbackCompanyName},</if>
-            <if test="feedbackTime != null ">#{feedbackTime},</if>
-            <if test="feedbackContent != null  and feedbackContent != ''">#{feedbackContent},</if>
-            <if test="remark != null  and remark != ''">#{remark},</if>
-            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
-            <if test="createdTime != null ">#{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
-            <if test="updatedTime != null ">#{updatedTime},</if>
-            <if test="entId != null  and entId != ''">#{entId},</if>
-         </trim>
-    </insert>
 
-    <update id="updateInspectionClueTransfer" parameterType="InspectionClueTransferPO">
-        update inspection_clue_transfer
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="planId != null  and planId != ''">PLAN_ID = #{planId},</if>
-            <if test="unitsId != null ">UNITS_ID = #{unitsId},</if>
-            <if test="clueName != null  and clueName != ''">CLUE_NAME = #{clueName},</if>
-            <if test="transferId != null  and transferId != ''">TRANSFER_ID = #{transferId},</if>
-            <if test="transferName != null  and transferName != ''">TRANSFER_NAME = #{transferName},</if>
-            <if test="transferAgentId != null  and transferAgentId != ''">TRANSFER_AGENT_ID = #{transferAgentId},</if>
-            <if test="transferAgentName != null  and transferAgentName != ''">TRANSFER_AGENT_NAME = #{transferAgentName},</if>
-            <if test="transferTime != null ">TRANSFER_TIME = #{transferTime},</if>
-            <if test="receiverId != null  and receiverId != ''">RECEIVER_ID = #{receiverId},</if>
-            <if test="receiverName != null  and receiverName != ''">RECEIVER_NAME = #{receiverName},</if>
-            <if test="receiverAgentId != null  and receiverAgentId != ''">RECEIVER_AGENT_ID = #{receiverAgentId},</if>
-            <if test="receiverAgentName != null  and receiverAgentName != ''">RECEIVER_AGENT_NAME = #{receiverAgentName},</if>
-            <if test="receiverTime != null ">RECEIVER_TIME = #{receiverTime},</if>
-            <if test="feedbackCompanyId != null  and feedbackCompanyId != ''">FEEDBACK_COMPANY_ID = #{feedbackCompanyId},</if>
-            <if test="feedbackCompanyName != null  and feedbackCompanyName != ''">FEEDBACK_COMPANY_NAME = #{feedbackCompanyName},</if>
-            <if test="feedbackTime != null ">FEEDBACK_TIME = #{feedbackTime},</if>
-            <if test="feedbackContent != null  and feedbackContent != ''">FEEDBACK_CONTENT = #{feedbackContent},</if>
-            <if test="remark != null  and remark != ''">REMARK = #{remark},</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
-            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
-            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
-            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
-        </trim>
-        where CLUE_TRANSFER_ID = #{clueTransferId}
-    </update>
 
-    <delete id="deleteInspectionClueTransferById" parameterType="String">
-        delete from inspection_clue_transfer where CLUE_TRANSFER_ID = #{clueTransferId}
-    </delete>
-
-    <delete id="deleteInspectionClueTransferByIds" parameterType="String">
-        delete from inspection_clue_transfer where CLUE_TRANSFER_ID in 
-        <foreach item="clueTransferId" collection="array" open="(" separator="," close=")">
-            #{clueTransferId}
-        </foreach>
-    </delete>
-    
 </mapper>

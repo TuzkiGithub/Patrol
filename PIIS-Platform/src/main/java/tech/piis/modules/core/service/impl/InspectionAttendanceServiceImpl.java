@@ -65,6 +65,7 @@ public class InspectionAttendanceServiceImpl implements IInspectionAttendanceSer
         QueryWrapper<InspectionAttendancePO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("units_id", inspectionAttendance.getUnitsId());
         queryWrapper.eq("plan_id", inspectionAttendance.getPlanId());
+        queryWrapper.orderByDesc("created_time");
         return inspectionAttendanceMapper.selectList(queryWrapper);
     }
 

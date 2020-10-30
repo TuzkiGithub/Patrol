@@ -1,6 +1,7 @@
 package tech.piis.modules.core.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import tech.piis.common.exception.BaseException;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
 
@@ -87,4 +88,16 @@ public interface IPiisDocumentService {
      * @return
      */
     int deleteDocumentById(Long docId, String filePath);
+
+    /**
+     * 根据条件删除文件
+     * @return
+     * @throws BaseException
+     */
+    int deleteDocumentByCondition(QueryWrapper<PiisDocumentPO> queryWrapper) throws BaseException;
+
+
+    List<PiisDocumentPO> selectDocumentByCondition(QueryWrapper<PiisDocumentPO> queryWrapper) throws BaseException;
+
+    void insertBatchDocument(List<PiisDocumentPO> documents) throws BaseException;
 }

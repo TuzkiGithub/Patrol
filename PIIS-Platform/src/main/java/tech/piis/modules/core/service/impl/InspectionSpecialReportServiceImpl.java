@@ -60,6 +60,7 @@ public class InspectionSpecialReportServiceImpl implements IInspectionSpecialRep
         QueryWrapper<InspectionSpecialReportPO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("units_id", inspectionSpecialReport.getUnitsId());
         queryWrapper.eq("plan_id", inspectionSpecialReport.getPlanId());
+        queryWrapper.orderByDesc("created_time");
         return inspectionSpecialReportMapper.selectList(queryWrapper);
     }
 

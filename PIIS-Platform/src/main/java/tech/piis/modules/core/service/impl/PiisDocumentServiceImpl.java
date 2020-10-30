@@ -51,6 +51,7 @@ public class PiisDocumentServiceImpl implements IPiisDocumentService {
     public List<PiisDocumentPO> getFileListByBizId(String bizId) throws BaseException {
         QueryWrapper<PiisDocumentPO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("OBJECT_ID", bizId);
+        queryWrapper.orderByDesc("created_time");
         return piisDocumentMapper.selectList(queryWrapper);
     }
 
@@ -195,6 +196,31 @@ public class PiisDocumentServiceImpl implements IPiisDocumentService {
             FileUploadUtils.deleteServerFile(filePath.replace(serverAddr + "/upload", baseFileUrl));
         }
         return result;
+    }
+
+    /**
+     * 根据条件删除文件
+     *
+     * @return
+     * @throws BaseException
+     */
+    @Override
+    public int deleteDocumentByCondition(QueryWrapper<PiisDocumentPO> queryWrapper) throws BaseException {
+        return piisDocumentMapper.delete(queryWrapper);
+    }
+
+    @Override
+    public List<PiisDocumentPO> selectDocumentByCondition(QueryWrapper<PiisDocumentPO> queryWrapper) throws BaseException {
+        return piisDocumentMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public void insertBatchDocument(List<PiisDocumentPO> documents) throws BaseException {
+        if (!CollectionUtils.isEmpty(documents)){
+            documents.forEach(document -> {
+                piisDocumentMapper.insert(document);
+            });
+        }
     }
 
 }

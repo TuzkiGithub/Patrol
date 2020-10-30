@@ -103,7 +103,7 @@ public class IAMAuth {
      * @return
      * @throws Exception
      */
-    @RequestMapping("auth")
+    @RequestMapping("auth/v1/init")
     public AjaxResult getCode(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "state", required = false) String state) throws Exception {
         if (StringUtils.isEmpty(code)) {
             String url = code_url +

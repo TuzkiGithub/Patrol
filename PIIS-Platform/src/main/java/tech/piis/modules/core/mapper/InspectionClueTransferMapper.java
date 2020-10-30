@@ -19,4 +19,12 @@ public interface InspectionClueTransferMapper extends BaseMapper<InspectionClueT
      *
      */
     List<UnitsBizCountVO> selectInspectionClueTransferCount(String planId) throws BaseException;
+
+    /**
+     * 查询线索移交列表
+     * @param inspectionClueTransferPO
+     * @return
+     * @throws BaseException
+     */
+    List<InspectionClueTransferPO> selectInspectionClueTransferList(InspectionClueTransferPO inspectionClueTransferPO) throws BaseException;
 }

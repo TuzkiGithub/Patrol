@@ -4,19 +4,21 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.ToString;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import tech.piis.modules.core.domain.po.PiisDocumentPO;
-import java.util.List;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 线索移交 对象 inspection_clue_transfer
- * 
+ *
  * @author Tuzki
  * @date 2020-10-27
  */
@@ -26,55 +28,116 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionClueTransferPO extends PIBaseEntity
-{
-    /** 线索移交编号 */
+public class InspectionClueTransferPO extends PIBaseEntity {
+    /**
+     * 线索移交编号
+     */
+    @TableId(value = "CLUE_TRANSFER_ID")
     private String clueTransferId;
-    /** 巡视方案ID */
+    /**
+     * 巡视方案ID
+     */
+    @NotEmpty(message = "巡视方案ID不能为空")
     private String planId;
-    /** 被巡视单位ID */
+    /**
+     * 被巡视单位ID
+     */
+    @NotNull(message = "被巡视单位ID不能为空")
     private Long unitsId;
-    /** 问题线索名称 */
+    /**
+     * 问题线索名称
+     */
+    @NotEmpty(message = "问题线索名称不能为空")
     private String clueName;
-    /** 移交方ID */
-    private String transferId;
-    /** 移交方姓名 */
-    private String transferName;
-    /** 移交经办人ID */
+    /**
+     * 移交方公司ID
+     */
+    @NotEmpty(message = "移交方公司ID不能为空")
+    private String transferCompanyId;
+    /**
+     * 移交方公司姓名
+     */
+    @NotEmpty(message = "移交方公司姓名不能为空")
+    private String transferCompanyName;
+    /**
+     * 移交经办人ID
+     */
+    @NotEmpty(message = "移交经办人ID不能为空")
     private String transferAgentId;
-    /** 移交经办人姓名 */
+    /**
+     * 移交经办人姓名
+     */
+    @NotEmpty(message = "移交经办人姓名不能为空")
     private String transferAgentName;
-    /** 移交时间 */
+    /**
+     * 移交时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "移交时间不能为空")
     private Date transferTime;
-    /** 接收方ID */
-    private String receiverId;
-    /** 接收方姓名 */
-    private String receiverName;
-    /** 接收经办人ID */
+    /**
+     * 接收方公司ID
+     */
+    @NotEmpty(message = "接收方公司ID不能为空")
+    private String receiverCompanyId;
+    /**
+     * 接收方公司姓名
+     */
+    @NotEmpty(message = "接收方公司姓名不能为空")
+    private String receiverCompanyName;
+    /**
+     * 接收经办人ID
+     */
+    @NotEmpty(message = "接收经办人ID不能为空")
     private String receiverAgentId;
-    /** 接收经办人姓名 */
+    /**
+     * 接收经办人姓名
+     */
+    @NotEmpty(message = "接收经办人姓名不能为空")
     private String receiverAgentName;
-    /** 接收时间 */
+    /**
+     * 接收时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "接收时间不能为空")
     private Date receiverTime;
-    /** 反馈部门ID */
+    /**
+     * 反馈部门ID
+     */
+    @NotEmpty(message = "反馈部门ID不能为空")
     private String feedbackCompanyId;
-    /** 反馈部门名称 */
+    /**
+     * 反馈部门名称
+     */
+    @NotEmpty(message = "反馈部门名称不能为空")
     private String feedbackCompanyName;
-    /** 反馈时间 */
+    /**
+     * 反馈时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "反馈时间不能为空")
     private Date feedbackTime;
-    /** 反馈内容 */
+    /**
+     * 反馈内容
+     */
     private String feedbackContent;
-    /** 创建人 */
-    private String createdBy;
-    /** 创建时间 */
-    private Date createdTime;
-    /** 更新人 */
-    private String updatedBy;
-    /** 更新时间 */
-    private Date updatedTime;
-    /** 租户编号 */
-    private String entId;
 
+    /**
+     * 备注
+     */
+    private String remark;
+
+    /**
+     * 线索移交详情
+     */
+    @Valid
+    private List<InspectionClueTransferDetailPO> clueTransferDetailList;
+
+
+    /**
+     * 操作类型
+     */
     @TableField(exist = false)
-    private List<PiisDocumentPO> documents;
+    private Integer operationType;
+
 }

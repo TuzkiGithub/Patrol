@@ -106,7 +106,7 @@ public class ControllerTest {
     }
 
     @GetMapping("sync/user")
-    public int syncUser() throws URISyntaxException {
+    public int syncUser() throws Exception {
         syncData.syncUser();
         return 0;
     }

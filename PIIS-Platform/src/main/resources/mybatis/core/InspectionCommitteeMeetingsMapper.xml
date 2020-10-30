@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tech.piis.modules.core.mapper.InspectionCommitteeMeetingsMapper">
-    
+
     <resultMap type="InspectionCommitteeMeetingsPO" id="InspectionCommitteeMeetingsResult">
-        <result property="committeeMeetingsId"    column="COMMITTEE_MEETINGS_ID"    />
-        <result property="planId"    column="PLAN_ID"    />
-        <result property="unitsId"    column="UNITS_ID"    />
-        <result property="meetingsName"    column="MEETINGS_NAME"    />
-        <result property="meetingsTime"    column="MEETINGS_TIME"    />
-        <result property="venue"    column="VENUE"    />
-        <result property="participantsId"    column="PARTICIPANTS_ID"    />
-        <result property="participantsName"    column="PARTICIPANTS_NAME"    />
-        <result property="meetingsContent"    column="MEETINGS_CONTENT"    />
-        <result property="createdBy"    column="CREATED_BY"    />
-        <result property="createdTime"    column="CREATED_TIME"    />
-        <result property="updatedBy"    column="UPDATED_BY"    />
-        <result property="updatedTime"    column="UPDATED_TIME"    />
-        <result property="entId"    column="ENT_ID"    />
+        <result property="committeeMeetingsId" column="COMMITTEE_MEETINGS_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="meetingsName" column="MEETINGS_NAME"/>
+        <result property="meetingsTime" column="MEETINGS_TIME"/>
+        <result property="venue" column="VENUE"/>
+        <result property="participantsId" column="PARTICIPANTS_ID"/>
+        <result property="participantsName" column="PARTICIPANTS_NAME"/>
+        <result property="meetingsContent" column="MEETINGS_CONTENT"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -29,99 +29,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createdTime" column="CREATED_TIME"/>
     </resultMap>
 
-    <sql id="selectInspectionCommitteeMeetingsVo">
-        select COMMITTEE_MEETINGS_ID, PLAN_ID, UNITS_ID, MEETINGS_NAME, MEETINGS_TIME, VENUE, PARTICIPANTS_ID, PARTICIPANTS_NAME, MEETINGS_CONTENT, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_committee_meetings
-    </sql>
-
-    <select id="selectInspectionCommitteeMeetingsList" parameterType="InspectionCommitteeMeetingsPO" resultMap="InspectionCommitteeMeetingsResult">
-        <include refid="selectInspectionCommitteeMeetingsVo"/>
-        <where>  
-            <if test="planId != null  and planId != ''"> and PLAN_ID = #{planId}</if>
-            <if test="unitsId != null "> and UNITS_ID = #{unitsId}</if>
-            <if test="meetingsName != null  and meetingsName != ''"> and MEETINGS_NAME like concat('%', #{meetingsName}, '%')</if>
-            <if test="meetingsTime != null "> and MEETINGS_TIME = #{meetingsTime}</if>
-            <if test="venue != null  and venue != ''"> and VENUE = #{venue}</if>
-            <if test="participantsId != null  and participantsId != ''"> and PARTICIPANTS_ID = #{participantsId}</if>
-            <if test="participantsName != null  and participantsName != ''"> and PARTICIPANTS_NAME like concat('%', #{participantsName}, '%')</if>
-            <if test="meetingsContent != null  and meetingsContent != ''"> and MEETINGS_CONTENT = #{meetingsContent}</if>
-            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
-            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
-            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
-            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
-        </where>
+    <select id="selectInspectionCommitteeMeetingsCount" parameterType="java.lang.String"
+            resultMap="unitsBizCountResultMap">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time, count(d.UNITS_ID) as count
+        from inspection_units u
+        left join inspection_committee_meetings d on u.UNITS_ID = d.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
+        order by u.created_time desc
     </select>
-    
-    <select id="selectInspectionCommitteeMeetingsById" parameterType="Long" resultMap="InspectionCommitteeMeetingsResult">
-        <include refid="selectInspectionCommitteeMeetingsVo"/>
-        where COMMITTEE_MEETINGS_ID = #{committeeMeetingsId}
-    </select>
-        
-    <insert id="insertInspectionCommitteeMeetings" parameterType="InspectionCommitteeMeetingsPO">
-        insert into inspection_committee_meetings
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="committeeMeetingsId != null ">COMMITTEE_MEETINGS_ID,</if>
-            <if test="planId != null  and planId != ''">PLAN_ID,</if>
-            <if test="unitsId != null ">UNITS_ID,</if>
-            <if test="meetingsName != null  and meetingsName != ''">MEETINGS_NAME,</if>
-            <if test="meetingsTime != null ">MEETINGS_TIME,</if>
-            <if test="venue != null  and venue != ''">VENUE,</if>
-            <if test="participantsId != null  and participantsId != ''">PARTICIPANTS_ID,</if>
-            <if test="participantsName != null  and participantsName != ''">PARTICIPANTS_NAME,</if>
-            <if test="meetingsContent != null  and meetingsContent != ''">MEETINGS_CONTENT,</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
-            <if test="createdTime != null ">CREATED_TIME,</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
-            <if test="updatedTime != null ">UPDATED_TIME,</if>
-            <if test="entId != null  and entId != ''">ENT_ID,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="committeeMeetingsId != null ">#{committeeMeetingsId},</if>
-            <if test="planId != null  and planId != ''">#{planId},</if>
-            <if test="unitsId != null ">#{unitsId},</if>
-            <if test="meetingsName != null  and meetingsName != ''">#{meetingsName},</if>
-            <if test="meetingsTime != null ">#{meetingsTime},</if>
-            <if test="venue != null  and venue != ''">#{venue},</if>
-            <if test="participantsId != null  and participantsId != ''">#{participantsId},</if>
-            <if test="participantsName != null  and participantsName != ''">#{participantsName},</if>
-            <if test="meetingsContent != null  and meetingsContent != ''">#{meetingsContent},</if>
-            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
-            <if test="createdTime != null ">#{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
-            <if test="updatedTime != null ">#{updatedTime},</if>
-            <if test="entId != null  and entId != ''">#{entId},</if>
-         </trim>
-    </insert>
 
-    <update id="updateInspectionCommitteeMeetings" parameterType="InspectionCommitteeMeetingsPO">
-        update inspection_committee_meetings
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="planId != null  and planId != ''">PLAN_ID = #{planId},</if>
-            <if test="unitsId != null ">UNITS_ID = #{unitsId},</if>
-            <if test="meetingsName != null  and meetingsName != ''">MEETINGS_NAME = #{meetingsName},</if>
-            <if test="meetingsTime != null ">MEETINGS_TIME = #{meetingsTime},</if>
-            <if test="venue != null  and venue != ''">VENUE = #{venue},</if>
-            <if test="participantsId != null  and participantsId != ''">PARTICIPANTS_ID = #{participantsId},</if>
-            <if test="participantsName != null  and participantsName != ''">PARTICIPANTS_NAME = #{participantsName},</if>
-            <if test="meetingsContent != null  and meetingsContent != ''">MEETINGS_CONTENT = #{meetingsContent},</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
-            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
-            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
-            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
-        </trim>
-        where COMMITTEE_MEETINGS_ID = #{committeeMeetingsId}
-    </update>
-
-    <delete id="deleteInspectionCommitteeMeetingsById" parameterType="Long">
-        delete from inspection_committee_meetings where COMMITTEE_MEETINGS_ID = #{committeeMeetingsId}
-    </delete>
-
-    <delete id="deleteInspectionCommitteeMeetingsByIds" parameterType="String">
-        delete from inspection_committee_meetings where COMMITTEE_MEETINGS_ID in 
-        <foreach item="committeeMeetingsId" collection="array" open="(" separator="," close=")">
-            #{committeeMeetingsId}
-        </foreach>
-    </delete>
-    
 </mapper>

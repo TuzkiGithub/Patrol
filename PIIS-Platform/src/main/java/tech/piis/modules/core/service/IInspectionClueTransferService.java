@@ -56,5 +56,5 @@ public interface IInspectionClueTransferService {
      * 统计总数
      * @return
      */
-    int count();
+    int count(InspectionClueTransferPO inspectionClueTransfer);
 }

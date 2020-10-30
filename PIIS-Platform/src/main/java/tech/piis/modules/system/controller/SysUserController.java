@@ -77,7 +77,7 @@ public class SysUserController extends BaseController {
 
     /**
      * 根据用户名称模糊查询用户、部门、岗位信息
-     *
+     *      *
      * @param user
      * @return
      */

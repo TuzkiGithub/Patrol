@@ -55,6 +55,7 @@ public class InspectionProblemDraftServiceImpl implements IInspectionProblemDraf
         QueryWrapper<InspectionProblemDraftPO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("units_id", inspectionProblemDraft.getUnitsId());
         queryWrapper.eq("plan_id", inspectionProblemDraft.getPlanId());
+        queryWrapper.orderByDesc("created_time");
         return inspectionProblemDraftMapper.selectList(queryWrapper);
     }
 

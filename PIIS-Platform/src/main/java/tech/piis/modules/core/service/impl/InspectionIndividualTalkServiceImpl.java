@@ -55,6 +55,7 @@ public class InspectionIndividualTalkServiceImpl implements IInspectionIndividua
         QueryWrapper<InspectionIndividualTalkPO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("units_id", inspectionIndividualTalk.getUnitsId());
         queryWrapper.eq("plan_id", inspectionIndividualTalk.getPlanId());
+        queryWrapper.orderByDesc("created_time");
         return inspectionIndividualTalkMapper.selectList(queryWrapper);
     }
 

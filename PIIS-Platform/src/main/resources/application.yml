@@ -8,6 +8,7 @@ piis:
   serverAddr: piis.file.com:81
   # Get IP Address
   ipAddress: true
+  defaultRoleId: 1
 
 # Development Environment Setting
 server:
@@ -112,10 +113,7 @@ xss:
   # Patterns UIL (/XX/*,/XX/*,/XX/*)
   urlPatterns: /system/*,/monitor/*,/tool/*
 
-# Logging Setting
-logging:
-  level:
-    tech.kevinwong: debug
-    org.springframework: warn
+
+
 
 

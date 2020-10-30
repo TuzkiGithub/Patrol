@@ -174,7 +174,8 @@
             <if test="planCompanyId!=null and planCompanyId!=''">
                 AND PLAN_COMPANY_ID = #{planCompanyId}
             </if>
-        </where>逆序
+        </where>
+        order by CREATED_TIME desc
         limit #{pageNum},#{pageSize}
         ) p
         left join inspection_group g on p.PLAN_ID = g.PLAN_ID
@@ -183,7 +184,7 @@
         left join inspection_units u on u.UNITS_ID = gmn.units_id
         left join inspection_mobilize mb on mb.PLAN_ID = p.PLAN_ID
         left join inspection_mobilize_attendee mba on mba.MOBILIZE_ID = mb.MOBILIZE_ID
-        order by p.CREATED_TIME, u.CREATED_TIME desc
+        order by u.CREATED_TIME desc
     </select>
 
     <select id="selectPlanCompanyTotal" resultMap="selectPlanCompanyTotalResultMap">

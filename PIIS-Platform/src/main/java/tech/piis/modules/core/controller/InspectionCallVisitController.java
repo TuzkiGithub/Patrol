@@ -29,7 +29,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/piis/call/visit")
-public class InspectionCallVisitController extends BaseController {
+public class
+InspectionCallVisitController extends BaseController {
     @Autowired
     private IInspectionCallVisitService inspectionCallVisitService;
 

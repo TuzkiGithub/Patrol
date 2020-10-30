@@ -9,13 +9,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import tech.piis.common.constant.ResultEnum;
 import tech.piis.common.core.lang.UUID;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.http.HttpClientUtils;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.SecurityUtils;
-import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.modules.common.domain.DeptExternal;
 import tech.piis.modules.common.domain.DeptResponse;
 import tech.piis.modules.common.domain.UserExternal;
@@ -23,7 +21,6 @@ import tech.piis.modules.common.domain.UserResponse;
 import tech.piis.modules.system.domain.*;
 import tech.piis.modules.system.mapper.*;
 
-import java.net.URISyntaxException;
 import java.util.*;
 
 import static tech.piis.common.constant.HttpStatus.SUCCESS;
@@ -34,7 +31,7 @@ import static tech.piis.common.constant.HttpStatus.SUCCESS;
  * User: Tuzki
  * Date: 2020/10/8
  * Time: 16:32
- * Description:同步部门、岗位、员工数据
+ * Description:数据港同步部门、岗位、员工数据
  */
 @Slf4j
 @Component("SyncData")
@@ -62,53 +59,79 @@ public class SyncData {
     @Value("${data.dept.url}")
     private String GET_DEPT_URL;
 
+    @Value("${data.dept.chg_url}")
+    private String GET_DEPT_CHG_URL;
+
     @Value("${data.user.url}")
     private String GET_USER_URL;
+
+    @Value("${data.dept.chg_url}")
+    private String GET_USER_CHG_URL;
+
+    @Value("${data.Authorization}")
+    private String Authorization;
+
+    /**
+     * 同步数据
+     *
+     * @return
+     */
+    public void sync() {
+        try {
+            syncDept();
+            syncUser();
+        } catch (Exception e) {
+            log.error("#####SyncData##### e = {}", e);
+        }
+    }
 
     /**
      * 从数据港同步部门数据
      */
-    public AjaxResult syncDept() throws Exception {
-
-        String syncDeptUrl = GET_DEPT_URL + DateUtils.dateTimeNow("yyyyMMdd");
+    public void syncDept() throws Exception {
+        String syncDeptUrl;
+        if (!GET_DEPT_CHG_URL.equals("NULL")) {
+            syncDeptUrl = GET_DEPT_CHG_URL + DateUtils.dateTimeNow("yyyyMMdd");
+        } else {
+            syncDeptUrl = GET_DEPT_URL;
+        }
         log.info("================================同步部门增量数据START================================ get dept url = {}", syncDeptUrl);
-        DeptResponse deptResponse = JSONObject.parseObject(HttpClientUtils.doGet(GET_DEPT_URL), DeptResponse.class);
+        DeptResponse deptResponse = JSONObject.parseObject(HttpClientUtils.doGet(GET_DEPT_URL, Authorization), DeptResponse.class);
         if (null != deptResponse) {
             if (deptResponse.getCode() == SUCCESS) {
                 syncDept(deptResponse.getData());
             } else {
                 log.error("同步部门增量数据失败！ code = {}, msg = {}", deptResponse.getCode(), deptResponse.getMessage());
-                return new AjaxResult(ResultEnum.EXTERNAL_FAILED.getCode(), ResultEnum.EXTERNAL_FAILED.getMsg());
             }
         } else {
             log.error("同步部门增量数据失败！ deptResponse is null");
-            return new AjaxResult(ResultEnum.EXTERNAL_FAILED.getCode(), ResultEnum.EXTERNAL_FAILED.getMsg());
         }
         log.info("================================同步部门增量数据END================================");
-        return new AjaxResult(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
     }
 
 
     /**
      * 从数据港同步用户数据
      */
-    public AjaxResult syncUser() throws URISyntaxException {
-        String syncUserUrl = GET_USER_URL + DateUtils.dateTimeNow("yyyyMMdd");
+    public void syncUser() throws Exception {
+        String syncUserUrl;
+        if (!GET_USER_CHG_URL.equals("NULL")) {
+            syncUserUrl = GET_USER_CHG_URL + DateUtils.dateTimeNow("yyyyMMdd");
+        } else {
+            syncUserUrl = GET_USER_URL;
+        }
         log.info("================================同步用户增量数据START================================ ger user url = {}", syncUserUrl);
-        UserResponse userResponse = JSONObject.parseObject(HttpClientUtils.doGet(GET_USER_URL), UserResponse.class);
+        UserResponse userResponse = JSONObject.parseObject(HttpClientUtils.doGet(GET_USER_URL, Authorization), UserResponse.class);
         if (null != userResponse) {
             if (userResponse.getCode() == SUCCESS) {
                 syncUser(userResponse.getData());
             } else {
                 log.error("同步用户增量数据失败！ code = {}, msg = {}", userResponse.getCode(), userResponse.getMessage());
-                return new AjaxResult(ResultEnum.EXTERNAL_FAILED.getCode(), ResultEnum.EXTERNAL_FAILED.getMsg());
             }
         } else {
             log.error("同步用户增量数据失败！ userResponse is null!");
-            return new AjaxResult(ResultEnum.EXTERNAL_FAILED.getCode(), ResultEnum.EXTERNAL_FAILED.getMsg());
         }
         log.info("================================同步用户增量数据END================================");
-        return new AjaxResult(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
     }
 
     /**
@@ -240,7 +263,8 @@ public class SyncData {
             if (!CollectionUtils.isEmpty(postHistories)) {
                 postHistoryMapper.insertPostHistoryBatch(postHistories);
             }
-            //先删除原有的用户部门关系
+
+            //通过增量数据无法区分该用户-部门是新增，还是修改，先删除原有的用户部门关系 TODO... 自增主键？
             if (!CollectionUtils.isEmpty(userDepts)) {
                 userDeptMapper.delUserDeptBatch(userDepts);
                 userDeptMapper.batchUserDept(userDepts);
@@ -280,6 +304,7 @@ public class SyncData {
                     dept.setStatus("0");
                 } else {
                     dept.setStatus("1");
+                    dept.setDelFlag("2");
                 }
                 //设置祖先节点
                 String ancestors = deptExternal.getOrgIdHrcyStr();

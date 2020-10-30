@@ -151,4 +151,45 @@ public class HttpClientUtils {
         }
         return null;
     }
+
+
+    /**
+     * 发送Get请求
+     * 请求头添加token
+     *
+     * @param url 请求地址加参数
+     * @return
+     */
+    public static String doGet(String url, String token) throws URISyntaxException {
+        String result = null;
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        URI uri = new URI(url);
+        HttpGet get = new HttpGet(uri);
+        get.addHeader("Authorization", token);
+        CloseableHttpResponse response = null;
+        try {
+            response = httpClient.execute(get);
+            HttpEntity entity = null;
+            if (null != response) {
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    entity = response.getEntity();
+                    result = EntityUtils.toString(entity, "UTF-8").trim();
+                }
+                return null != result ? result : EntityUtils.toString(response.getEntity(), "UTF-8").trim();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                httpClient.close();
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }

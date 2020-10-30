@@ -56,6 +56,7 @@ public class InspectionImportantReportServiceImpl implements IInspectionImportan
         QueryWrapper<InspectionImportantReportPO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("units_id", inspectionImportantReport.getUnitsId());
         queryWrapper.eq("plan_id", inspectionImportantReport.getPlanId());
+        queryWrapper.orderByDesc("created_time");
         return inspectionImportantReportMapper.selectList(queryWrapper);
     }
 
