@@ -174,6 +174,13 @@
  		update sys_user set password = #{password} where user_name = #{userName}
 	</update>
 
+    <update id="updateUserDelStatusBatch" parameterType="java.util.List">
+        update sys_user set status = '1',del_flag='2' where user_id in
+        <foreach collection="list" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </update>
+
     <delete id="deleteUserById" parameterType="String">
  		delete from sys_user where user_id = #{userId}
  	</delete>
@@ -198,7 +205,7 @@
         <if test="status != null and status != ''">
             AND u.status = #{status}
         </if>
-	</select>
+    </select>
 
     <insert id="insertBatch" parameterType="tech.piis.modules.system.domain.SysUser">
         insert into sys_user(user_id, user_name, email,phonenumber,sex, create_by,create_time, update_by,update_time)
@@ -214,4 +221,5 @@
         update_by = values(update_by),
         update_time = values(update_time)
     </insert>
+
 </mapper> 

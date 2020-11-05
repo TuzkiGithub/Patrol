@@ -36,4 +36,11 @@ public class UserConstants
     /** 校验返回结果码 */
     public final static String UNIQUE = "0";
     public final static String NOT_UNIQUE = "1";
+
+    /**
+     * 用户性别
+     */
+    public final static String SEX_MAN = "0";
+    public final static String SEX_WOMAN = "1";
+    public final static String SEX_UNKNOWN = "2";
 }

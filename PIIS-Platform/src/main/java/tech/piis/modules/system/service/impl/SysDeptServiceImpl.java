@@ -1,5 +1,6 @@
 package tech.piis.modules.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -263,6 +264,11 @@ public class SysDeptServiceImpl implements ISysDeptService {
         }
 //        ArrayList<Long> arrayList = Arrays.
         return buildDeptTreeSelect(this.deptMapper.selectDeptByParentIds((String[]) deptIds));
+    }
+
+    @Override
+    public int count(SysDept sysDept) {
+        return deptMapper.selectCount(null);
     }
 
     /**

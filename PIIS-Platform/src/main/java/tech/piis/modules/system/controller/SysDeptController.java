@@ -1,9 +1,11 @@
 package tech.piis.modules.system.controller;
 
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import tech.piis.common.constant.ResultEnum;
 import tech.piis.common.constant.UserConstants;
 import tech.piis.framework.aspectj.lang.annotation.Log;
 import tech.piis.framework.aspectj.lang.enums.BusinessType;
@@ -20,7 +22,7 @@ import java.util.List;
 /**
  * 部门信息
  *
- * @author Kevin<EastascendWang   @   gmail.com>
+ * @author Kevin<EastascendWang                                                                                                                               @                                                                                                                               gmail.com>
  */
 @RestController
 @RequestMapping("/system/dept")
@@ -37,27 +39,34 @@ public class SysDeptController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:dept:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysDept dept) {
-        startPage();
+        if (null != dept) {
+            Integer pageNum = dept.getPageNum() * dept.getPageSize();
+            dept.setPageNum(pageNum);
+        }
+
         List<SysDept> depts = deptService.selectDeptList(dept);
-        return getDataTable(depts);
+        return new TableDataInfo()
+                .setCode(ResultEnum.SUCCESS.getCode())
+                .setMsg(ResultEnum.SUCCESS.getMsg())
+                .setRows(depts)
+                .setTotal(deptService.count(dept));
     }
 
     /**
      * 根据部门ID查询树结构
-     *
+     * <p>
      * unKnown
+     *
      * @return
      */
     @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping("tree/{deptId}")
-    public AjaxResult getDeptTreeById(@PathVariable String deptId){
+    public AjaxResult getDeptTreeById(@PathVariable String deptId) {
         return AjaxResult.success(this.deptService.selectDeptTreeById(deptId));
     }
 
     /**
      * 根据部门编号获取详细信息
-     *
-     *
      */
     @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping(value = "/{deptId}")
@@ -67,7 +76,7 @@ public class SysDeptController extends BaseController {
 
     /**
      * 获取部门下拉树列表
-     *
+     * <p>
      * unKnown
      */
     @GetMapping("/treeselect")
@@ -78,7 +87,7 @@ public class SysDeptController extends BaseController {
 
     /**
      * 加载对应角色部门列表树
-     *
+     * <p>
      * unKnown
      */
     @GetMapping(value = "/roleDeptTreeselect/{roleId}")
@@ -104,6 +113,7 @@ public class SysDeptController extends BaseController {
 
     /**
      * 查询根部门节点
+     *
      * @return
      */
     @PreAuthorize("@ss.hasPermi('system:dept:query')")
@@ -155,10 +165,11 @@ public class SysDeptController extends BaseController {
 
     /**
      * 初始化部门数据
+     *
      * @return
      */
     @PostMapping("init")
-    public AjaxResult initDept(){
+    public AjaxResult initDept() {
         deptInitUtils.initDept(deptService.selectDeptList(null));
         return AjaxResult.success();
     }

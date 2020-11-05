@@ -1,6 +1,7 @@
 package tech.piis.modules.system.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.beans.factory.annotation.Value;
 import tech.piis.framework.aspectj.lang.annotation.Excel;
 import tech.piis.framework.aspectj.lang.annotation.Excels;
 import tech.piis.framework.web.domain.BaseEntity;
@@ -162,7 +163,7 @@ public class SysUser extends BaseEntity {
     }
 
     public static boolean isAdmin(String userId) {
-        return "1".equals(userId);
+        return "admin".equals(userId);
     }
 
     public String[] getDeptId() {

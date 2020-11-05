@@ -51,6 +51,38 @@ public class BizUtils {
 
     }
 
+
+    @SuppressWarnings("unchecked")
+    public static <T> void setCreatedTimeOperation(Class<T> clazz, T object) {
+        List<Field> fieldList = new ArrayList<>();
+        while (clazz != null) {
+            fieldList.addAll(new ArrayList<>(Arrays.asList(clazz.getDeclaredFields())));
+            clazz = (Class<T>) clazz.getSuperclass();
+        }
+        try {
+            for (Field field : fieldList) {
+                field.setAccessible(true);
+                Object fieldName = field.getName();
+                if (fieldName.equals("createdBy")) {
+                    field.set(object, "sys");
+                }
+                if(fieldName.equals("createBy")){
+                    field.set(object, "sys");
+                }
+                if(fieldName.equals("createTime")){
+                    field.set(object, DateUtils.getNowDate());
+                }
+                if (fieldName.equals("createdTime")) {
+                    field.set(object, DateUtils.getNowDate());
+                }
+            }
+        } catch (Exception e) {
+            log.error("###BizUtils### reflect is failed!");
+            e.printStackTrace();
+        }
+
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> void setUpdatedOperation(Class<T> clazz, T object) {
         List<Field> fieldList = new ArrayList<>();
@@ -70,6 +102,36 @@ public class BizUtils {
                 }
                 if (fieldName.equals("updateBy")) {
                     field.set(object, SecurityUtils.getUsername());
+                }
+                if (fieldName.equals("updateTime")) {
+                    field.set(object, DateUtils.getNowDate());
+                }
+            }
+        } catch (Exception e) {
+            log.error("###BizUtils### reflect is failed!");
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> void setUpdatedTimeOperation(Class<T> clazz, T object) {
+        List<Field> fieldList = new ArrayList<>();
+        while (clazz != null) {
+            fieldList.addAll(new ArrayList<>(Arrays.asList(clazz.getDeclaredFields())));
+            clazz = (Class<T>) clazz.getSuperclass();
+        }
+        try {
+            for (Field field : fieldList) {
+                field.setAccessible(true);
+                Object fieldName = field.getName();
+                if (fieldName.equals("updatedBy")) {
+                    field.set(object, "sys");
+                }
+                if (fieldName.equals("updatedTime")) {
+                    field.set(object, DateUtils.getNowDate());
+                }
+                if (fieldName.equals("updateBy")) {
+                    field.set(object, "sys");
                 }
                 if (fieldName.equals("updateTime")) {
                     field.set(object, DateUtils.getNowDate());
