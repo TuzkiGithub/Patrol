@@ -12,6 +12,7 @@ import tech.piis.common.exception.user.CaptchaException;
 import tech.piis.common.exception.user.CaptchaExpireException;
 import tech.piis.common.exception.user.UserPasswordNotMatchException;
 import tech.piis.common.utils.MessageUtils;
+import tech.piis.common.utils.sign.Base64;
 import tech.piis.framework.manager.AsyncManager;
 import tech.piis.framework.manager.factory.AsyncFactory;
 import tech.piis.framework.redis.RedisCache;
@@ -21,12 +22,11 @@ import javax.annotation.Resource;
 
 /**
  * 登录校验方法
- * 
- * @author Kevin<EastascendWang@gmail.com>
+ *
+ * @author Kevin<EastascendWang   @   gmail.com>
  */
 @Component
-public class SysLoginService
-{
+public class SysLoginService {
     @Autowired
     private TokenService tokenService;
 
@@ -38,45 +38,36 @@ public class SysLoginService
 
     /**
      * 登录验证
-     * 
+     *
      * @param username 用户名
      * @param password 密码
-     * @param code 验证码
-     * @param uuid 唯一标识
+     * @param code     验证码
+     * @param uuid     唯一标识
      * @return 结果
      */
-    public String login(String username, String password, String code, String uuid)
-    {
+    public String login(String username, String password, String code, String uuid) {
         String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
         String captcha = redisCache.getCacheObject(verifyKey);
         redisCache.deleteObject(verifyKey);
-        if (captcha == null)
-        {
+        if (captcha == null) {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
             throw new CaptchaExpireException();
         }
-        if (!code.equalsIgnoreCase(captcha))
-        {
+        if (!code.equalsIgnoreCase(captcha)) {
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
             throw new CaptchaException();
         }
         // 用户验证
         Authentication authentication = null;
-        try
-        {
+        try {
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        }
-        catch (Exception e)
-        {
-            if (e instanceof BadCredentialsException)
-            {
+                    .authenticate(new UsernamePasswordAuthenticationToken(username, new String(Base64.decode(password))));
+        } catch (Exception e) {
+            if (e instanceof BadCredentialsException) {
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
                 throw new UserPasswordNotMatchException();
-            }
-            else
-            {
+            } else {
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage()));
                 throw new CustomException(e.getMessage());
             }

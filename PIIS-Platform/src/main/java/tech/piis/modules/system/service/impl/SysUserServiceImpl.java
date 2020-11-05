@@ -6,14 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import tech.piis.common.constant.UserConstants;
 import tech.piis.common.exception.CustomException;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.utils.SecurityUtils;
-import tech.piis.modules.system.domain.SysRole;
-import tech.piis.modules.system.domain.SysUser;
-import tech.piis.modules.system.domain.SysUserDept;
-import tech.piis.modules.system.domain.SysUserRole;
+import tech.piis.modules.system.domain.*;
 import tech.piis.modules.system.domain.vo.UserVO;
 import tech.piis.modules.system.mapper.*;
 import tech.piis.modules.system.service.ISysConfigService;
@@ -49,6 +47,9 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Autowired
     private ISysConfigService configService;
+
+    @Autowired
+    private SysDeptMapper deptMapper;
 
 
     /**
@@ -433,7 +434,24 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public List<UserVO> selectUserDeptPost(SysUser user) {
-        return userDetailsMapper.selectUserDeptPost(user);
+        List<UserVO> userList = userDetailsMapper.selectUserDeptPost(user);
+        if (!CollectionUtils.isEmpty(userList)) {
+            userList.forEach(var -> {
+                 List<SysDept> depts = var.getDepts();
+                if (!CollectionUtils.isEmpty(depts)) {
+                    depts.forEach(dept -> {
+                        List<SysDept> deptList = deptMapper.selectDeptsById(dept.getAncestors().split(","));
+                        if (!CollectionUtils.isEmpty(deptList)) {
+                            StringBuilder deptName = new StringBuilder();
+                            deptList.forEach(deptVo -> deptName.append(deptVo.getDeptName()).append("/"));
+                            String deptNameStr = deptName.toString();
+                            dept.setDeptName(deptNameStr + dept.getDeptName());
+                        }
+                    });
+                }
+            });
+        }
+        return userList;
     }
 
 }

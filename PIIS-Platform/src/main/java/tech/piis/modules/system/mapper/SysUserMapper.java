@@ -131,4 +131,11 @@ public interface SysUserMapper
      * @return
      */
     public int insertBatch(List<SysUser> users);
+
+    /**
+     * 批量更新用户删除状态
+     * @param userId
+     * @return
+     */
+    int updateUserDelStatusBatch(List<String> userId);
 }

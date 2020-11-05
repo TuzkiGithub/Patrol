@@ -26,11 +26,9 @@ import tech.piis.modules.system.service.ISysPostService;
 import tech.piis.modules.system.service.ISysRoleService;
 import tech.piis.modules.system.service.ISysUserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static tech.piis.common.constant.GenConstants.DEFAULT_PAGE_NUM;
-import static tech.piis.common.constant.GenConstants.DEFAULT_PAGE_SIZE;
 
 /**
  * 用户信息
@@ -58,6 +56,7 @@ public class SysUserController extends BaseController {
     public TableDataInfo list(SysUser user) {
         int count = userService.selectCount(user);
         List<UserVO> list = userService.selectUserList(user);
+        //假分页
         Integer pageNum = user.getPageNum() * user.getPageSize();
         Integer pageSize = pageNum + user.getPageSize();
         if (!CollectionUtils.isEmpty(list)) {
@@ -65,7 +64,11 @@ public class SysUserController extends BaseController {
                 if (pageSize > list.size()) {
                     pageSize = list.size();
                 }
-                list = list.subList(pageNum, pageSize);
+                if (pageNum <= pageSize) {
+                    list = list.subList(pageNum, pageSize);
+                } else {
+                    list = new ArrayList<>();
+                }
             }
         }
         return new TableDataInfo()
@@ -77,21 +80,15 @@ public class SysUserController extends BaseController {
 
     /**
      * 根据用户名称模糊查询用户、部门、岗位信息
-     *      *
+     * *
+     *
      * @param user
      * @return
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping("find")
     public AjaxResult findUserDeptPostInfo(SysUser user) {
-        if (null != user) {
-            if (user.getPageNum() == null || user.getPageSize() == null) {
-                user.setPageNum(DEFAULT_PAGE_NUM);
-                user.setPageSize(DEFAULT_PAGE_SIZE);
-            } else {
-                user.setPageNum(user.getPageNum() + user.getPageNum() * user.getPageSize());
-            }
-        } else {
+        if (null == user) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
         return AjaxResult.success(userService.selectUserDeptPost(user));

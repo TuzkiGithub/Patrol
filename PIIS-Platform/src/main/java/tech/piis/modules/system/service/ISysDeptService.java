@@ -120,4 +120,6 @@ public interface ISysDeptService
      * @return
      */
     public List<TreeSelect> selectDeptTreeById(String deptId);
+
+    int count(SysDept sysDept);
 }
