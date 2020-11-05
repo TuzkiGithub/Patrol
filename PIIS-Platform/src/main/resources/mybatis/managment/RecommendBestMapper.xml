@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tech.piis.modules.managment.mapper.RecommendBestMapper">
+
+    <!--择优推荐-->
+    <resultMap id="recommendBestResultMap" type="tech.piis.modules.managment.domain.RecommendBestPO">
+        <id property="id" column="ID"/>
+        <result property="orgId" column="ORG_ID"/>
+        <result property="year" column="YEAR"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="memberName" column="MEMBER_NAME"/>
+        <result property="memberUnit" column="MEMBER_UNIT"/>
+        <result property="memberPost" column="MEMBER_POST"/>
+        <result property="recommendType" column="RECOMMEND_TYPE"/>
+        <result property="trainingName" column="TRAINING_NAME"/>
+        <result property="beginDate" column="BEGIN_DATE"/>
+        <result property="endDate" column="END_DATE"/>
+        <result property="trainingPlace" column="TRAINING_PLACE"/>
+        <result property="remark" column="REMARK"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+    <!--根据条件动态查询择优推荐-->
+    <select id="selectListByConditions" resultMap="recommendBestResultMap">
+        select
+        ID,
+        ORG_ID,
+        RECOMMEND_YEAR,
+        MEMBER_ID,
+        MEMBER_NAME,
+        MEMBER_UNIT,
+        MEMBER_POST,
+        RECOMMEND_TYPE,
+        TRAINING_NAME,
+        BEGIN_DATE,
+        END_DATE,
+        TRAINING_PLACE
+        from
+        recommend_best
+        <where>
+            <if test="memberUnit != null and memberUnit != ''">
+                MEMBER_UNIT = #{memberUnit}
+            </if>
+            <if test="memberUnit != null and memberUnit != ''">
+                and MEMBER_NAME = #{memberName}
+            </if>
+            <if test="memberUnit != null and memberUnit != ''">
+                and RECOMMEND_TYPE = #{memberType}
+            </if>
+            <if test="memberUnit != null and memberUnit != ''">
+                and RECOMMEND_YEAR = #{recommendYear}
+            </if>
+        </where>
+        limit #{pageNum},#{pageSize}
+        order by RECOMMEND_YEAR desc
+    </select>
+
+    <select id="selectTotal" >
+        select
+          count(*)
+        from
+        recommend_best
+        <where>
+            <if test="memberUnit != null and memberUnit != ''">
+                MEMBER_UNIT = #{memberUnit}
+            </if>
+            <if test="memberUnit != null and memberUnit != ''">
+                and MEMBER_NAME = #{memberName}
+            </if>
+            <if test="memberUnit != null and memberUnit != ''">
+                and RECOMMEND_TYPE = #{memberType}
+            </if>
+            <if test="memberUnit != null and memberUnit != ''">
+                and RECOMMEND_YEAR = #{recommendYear}
+            </if>
+        </where>
+        limit #{pageNum},#{pageSize}
+        order by RECOMMEND_YEAR desc
+    </select>
+</mapper>
