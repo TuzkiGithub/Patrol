@@ -68,10 +68,6 @@ public class InspectionIndividualTalkServiceImpl implements IInspectionIndividua
     @Override
     public int save(InspectionIndividualTalkPO inspectionIndividualTalk) throws BaseException {
         int result = inspectionIndividualTalkMapper.insert(inspectionIndividualTalk);
-        List<PiisDocumentPO> documents = inspectionIndividualTalk.getDocuments();
-        documents.forEach(document -> document.setOperationType(INSERT));
-        Object bizId = null;
-        documentService.updateDocumentBatch(documents, "InspectionIndividualTalk" + bizId, null);
         return result;
     }
 
@@ -83,8 +79,6 @@ public class InspectionIndividualTalkServiceImpl implements IInspectionIndividua
      */
     @Override
     public int update(InspectionIndividualTalkPO inspectionIndividualTalk) throws BaseException {
-        Object bizId = null;
-        documentService.updateDocumentBatch(inspectionIndividualTalk.getDocuments(), "InspectionIndividualTalk" + bizId, null);
         return inspectionIndividualTalkMapper.updateById(inspectionIndividualTalk);
     }
 

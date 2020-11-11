@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import tech.piis.common.core.lang.UUID;
 import tech.piis.common.enums.FileEnum;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
@@ -18,12 +17,7 @@ import tech.piis.modules.core.domain.po.*;
 import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
 import tech.piis.modules.core.mapper.*;
 import tech.piis.modules.core.service.IInspectionPlanService;
-import tech.piis.modules.system.domain.SysPost;
-import tech.piis.modules.system.domain.SysRole;
-import tech.piis.modules.system.mapper.SysPostMapper;
-import tech.piis.modules.system.mapper.SysRoleMapper;
 
-import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,6 +49,9 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     private InspectionUnitsMapper unitsMapper;
 
     @Autowired
+    private InspectionTalkOutlineMapper talkOutlineMapper;
+
+    @Autowired
     private PiisDocumentMapper documentMapper;
 
     @Value("${piis.profile}")
@@ -82,12 +79,16 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
      */
     @Override
     public int selectCount(InspectionPlanPO plan) {
-        if (null != plan && null != plan.getPlanCompanyId()) {
-            QueryWrapper<InspectionPlanPO> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("PLAN_COMPANY_ID", plan.getPlanCompanyId());
-            return planMapper.selectCount(queryWrapper);
+        QueryWrapper<InspectionPlanPO> queryWrapper = new QueryWrapper<>();
+        if (null != plan) {
+            if (!StringUtils.isEmpty(plan.getPlanName())) {
+                queryWrapper.like("PLAN_NAME", plan.getPlanName());
+            }
+            if (!StringUtils.isEmpty(plan.getPlanCompanyId())) {
+                queryWrapper.eq("PLAN_COMPANY_ID", plan.getPlanCompanyId());
+            }
         }
-        return planMapper.selectCount(null);
+        return planMapper.selectCount(queryWrapper);
     }
 
     /**
@@ -122,10 +123,12 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         updateFile(inspectionPlanPO.getDocuments(), planId);
         //新增计划
         BizUtils.setCreatedOperation(InspectionPlanPO.class, inspectionPlanPO);
+
+        //新增默认谈话纲要分类
+        saveTalkOutline(planId);
         return planMapper.insert(inspectionPlanPO.setInspectionGroupList(null));
 
     }
-
 
     /**
      * 修改巡视计划
@@ -207,6 +210,40 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                     log.warn("documents operationType is null! documents = {}", document);
                 }
             });
+        }
+    }
+
+
+    /**
+     * 新增默认谈话纲要
+     *
+     * @param planId 巡视ID
+     */
+    private void saveTalkOutline(String planId) {
+        List<InspectionTalkOutlinePO> talkOutlineList = new ArrayList<>();
+        talkOutlineList.add(new InspectionTalkOutlinePO()
+                .setPlanId(planId)
+                .setTalkClassification("落实党的路线方针政策和党中央重大决策部署监督重点情况")
+                .setTalkClassificationId(-1L));
+
+        talkOutlineList.add(new InspectionTalkOutlinePO()
+                .setPlanId(planId)
+                .setTalkClassification("落实全面从严治党战略部署监督重点情况")
+                .setTalkClassificationId(-1L));
+
+        talkOutlineList.add(new InspectionTalkOutlinePO()
+                .setPlanId(planId)
+                .setTalkClassification("落实新时代党的组织路线监督重点情况")
+                .setTalkClassificationId(-1L));
+
+        talkOutlineList.add(new InspectionTalkOutlinePO()
+                .setPlanId(planId)
+                .setTalkClassification("落实巡视、 主题教育、审计整改情况")
+                .setTalkClassificationId(-1L));
+
+        for (InspectionTalkOutlinePO talkOutline : talkOutlineList) {
+            BizUtils.setCreatedOperation(InspectionTalkOutlinePO.class, talkOutline);
+            talkOutlineMapper.insert(talkOutline);
         }
     }
 
@@ -381,33 +418,5 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         unitsMapper.deleteByMap(params);
         //删除组员和被巡视单位关系
         groupMemberUnitsMapper.deleteByMap(params);
-    }
-
-
-    @Autowired
-    private SysPostMapper postMapper;
-
-    @Autowired
-    private SysRoleMapper roleMapper;
-
-    @Transactional
-    public int testTransaction() throws FileNotFoundException {
-        A();
-        B();
-        return 0;
-    }
-
-    public void A() {
-        SysPost post = new SysPost();
-        post.setPostId(UUID.fastUUID().toString());
-        post.setPostName("test");
-        postMapper.insertPost(post);
-    }
-
-    //    @Transactional
-    public void B() {
-        SysRole role = new SysRole();
-        role.setRoleName("test");
-        roleMapper.insertRole(role);
     }
 }

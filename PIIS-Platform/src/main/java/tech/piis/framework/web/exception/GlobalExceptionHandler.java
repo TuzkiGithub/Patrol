@@ -14,6 +14,7 @@ import tech.piis.common.constant.HttpStatus;
 import tech.piis.common.exception.BaseException;
 import tech.piis.common.exception.CustomException;
 import tech.piis.common.exception.DemoModeException;
+import tech.piis.common.exception.file.QuestionFileException;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.web.domain.AjaxResult;
 
@@ -79,6 +80,13 @@ public class GlobalExceptionHandler
 
     @ExceptionHandler(Exception.class)
     public AjaxResult handleException(Exception e)
+    {
+        log.error(e.getMessage(), e);
+        return AjaxResult.error("系统异常！");
+    }
+
+    @ExceptionHandler(QuestionFileException.class)
+    public AjaxResult handleQuestionException(Exception e)
     {
         log.error(e.getMessage(), e);
         return AjaxResult.error(e.getMessage());

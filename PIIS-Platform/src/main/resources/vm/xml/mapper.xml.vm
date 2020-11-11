@@ -22,6 +22,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select#foreach($column in $columns) $column.columnName#if($velocityCount != $columns.size()),#end#end from ${tableName}
     </sql>
 
+    <select id="select${ClassName}Count}" parameterType="java.lang.String"
+            resultMap="unitsBizCountResultMap">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
+        from inspection_units u
+        left join ${tableName} d on u.UNITS_ID = d.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
+        order by u.created_time, u.UNITS_ID desc
+    </select>
+
     <select id="select${ClassName}List" parameterType="${ClassName}PO" resultMap="${ClassName}Result">
         <include refid="select${ClassName}Vo"/>
         <where>  

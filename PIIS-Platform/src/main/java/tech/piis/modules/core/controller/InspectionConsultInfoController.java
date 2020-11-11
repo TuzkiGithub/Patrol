@@ -5,7 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
-import tech.piis.common.constant.ResultEnum;
+import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
 import tech.piis.framework.aspectj.lang.enums.BusinessType;
@@ -44,9 +44,7 @@ public class InspectionConsultInfoController extends BaseController {
     @PreAuthorize("@ss.hasPermi('piis:consult/info:list')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionConsultInfoPO inspectionConsultInfo) throws BaseException {
-        Long unitsId = null;
         if (null != inspectionConsultInfo) {
-            unitsId = Long.valueOf(inspectionConsultInfo.getUnitsId());
             if (null == inspectionConsultInfo.getPageNum() || null == inspectionConsultInfo.getPageNum()) {
                 inspectionConsultInfo.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
                 inspectionConsultInfo.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
@@ -58,7 +56,7 @@ public class InspectionConsultInfoController extends BaseController {
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
                 .setRows(data)
-                .setTotal(inspectionConsultInfoService.count(unitsId));
+                .setTotal(inspectionConsultInfoService.count(inspectionConsultInfo));
     }
 
     /**

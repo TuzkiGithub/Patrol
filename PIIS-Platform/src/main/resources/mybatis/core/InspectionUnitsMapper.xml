@@ -44,4 +44,11 @@
         left join inspection_group_member m on m.GROUP_MEMBER_ID = gmu.group_member_id
         where u.UNITS_ID = #{unitsId}
     </select>
+
+    <select id="selectUnitsOrderBy" parameterType="java.lang.String" resultMap="inspectionUnitsResultMap">
+    select *
+    from inspection_units
+    where PLAN_ID = #{planId}
+    group by CREATED_TIME, UNITS_ID desc
+    </select>
 </mapper> 

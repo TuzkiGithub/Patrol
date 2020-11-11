@@ -11,6 +11,8 @@
         <result property="groupName" column="GROUP_NAME"/>
         <result property="leaderId" column="LEADER_ID"/>
         <result property="leaderName" column="LEADER_NAME"/>
+        <result property="connectorId" column="CONNECTOR_ID"/>
+        <result property="connectorName" column="CONNECTOR_NAME"/>
         <result property="deputyLeaderId" column="DEPUTY_LEADER_ID"/>
         <result property="deputyLeaderName" column="DEPUTY_LEADER_NAME"/>
         <result property="createdBy" column="CREATED_BY"/>
@@ -48,10 +50,10 @@
 
     <insert id="insertBatch" parameterType="InspectionGroupPO">
         insert into
-        inspection_group(GROUP_ID,PLAN_ID,GROUP_NAME,LEADER_ID,LEADER_NAME,DEPUTY_LEADER_ID,DEPUTY_LEADER_NAME) values
+        inspection_group(GROUP_ID,PLAN_ID,GROUP_NAME,LEADER_ID,LEADER_NAME,DEPUTY_LEADER_ID,DEPUTY_LEADER_NAME,CONNECTOR_ID,CONNECTOR_NAME) values
         <foreach item="item" index="index" collection="list" separator=",">
             (#{item.groupId},
-            #{item.planId},#{item.groupName},#{item.leaderId},#{item.leaderName},#{item.deputyLeaderId},#{item.deputyLeaderName})
+            #{item.planId},#{item.groupName},#{item.leaderId},#{item.leaderName},#{item.deputyLeaderId},#{item.deputyLeaderName},#{item.connectorId},#{item.connectorName})
         </foreach>
     </insert>
 </mapper> 

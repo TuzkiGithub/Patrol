@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionTalkOutlineMapper">
+
+    <resultMap type="InspectionTalkOutlinePO" id="InspectionTalkOutlineResult">
+        <id property="talkOutlineId" column="TALK_OUTLINE_ID"/>
+        <result property="talkClassificationId" column="TALK_CLASSIFICATION_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="talkQuestion" column="TALK_QUESTION"/>
+        <result property="talkAnswer" column="TALK_ANSWER"/>
+        <result property="talkClassification" column="TALK_CLASSIFICATION"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+        <collection property="questionList" javaType="java.util.List" resultMap="talkOutlineQuestionResult"/>
+    </resultMap>
+
+    <resultMap id="talkOutlineQuestionResult" type="InspectionTalkOutlinePO">
+        <result property="talkOutlineId" column="TALK_OUTLINE_ID2"/>
+        <result property="talkQuestion" column="TALK_QUESTION2"/>
+        <result property="createdTime" column="CREATED_TIME2"/>
+    </resultMap>
+
+    <select id="selectTalkOutlineList" parameterType="java.lang.String" resultMap="InspectionTalkOutlineResult">
+        select t1.TALK_OUTLINE_ID, t1.TALK_CLASSIFICATION_ID,t1.PLAN_ID,t1.TALK_CLASSIFICATION,t1.CREATED_TIME,t2.TALK_OUTLINE_ID TALK_OUTLINE_ID2, t2.TALK_QUESTION TALK_QUESTION2,t2.CREATED_TIME  CREATED_TIME2
+        from inspection_talk_outline t1
+        left JOIN inspection_talk_outline t2 on t1.TALK_OUTLINE_ID = t2.TALK_CLASSIFICATION_ID
+        where t1.TALK_CLASSIFICATION_ID = -1
+        and t1.PLAN_ID = #{planId}
+        order by t1.CREATED_TIME, t2.CREATED_TIME asc
+    </select>
+
+</mapper>

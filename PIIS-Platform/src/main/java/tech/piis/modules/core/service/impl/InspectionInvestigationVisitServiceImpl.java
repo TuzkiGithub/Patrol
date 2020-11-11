@@ -147,9 +147,10 @@ public class InspectionInvestigationVisitServiceImpl implements IInspectionInves
      * @return
      */
     @Override
-    public int count(Long unitsId) throws BaseException {
+    public int count(InspectionInvestigationVisitPO inspectionInvestigationVisit) throws BaseException {
         QueryWrapper<InspectionInvestigationVisitPO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("UNITS_ID", unitsId);
+        queryWrapper.eq("UNITS_ID", inspectionInvestigationVisit.getUnitsId());
+        queryWrapper.eq("PLAN_ID", inspectionInvestigationVisit.getPlanId());
         return inspectionInvestigationVisitMapper.selectCount(queryWrapper);
     }
 }

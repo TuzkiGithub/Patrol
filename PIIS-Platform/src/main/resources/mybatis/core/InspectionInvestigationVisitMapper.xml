@@ -93,6 +93,6 @@
         left join inspection_investigation_visit v on u.UNITS_ID = v.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time desc
+        order by u.created_time, u.UNITS_ID desc
     </select>
 </mapper>

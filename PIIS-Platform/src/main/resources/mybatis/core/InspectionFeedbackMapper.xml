@@ -15,11 +15,29 @@
         <result property="copyCompanyId" column="COPY_COMPANY_ID"/>
         <result property="copyCompanyName" column="COPY_COMPANY_NAME"/>
         <result property="toDoTime" column="TO_DO_TIME"/>
+        <result property="printTime" column="PRINT_TIME"/>
         <result property="createdBy" column="CREATED_BY"/>
         <result property="createdTime" column="CREATED_TIME"/>
         <result property="updatedBy" column="UPDATED_BY"/>
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
+        <collection property="feedbackQuestionsList" javaType="java.util.List"
+                    resultMap="InspectionFeedbackQuestionsResult"/>
+    </resultMap>
+
+
+    <resultMap type="InspectionFeedbackQuestionsPO" id="InspectionFeedbackQuestionsResult">
+        <result property="feedbackQuestionsId" column="FEEDBACK_QUESTIONS_ID"/>
+        <result property="problemClassification" column="PROBLEM_CLASSIFICATION"/>
+        <result property="problemPerformance" column="PROBLEM_PERFORMANCE"/>
+        <result property="deputyLeaderId" column="DEPUTY_LEADER_ID"/>
+        <result property="deputyLeaderName" column="DEPUTY_LEADER_NAME"/>
+        <result property="rectificationCompanyId" column="RECTIFICATION_COMPANY_ID"/>
+        <result property="rectificationCompanyName" column="RECTIFICATION_COMPANY_NAME"/>
+        <result property="mainLeaderId" column="MAIN_LEADER_ID"/>
+        <result property="mainLeaderName" column="MAIN_LEADER_NAME"/>
+        <result property="rectificationStatus" column="RECTIFICATION_STATUS"/>
+        <result property="rectificationMeasures" column="RECTIFICATION_MEASURES"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -32,30 +50,20 @@
 
     <sql id="selectInspectionFeedbackVo">
         select FEEDBACK_ID, PLAN_ID, UNITS_ID, FILE_NAME, FILE_CODE, MAIN_COMPANY_ID, MAIN_COMPANY_NAME, COPY_COMPANY_ID, COPY_COMPANY_NAME, TO_DO_TIME, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_feedback
-    </sql>
+</sql>
 
     <select id="selectInspectionFeedbackList" parameterType="InspectionFeedbackPO" resultMap="InspectionFeedbackResult">
-        <include refid="selectInspectionFeedbackVo"/>
-        <where>
-            <if test="planId != null  and planId != ''">and PLAN_ID = #{planId}</if>
-            <if test="unitsId != null ">and UNITS_ID = #{unitsId}</if>
-            <if test="fileName != null  and fileName != ''">and FILE_NAME like concat('%', #{fileName}, '%')</if>
-            <if test="fileCode != null  and fileCode != ''">and FILE_CODE = #{fileCode}</if>
-            <if test="mainCompanyId != null  and mainCompanyId != ''">and MAIN_COMPANY_ID = #{mainCompanyId}</if>
-            <if test="mainCompanyName != null  and mainCompanyName != ''">and MAIN_COMPANY_NAME like concat('%',
-                #{mainCompanyName}, '%')
-            </if>
-            <if test="copyCompanyId != null  and copyCompanyId != ''">and COPY_COMPANY_ID = #{copyCompanyId}</if>
-            <if test="copyCompanyName != null  and copyCompanyName != ''">and COPY_COMPANY_NAME like concat('%',
-                #{copyCompanyName}, '%')
-            </if>
-            <if test="toDoTime != null ">and TO_DO_TIME = #{toDoTime}</if>
-            <if test="createdBy != null  and createdBy != ''">and CREATED_BY = #{createdBy}</if>
-            <if test="createdTime != null ">and CREATED_TIME = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''">and UPDATED_BY = #{updatedBy}</if>
-            <if test="updatedTime != null ">and UPDATED_TIME = #{updatedTime}</if>
-            <if test="entId != null  and entId != ''">and ENT_ID = #{entId}</if>
-        </where>
+        select f.FEEDBACK_ID, PLAN_ID, UNITS_ID, FILE_NAME, FILE_CODE, MAIN_COMPANY_ID, MAIN_COMPANY_NAME, COPY_COMPANY_ID, COPY_COMPANY_NAME, TO_DO_TIME,PRINT_TIME, f.CREATED_BY, f.CREATED_TIME, f.UPDATED_BY, f.UPDATED_TIME, f.ENT_ID ,
+        FEEDBACK_QUESTIONS_ID, PROBLEM_CLASSIFICATION, PROBLEM_PERFORMANCE, DEPUTY_LEADER_ID, DEPUTY_LEADER_NAME, RECTIFICATION_COMPANY_ID, RECTIFICATION_COMPANY_NAME, MAIN_LEADER_ID, MAIN_LEADER_NAME, RECTIFICATION_STATUS, RECTIFICATION_MEASURES
+        from
+        (
+          select FEEDBACK_ID, PLAN_ID, UNITS_ID, FILE_NAME, FILE_CODE, MAIN_COMPANY_ID, MAIN_COMPANY_NAME, COPY_COMPANY_ID, COPY_COMPANY_NAME, TO_DO_TIME, PRINT_TIME, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID
+          from inspection_feedback
+          where PLAN_ID = #{planId}
+          and   UNITS_ID = #{unitsId}
+          limit #{pageNum}, #{pageSize}
+        )f
+        left join inspection_feedback_questions q on q.FEEDBACK_ID = f.FEEDBACK_ID
     </select>
 
     <select id="selectInspectionFeedbackCount" parameterType="java.lang.String"
@@ -65,7 +73,7 @@
         left join inspection_feedback d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time desc
+        order by u.created_time, u.UNITS_ID desc
     </select>
 
 </mapper>

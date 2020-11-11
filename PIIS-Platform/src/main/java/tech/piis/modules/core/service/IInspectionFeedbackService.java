@@ -56,5 +56,5 @@ public interface IInspectionFeedbackService {
      * 统计总数
      * @return
      */
-    int count();
+    int count(InspectionFeedbackPO inspectionFeedback);
 }

@@ -68,14 +68,14 @@ public class InspectionCheckPersonMattersServiceImpl implements IInspectionCheck
     /**
      * 查询总数
      *
-     * @param unitsId 本巡视单位
      * @return
      * @throws BaseException
      */
     @Override
-    public int count(Long unitsId) throws BaseException {
+    public int count(InspectionCheckPersonMattersPO inspectionCheckPersonMatters) throws BaseException {
         QueryWrapper<InspectionCheckPersonMattersPO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("UNITS_ID", unitsId);
+        queryWrapper.eq("UNITS_ID", inspectionCheckPersonMatters.getUnitsId());
+        queryWrapper.eq("PLAN_ID", inspectionCheckPersonMatters.getPlanId());
         return inspectionCheckPersonMattersMapper.selectCount(queryWrapper);
     }
 

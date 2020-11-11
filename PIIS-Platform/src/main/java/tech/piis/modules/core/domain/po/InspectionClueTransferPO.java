@@ -1,6 +1,5 @@
 package tech.piis.modules.core.domain.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -11,7 +10,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +36,7 @@ public class InspectionClueTransferPO extends PIBaseEntity {
     /**
      * 巡视方案ID
      */
-    @NotEmpty(message = "巡视方案ID不能为空")
+    @NotBlank(message = "巡视方案ID不能为空")
     private String planId;
     /**
      * 被巡视单位ID
@@ -47,27 +46,27 @@ public class InspectionClueTransferPO extends PIBaseEntity {
     /**
      * 问题线索名称
      */
-    @NotEmpty(message = "问题线索名称不能为空")
+    @NotBlank(message = "问题线索名称不能为空")
     private String clueName;
     /**
      * 移交方公司ID
      */
-    @NotEmpty(message = "移交方公司ID不能为空")
+    @NotBlank(message = "移交方公司ID不能为空")
     private String transferCompanyId;
     /**
      * 移交方公司姓名
      */
-    @NotEmpty(message = "移交方公司姓名不能为空")
+    @NotBlank(message = "移交方公司姓名不能为空")
     private String transferCompanyName;
     /**
      * 移交经办人ID
      */
-    @NotEmpty(message = "移交经办人ID不能为空")
+    @NotBlank(message = "移交经办人ID不能为空")
     private String transferAgentId;
     /**
      * 移交经办人姓名
      */
-    @NotEmpty(message = "移交经办人姓名不能为空")
+    @NotBlank(message = "移交经办人姓名不能为空")
     private String transferAgentName;
     /**
      * 移交时间
@@ -78,22 +77,22 @@ public class InspectionClueTransferPO extends PIBaseEntity {
     /**
      * 接收方公司ID
      */
-    @NotEmpty(message = "接收方公司ID不能为空")
+    @NotBlank(message = "接收方公司ID不能为空")
     private String receiverCompanyId;
     /**
      * 接收方公司姓名
      */
-    @NotEmpty(message = "接收方公司姓名不能为空")
+    @NotBlank(message = "接收方公司姓名不能为空")
     private String receiverCompanyName;
     /**
      * 接收经办人ID
      */
-    @NotEmpty(message = "接收经办人ID不能为空")
+    @NotBlank(message = "接收经办人ID不能为空")
     private String receiverAgentId;
     /**
      * 接收经办人姓名
      */
-    @NotEmpty(message = "接收经办人姓名不能为空")
+    @NotBlank(message = "接收经办人姓名不能为空")
     private String receiverAgentName;
     /**
      * 接收时间
@@ -104,12 +103,12 @@ public class InspectionClueTransferPO extends PIBaseEntity {
     /**
      * 反馈部门ID
      */
-    @NotEmpty(message = "反馈部门ID不能为空")
+    @NotBlank(message = "反馈部门ID不能为空")
     private String feedbackCompanyId;
     /**
      * 反馈部门名称
      */
-    @NotEmpty(message = "反馈部门名称不能为空")
+    @NotBlank(message = "反馈部门名称不能为空")
     private String feedbackCompanyName;
     /**
      * 反馈时间

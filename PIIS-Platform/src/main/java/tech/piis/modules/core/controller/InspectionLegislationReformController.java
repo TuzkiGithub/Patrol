@@ -38,7 +38,7 @@ public class InspectionLegislationReformController extends BaseController
      * 查询立行立改 列表
      * @param  inspectionLegislationReform
      */
-    @PreAuthorize("@ss.hasPermi('core:reform:list')")
+    @PreAuthorize("@ss.hasPermi('piis:reform:list')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionLegislationReformPO inspectionLegislationReform) throws BaseException{
         startPage();
@@ -50,7 +50,7 @@ public class InspectionLegislationReformController extends BaseController
      * 查询立行立改 文件
      * @param  inspectionLegislationReformId 文件关联ID
      */
-    @PreAuthorize("@ss.hasPermi('core:reform:query')")
+    @PreAuthorize("@ss.hasPermi('piis:reform:query')")
     @GetMapping("/file")
     public AjaxResult findInspectionLegislationReformFile(@RequestParam("legislationReformId") String inspectionLegislationReformId) throws BaseException {
         return AjaxResult.success(documentService.getFileListByBizId("InspectionLegislationReform" + inspectionLegislationReformId));
@@ -61,7 +61,7 @@ public class InspectionLegislationReformController extends BaseController
      *
      * @param planId 巡视计划ID
     */
-    @PreAuthorize("@ss.hasPermi('core:reform:query')")
+    @PreAuthorize("@ss.hasPermi('piis:reform:query')")
     @GetMapping("/count")
     public AjaxResult countInspectionLegislationReformList(String planId) throws BaseException{
         return AjaxResult.success(inspectionLegislationReformService.selectInspectionLegislationReformCount(planId));
@@ -70,7 +70,7 @@ public class InspectionLegislationReformController extends BaseController
      * 新增立行立改 
      * @param  inspectionLegislationReform
      */
-    @PreAuthorize("@ss.hasPermi('core:reform:add')")
+    @PreAuthorize("@ss.hasPermi('piis:reform:add')")
     @Log(title = "立行立改 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InspectionLegislationReformPO inspectionLegislationReform) {
@@ -85,7 +85,7 @@ public class InspectionLegislationReformController extends BaseController
      * 修改立行立改 
      * @param  inspectionLegislationReform
      */
-    @PreAuthorize("@ss.hasPermi('core:reform:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:reform:edit')")
     @Log(title = "立行立改 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionLegislationReformPO inspectionLegislationReform) throws BaseException{
@@ -100,7 +100,7 @@ public class InspectionLegislationReformController extends BaseController
      * 删除立行立改 
      * legislationReformIds 立行立改 ID数组
      */
-    @PreAuthorize("@ss.hasPermi('core:reform:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:reform:remove')")
     @Log(title = "立行立改 ", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{legislationReformIds}")
     public AjaxResult remove(@PathVariable Long[] legislationReformIds) throws BaseException{

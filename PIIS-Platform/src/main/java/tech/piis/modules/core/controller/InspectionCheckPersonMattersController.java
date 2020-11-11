@@ -5,7 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
-import tech.piis.common.constant.ResultEnum;
+import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
 import tech.piis.framework.aspectj.lang.enums.BusinessType;
@@ -49,14 +49,16 @@ public class InspectionCheckPersonMattersController extends BaseController {
                 inspectionCheckPersonMatters.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
             }
             inspectionCheckPersonMatters.setPageNum(inspectionCheckPersonMatters.getPageNum() + inspectionCheckPersonMatters.getPageNum() * inspectionCheckPersonMatters.getPageSize());
-
+            List<InspectionCheckPersonMattersPO> data = inspectionCheckPersonMattersService.selectInspectionCheckPersonMattersList(inspectionCheckPersonMatters);
+            return new TableDataInfo()
+                    .setCode(ResultEnum.SUCCESS.getCode())
+                    .setMsg(ResultEnum.SUCCESS.getMsg())
+                    .setRows(data)
+                    .setTotal(inspectionCheckPersonMattersService.count(inspectionCheckPersonMatters));
         }
-        List<InspectionCheckPersonMattersPO> data = inspectionCheckPersonMattersService.selectInspectionCheckPersonMattersList(inspectionCheckPersonMatters);
         return new TableDataInfo()
-                .setCode(ResultEnum.SUCCESS.getCode())
-                .setMsg(ResultEnum.SUCCESS.getMsg())
-                .setRows(data)
-                .setTotal(inspectionCheckPersonMattersService.count(inspectionCheckPersonMatters.getUnitsId()));
+                .setCode(ResultEnum.FAILED.getCode())
+                .setMsg(ResultEnum.FAILED.getMsg());
     }
 
 

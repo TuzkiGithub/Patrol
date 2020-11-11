@@ -2,13 +2,12 @@ package tech.piis.modules.core.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
-import tech.piis.common.constant.GenConstants;
 import tech.piis.common.constant.PiisConstants;
-import tech.piis.common.constant.ResultEnum;
+import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.utils.DateUtils;
-import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.utils.SecurityUtils;
 import tech.piis.framework.web.controller.BaseController;
 import tech.piis.framework.web.domain.AjaxResult;
@@ -18,6 +17,10 @@ import tech.piis.modules.core.service.IInspectionPlanService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -41,39 +44,46 @@ public class InspectionPlanController extends BaseController {
     @PreAuthorize("@ss.hasPermi('piis:plan:list')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionPlanPO inspectionPlanPO) {
+        List<InspectionPlanPO> list = null;
         if (null != inspectionPlanPO) {
-            //模糊查询时不分页
-            if (!StringUtils.isEmpty(inspectionPlanPO.getPlanName())) {
-                inspectionPlanPO.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
-                inspectionPlanPO.setPageSize(GenConstants.MAX_PAGE_SIZE);
+            list = inspectionPlanService.selectPlanList(inspectionPlanPO);
+            list = list.stream().sorted(Comparator.comparing(InspectionPlanPO::getCreatedTime).reversed()).collect(Collectors.toList());
+            //假分页
+            Integer pageNum = inspectionPlanPO.getPageNum() * inspectionPlanPO.getPageSize();
+            Integer pageSize = pageNum + inspectionPlanPO.getPageSize();
+            if (!CollectionUtils.isEmpty(list)) {
+                if (list.size() != 1) {
+                    if (pageSize > list.size()) {
+                        pageSize = list.size();
+                    }
+                    if(pageNum <= pageSize){
+                        list = list.subList(pageNum, pageSize);
+                    }else {
+                        list = new ArrayList<>();
+                    }
+                }
             }
-
             Integer planType = inspectionPlanPO.getPlanType();
-            if(null == planType){
+            if (null == planType) {
                 return new TableDataInfo()
                         .setCode(ResultEnum.FAILED.getCode())
                         .setMsg(BizConstants.PIIS_TYPE_NULL);
-            } else if(planType == PiisConstants.PIIS_TYPE && null == inspectionPlanPO.getPlanCompanyId()){
+            } else if (planType == PiisConstants.PIIS_TYPE && null == inspectionPlanPO.getPlanCompanyId()) {
                 return new TableDataInfo()
                         .setCode(ResultEnum.FAILED.getCode())
                         .setMsg(BizConstants.COMPANY_ID_NULL);
-            }
-            if (null == inspectionPlanPO.getPageNum() || null == inspectionPlanPO.getPageSize()) {
-                inspectionPlanPO.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
-                inspectionPlanPO.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
-            } else {
-                inspectionPlanPO.setPageNum(inspectionPlanPO.getPageNum() * inspectionPlanPO.getPageSize());
             }
         }
         return new TableDataInfo()
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
-                .setRows(inspectionPlanService.selectPlanList(inspectionPlanPO))
+                .setRows(list)
                 .setTotal(inspectionPlanService.selectCount(inspectionPlanPO));
     }
 
     /**
      * 统计一级子公司巡察情况
+     *
      * @return
      */
     @PreAuthorize("@ss.hasPermi('piis:plan:query')")

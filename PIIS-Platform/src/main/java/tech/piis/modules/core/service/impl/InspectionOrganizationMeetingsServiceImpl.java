@@ -21,9 +21,7 @@ import tech.piis.modules.core.service.IInspectionOrganizationMeetingsService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.DELETE;
 import static tech.piis.common.constant.OperationConstants.INSERT;
@@ -65,20 +63,17 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
      * @param organizationType 组织类型
      */
     public List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(String planId, Integer organizationType) throws BaseException {
-        QueryWrapper<InspectionUnitsPO> params = new QueryWrapper<>();
-        params.eq("PLAN_ID", planId);
-        List<InspectionUnitsPO> unitsList = unitsMapper.selectList(params);
         List<UnitsBizCountVO> unitsBizCountVOS = inspectionOrganizationMeetingsMapper.selectInspectionOrganizationMeetingsCount(planId, organizationType);
-        unitsBizCountVOS = unitsBizCountVOS.stream().filter(var -> organizationType.equals(var.getOrganizationType())).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(unitsList)) {
-            for (InspectionUnitsPO units : unitsList) {
-                boolean flag = isContainUnits(units, unitsBizCountVOS);
-                if (!flag) {
-                    unitsBizCountVOS.add(new UnitsBizCountVO().setUnitsId(units.getUnitsId()).setOrgId(units.getOrgId()).setOrgName(units.getOrgName()).setCreatedTime(units.getCreatedTime()).setCount(0));
+        if (!CollectionUtils.isEmpty(unitsBizCountVOS)) {
+            unitsBizCountVOS.forEach(var -> {
+                Integer currentOrganizationType = var.getOrganizationType();
+                if (!organizationType.equals(currentOrganizationType)) {
+                    var.setCount(0);
                 }
-            }
+            });
         }
-        unitsBizCountVOS = unitsBizCountVOS.stream().sorted(Comparator.comparing(UnitsBizCountVO::getCreatedTime).reversed()).collect(Collectors.toList());
+
+
         return unitsBizCountVOS;
     }
 

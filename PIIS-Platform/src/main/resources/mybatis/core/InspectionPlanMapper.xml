@@ -35,6 +35,8 @@
         <result property="leaderName" column="LEADER_NAME"/>
         <result property="deputyLeaderId" column="DEPUTY_LEADER_ID"/>
         <result property="deputyLeaderName" column="DEPUTY_LEADER_NAME"/>
+        <result property="connectorId" column="CONNECTOR_ID"/>
+        <result property="connectorName" column="CONNECTOR_NAME"/>
         <result property="remark" column="REMARK"/>
         <collection property="inspectionUnitsList" javaType="java.util.List" resultMap="inspectionUnitsResultMap"/>
         <collection property="inspectionGroupMemberList" javaType="java.util.List"
@@ -126,6 +128,8 @@
         g.LEADER_NAME,
         g.DEPUTY_LEADER_ID,
         g.DEPUTY_LEADER_NAME,
+        g.CONNECTOR_ID,
+        g.CONNECTOR_NAME,
         g.REMARK,
         m.GROUP_MEMBER_ID,
         m.MEMBER_ID,
@@ -176,7 +180,6 @@
             </if>
         </where>
         order by CREATED_TIME desc
-        limit #{pageNum},#{pageSize}
         ) p
         left join inspection_group g on p.PLAN_ID = g.PLAN_ID
         left join inspection_group_member m on g.GROUP_ID = m.GROUP_ID
@@ -184,7 +187,10 @@
         left join inspection_units u on u.UNITS_ID = gmn.units_id
         left join inspection_mobilize mb on mb.PLAN_ID = p.PLAN_ID
         left join inspection_mobilize_attendee mba on mba.MOBILIZE_ID = mb.MOBILIZE_ID
-        order by u.CREATED_TIME desc
+        where m.GROUP_MEMBER_ID = gmn.group_member_id
+        and u.UNITS_ID = gmn.units_id
+        and g.GROUP_ID = gmn.group_id
+        order by u.CREATED_TIME, u.UNITS_ID desc
     </select>
 
     <select id="selectPlanCompanyTotal" resultMap="selectPlanCompanyTotalResultMap">

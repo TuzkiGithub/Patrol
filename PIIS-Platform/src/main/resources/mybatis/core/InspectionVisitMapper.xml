@@ -35,7 +35,7 @@
             as callCount
         from inspection_units u
         where PLAN_ID = #{planId}
-        order by u.created_time desc
+        order by u.created_time, u.UNITS_ID desc
     </select>
 
 </mapper>

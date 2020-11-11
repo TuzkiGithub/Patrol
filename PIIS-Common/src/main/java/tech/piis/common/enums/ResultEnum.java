@@ -1,4 +1,4 @@
-package tech.piis.common.constant;
+package tech.piis.common.enums;
 
 /**
  * Created with IntelliJ IDEA.

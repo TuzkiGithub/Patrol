@@ -97,4 +97,5 @@ public class InspectionPlanPO extends PIBaseEntity {
      * 巡视动员
      */
     private InspectionMobilizePO inspectionMobilize;
+
 }
