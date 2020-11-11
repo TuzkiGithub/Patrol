@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tech.piis.common.constant.BizConstants;
-import tech.piis.common.constant.ResultEnum;
+import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.constant.UserConstants;
 import tech.piis.common.utils.ServletUtils;
 import tech.piis.common.utils.StringUtils;
