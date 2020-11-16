@@ -36,6 +36,8 @@ spring:
     basename: i18n/messages
   jackson:
       default-property-inclusion: non_null
+  main:
+    allow-bean-definition-overriding: true
   # File Upload
   servlet:
      multipart:

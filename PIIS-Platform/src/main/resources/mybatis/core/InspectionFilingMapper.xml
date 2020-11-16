@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionFilingMapper">
+
+    <resultMap id="inspectionFilingResultMap" type="InspectionFilingPO">
+        <result property="planId" column="PLAN_ID"/>
+        <result property="planName" column="PLAN_NAME"/>
+        <result property="groupId" column="GROUP_ID"/>
+        <result property="groupName" column="GROUP_NAME"/>
+        <result property="leaderName" column="LEADER_NAME"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="orgName" column="ORG_NAME"/>
+
+        <result property="committeeMeetingsCount" column="committeeMeetingsCount"/>
+        <result property="importReportCount" column="importReportCount"/>
+        <result property="talkCount" column="talkCount"/>
+        <result property="problemDraftCount" column="problemDraftCount"/>
+        <result property="checkPersonalCount" column="checkPersonalCount"/>
+        <result property="clueCount" column="clueCount"/>
+        <result property="consultCount" column="consultCount"/>
+        <result property="visitCount" column="visitCount"/>
+    </resultMap>
+
+   <select id="selectFilingByPlanId" parameterType="java.lang.String" resultMap="inspectionFilingResultMap">
+        select
+          p.PLAN_NAME,
+          g.GROUP_ID,
+          g.GROUP_NAME,
+          g.LEADER_NAME,
+          u.UNITS_ID,
+          u.ORG_NAME,
+          ifnull(count(distinct (cm.COMMITTEE_MEETINGS_ID)), 0)                        as committeeMeetingsCount,
+          ifnull(count(distinct (ir.IMPORTANT_REPORT_ID)), 0)                          as importReportCount,
+          ifnull(count(distinct (it.INDIVIDUAL_TALK_ID)), 0)                           as talkCount,
+          ifnull(count(distinct (pd.PROBLEM_DRAFT_ID)), 0)                             as problemDraftCount,
+          ifnull(count(distinct (pm.CHECK_PERSON_MATTERS_ID)), 0)                      as checkPersonalCount,
+          ifnull(count(distinct (ct.CLUE_TRANSFER_ID)), 0)                             as clueCount,
+          ifnull(count(distinct (ci.CONSULT_INFO_ID)), 0)                              as consultCount,
+          ifnull(count(distinct (v.VISIT_ID)) + count(distinct (cv.CALL_VISIT_ID)), 0) as
+                                                                                          visitCount
+        from inspection_plan p
+          LEFT JOIN inspection_group g ON p.PLAN_ID = g.PLAN_ID
+          LEFT JOIN inspection_units u ON u.GROUP_ID = g.GROUP_ID
+          left join inspection_committee_meetings cm on cm.UNITS_ID = u.UNITS_ID
+          left join inspection_important_report ir on ir.UNITS_ID = u.UNITS_ID
+          left join inspection_individual_talk it on it.UNITS_ID = u.UNITS_ID
+          left join inspection_problem_draft pd on pd.UNITS_ID = u.UNITS_ID
+          left join inspection_check_person_matters pm on pm.UNITS_ID = u.UNITS_ID
+          left join inspection_clue_transfer ct on ct.UNITS_ID = u.UNITS_ID
+          left join inspection_consult_info ci on ci.UNITS_ID = u.UNITS_ID
+          left join inspection_visit v on v.UNITS_ID = u.UNITS_ID
+          left join inspection_call_visit cv on cv.UNITS_ID = u.UNITS_ID
+        where p.plan_id = #{planId}
+        group by
+          p.PLAN_NAME,
+          g.GROUP_NAME,
+          u.UNITS_ID,
+          u.ORG_NAME
+        order by g.CREATED_TIME, g.GROUP_ID desc;
+   </select>
+</mapper> 

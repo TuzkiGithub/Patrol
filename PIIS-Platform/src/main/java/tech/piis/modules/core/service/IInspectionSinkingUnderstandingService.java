@@ -56,5 +56,5 @@ public interface IInspectionSinkingUnderstandingService {
      * 查询总数
      * @return
      */
-    int count(Long unitsId);
+    int count(InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding);
 }

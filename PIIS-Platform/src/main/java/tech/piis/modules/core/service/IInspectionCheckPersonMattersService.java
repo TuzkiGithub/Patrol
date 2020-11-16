@@ -31,11 +31,10 @@ public interface IInspectionCheckPersonMattersService {
 
     /**
      * 查询总数
-     * @param unitsId 被巡视单位
      * @return
      * @throws BaseException
      */
-    int count(Long unitsId) throws BaseException;
+    int count(InspectionCheckPersonMattersPO inspectionCheckPersonMatters) throws BaseException;
 
     /**
     * 新增抽查个人事项报告

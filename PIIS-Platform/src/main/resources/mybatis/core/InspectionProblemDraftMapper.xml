@@ -18,7 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join inspection_problem_draft d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time desc
+        order by u.created_time, u.UNITS_ID desc
     </select>
     
 </mapper>

@@ -70,6 +70,19 @@ public class InspectionGroupPO extends PIBaseEntity {
     private String deputyLeaderName;
 
     /**
+     * 联络员ID
+     */
+    @NotBlank(message = "联络员ID不能为空！")
+    private String connectorId;
+
+
+    /**
+     *联络员姓名
+     */
+    @NotBlank(message = "联络员姓名不能为空！")
+    private String connectorName;
+
+    /**
      * 被巡视单位
      */
     @Valid

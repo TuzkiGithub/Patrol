@@ -12,6 +12,7 @@ data:
     url: http://25.2.16.40:17121/org/id/emp?emp_range=1&grpOrgId=0000000000
   Authorization: Basic UElJUzpDZWIxMjM0NQ==
 
+
 #IAM参数
 iam:
   code:
@@ -28,3 +29,24 @@ iam:
   scope: sso:*
   state: piis
   grantType: authorization_code
+
+
+#E信参数
+ex:
+  code:
+    url: https://open.weixin.qq.com/connect/oauth2/authorize
+  redirect:
+    url: http://25.2.16.160:18080/oauth
+  token:
+    url: http://25.2.16.142/cgi-bin/gettoken
+  user:
+    url: http://25.2.16.142/cgi-bin/user/getuserinfo
+  responseType: code
+  scope: snsapi_privateinfo
+  appId: wl4778b9fc00
+  agentId: 1000232
+  corpId: wl4778b9fc00
+  corpSecret: -gz2V5cLE6wgvBjfmZmzwuY__M6AuwWypESh4DVjG3I
+  weChat: wechat_redirect
+
+

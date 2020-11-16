@@ -159,9 +159,10 @@ public class InspectionConsultInfoServiceImpl implements IInspectionConsultInfoS
      * @return
      */
     @Override
-    public int count(Long unitsId) {
+    public int count(InspectionConsultInfoPO inspectionConsultInfo) {
         QueryWrapper<InspectionConsultInfoPO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("UNITS_ID", unitsId);
+        queryWrapper.eq("UNITS_ID", inspectionConsultInfo.getUnitsId());
+        queryWrapper.eq("PLAN_ID", inspectionConsultInfo.getPlanId());
         return consultInfoMapper.selectCount(queryWrapper);
     }
 

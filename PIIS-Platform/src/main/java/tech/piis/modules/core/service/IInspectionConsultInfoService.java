@@ -56,5 +56,5 @@ public interface IInspectionConsultInfoService {
      * 统计总数
      * @return
      */
-    int count(Long unitsId);
+    int count(InspectionConsultInfoPO inspectionConsultInfo);
 }

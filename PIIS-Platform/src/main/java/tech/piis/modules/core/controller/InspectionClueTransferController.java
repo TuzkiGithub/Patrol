@@ -6,7 +6,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
-import tech.piis.common.constant.ResultEnum;
+import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.enums.FileEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;

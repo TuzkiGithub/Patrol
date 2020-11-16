@@ -5,7 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
-import tech.piis.common.constant.ResultEnum;
+import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
 import tech.piis.framework.aspectj.lang.enums.BusinessType;
@@ -57,7 +57,7 @@ public class InspectionSinkingUnderstandingController extends BaseController {
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
                 .setRows(data)
-                .setTotal(inspectionSinkingUnderstandingService.count(unitsId));
+                .setTotal(inspectionSinkingUnderstandingService.count(inspectionSinkingUnderstanding));
     }
 
     /**

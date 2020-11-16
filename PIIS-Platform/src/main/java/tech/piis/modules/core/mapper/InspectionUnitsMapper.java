@@ -24,4 +24,6 @@ public interface InspectionUnitsMapper extends BaseMapper<InspectionUnitsPO> {
      */
     public List<InspectionUnitsPO> selectUnitsMember(Long unitsId);
 
+    List<InspectionUnitsPO> selectUnitsOrderBy(String planId);
+
 }
