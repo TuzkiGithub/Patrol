@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.survey.mapper.SurveyOptionMapper">
+
+    <resultMap type="SurveyOptionPO" id="SurveyOptionResult">
+        <result property="optionId" column="OPTION_ID"/>
+        <result property="questionId" column="QUESTION_ID"/>
+        <result property="optionName" column="OPTION_NAME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+
+    <insert id="insertOptionBatch" parameterType="java.util.List">
+        insert into survey_option (QUESTION_ID,OPTION_NAME,REMARK) values
+        <foreach collection="list" item="option" separator=",">
+            (#{option.questionId},#{option.optionName},#{option.remark})
+        </foreach>
+    </insert>
+
+</mapper>
