@@ -60,4 +60,11 @@ public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
      * @return 结果
      */
     public int deleteUserRoleInfos(@Param("roleId") Long roleId, @Param("userIds") String[] userIds);
+
+    /**
+     * 新增用户-角色
+     * @param userRole
+     * @return
+     */
+    int insertUserRole(SysUserRole userRole);
 }

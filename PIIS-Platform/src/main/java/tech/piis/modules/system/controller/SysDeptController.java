@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.constant.UserConstants;
+import tech.piis.common.enums.ResultEnum;
 import tech.piis.framework.aspectj.lang.annotation.Log;
 import tech.piis.framework.aspectj.lang.enums.BusinessType;
 import tech.piis.framework.utils.DeptInitUtils;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * 部门信息
  *
- * @author Kevin<EastascendWang                                                                                                                               @                                                                                                                               gmail.com>
+ * @author Kevin<EastascendWang                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               gmail.com>
  */
 @RestController
 @RequestMapping("/system/dept")
@@ -39,8 +39,11 @@ public class SysDeptController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(SysDept dept) {
         if (null != dept) {
-            Integer pageNum = dept.getPageNum() * dept.getPageSize();
-            dept.setPageNum(pageNum);
+            Integer pageNum = dept.getPageNum();
+            Integer pageSize = dept.getPageSize();
+            if (null != pageNum && null != pageSize) {
+                dept.setPageNum(dept.getPageNum() * dept.getPageSize());
+            }
         }
 
         List<SysDept> depts = deptService.selectDeptList(dept);

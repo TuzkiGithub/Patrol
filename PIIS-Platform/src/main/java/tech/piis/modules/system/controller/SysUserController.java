@@ -7,14 +7,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tech.piis.common.constant.BizConstants;
-import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.constant.UserConstants;
+import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.utils.ServletUtils;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.aspectj.lang.annotation.Log;
 import tech.piis.framework.aspectj.lang.enums.BusinessType;
 import tech.piis.framework.security.LoginUser;
 import tech.piis.framework.security.service.TokenService;
+import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.SecurityUtils;
 import tech.piis.framework.utils.poi.ExcelUtil;
 import tech.piis.framework.web.controller.BaseController;
@@ -158,6 +159,8 @@ public class SysUserController extends BaseController {
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysUser user) {
         SysUser currentUser = userService.selectUserById(user.getUserId());
+        String oldPassword = currentUser.getPassword();
+        String newPassword = user.getPassword();
         if (!Objects.equals(user.getPhonenumber(), currentUser.getPhonenumber())) {
             if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
                 return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
@@ -170,10 +173,12 @@ public class SysUserController extends BaseController {
             }
         }
 
-        if (null != user.getPassword()) {
-            user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        if (null != newPassword) {
+            if (!Objects.equals(oldPassword, newPassword)) {
+                user.setPassword(SecurityUtils.encryptPassword(newPassword));
+            }
         }
-        user.setUpdateBy(SecurityUtils.getUsername());
+        BizUtils.setUpdatedOperation(SysUser.class, user);
         return toAjax(userService.updateUser(user));
     }
 

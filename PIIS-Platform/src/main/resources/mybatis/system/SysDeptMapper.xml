@@ -41,7 +41,10 @@
             AND status = #{status}
         </if>
         order by d.parent_id, d.order_num
-        limit #{pageNum},#{pageSize}
+        <if test="pageNum!=null and pageSize!=null">
+            limit #{pageNum},#{pageSize}
+        </if>
+
     </select>
 
     <select id="selectDeptListByRoleId" parameterType="String" resultType="Integer">
