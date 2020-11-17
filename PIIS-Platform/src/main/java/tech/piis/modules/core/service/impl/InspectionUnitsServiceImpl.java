@@ -27,7 +27,7 @@ public class InspectionUnitsServiceImpl implements IInspectionUnitsService {
      * @return
      */
     @Override
-    public List<InspectionUnitsPO> selectUnitsMember(Long unitsId) {
+    public InspectionUnitsPO selectUnitsMember(Long unitsId) {
         return inspectionUnitsMapper.selectUnitsMember(unitsId);
     }
 }

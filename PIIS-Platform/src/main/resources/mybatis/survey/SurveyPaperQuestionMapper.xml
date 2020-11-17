@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.survey.mapper.SurveyPaperQuestionMapper">
+
+    <resultMap type="SurveyPaperQuestionPO" id="SurveyPaperQuestionResult">
+        <result property="paperQuestionId" column="PAPER_QUESTION_ID"/>
+        <result property="paperId" column="PAPER_ID"/>
+        <result property="questionId" column="QUESTION_ID"/>
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+    </resultMap>
+
+
+    <insert id="insertPaperQuestionBatch" parameterType="java.util.List">
+        insert into survey_paper_question
+        (PAPER_ID, QUESTION_ID)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.paperId},#{item.questionId})
+        </foreach>
+    </insert>
+
+</mapper>

@@ -18,5 +18,5 @@ public interface IInspectionUnitsService {
      * @param unitsId
      * @return
      */
-    List<InspectionUnitsPO> selectUnitsMember(Long unitsId);
+    InspectionUnitsPO selectUnitsMember(Long unitsId);
 }

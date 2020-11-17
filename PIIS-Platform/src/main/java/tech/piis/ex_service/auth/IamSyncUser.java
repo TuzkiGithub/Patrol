@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import tech.piis.common.exception.BaseException;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.SecurityUtils;
 import tech.piis.modules.common.domain.IamResponse;
@@ -48,6 +49,7 @@ public class IamSyncUser {
     private Long defaultRoleId;
 
     @PostMapping("/jtsi/IAMService/syncCreateUser")
+    @Transactional
     public IamResponse syncUser(@RequestBody List<IamUser> userList) {
         log.info("======IamSyncUser===== userList = {}", userList);
         try {
@@ -55,17 +57,20 @@ public class IamSyncUser {
                 userList.forEach(user -> {
                     SysUser sysUser = new SysUser();
                     sysUser.setUserId(user.getUserId());
+                    sysUser.setUserName(user.getName());
                     sysUser.setPassword(SecurityUtils.encryptPassword(user.getUserId()));
                     sysUser.setPhonenumber(user.getMobile());
                     sysUser.setEmail(user.getEmail());
                     sysUser.setStatus("0");
                     sysUser.setDelFlag("0");
-                    BizUtils.setCreatedOperation(SysUser.class, sysUser);
+                    BizUtils.setCreatedTimeOperation(SysUser.class, sysUser);
 
                     SysUserDept userDept = new SysUserDept();
                     userDept.setUserId(user.getUserId());
                     userDept.setDeptId(user.getOrgCode());
                     QueryWrapper<SysUserDept> userDeptQueryWrapper = new QueryWrapper<>();
+                    userDeptQueryWrapper.eq("user_id", user.getUserId());
+                    userDeptQueryWrapper.eq("dept_id", user.getOrgCode());
                     List<SysUserDept> userDeptList = userDeptMapper.selectList(userDeptQueryWrapper);
                     //新增用户-部门关系
                     if (CollectionUtils.isEmpty(userDeptList)) {
@@ -79,14 +84,14 @@ public class IamSyncUser {
                         SysUserRole userRole = new SysUserRole();
                         userRole.setUserId(user.getUserId());
                         userRole.setRoleId(defaultRoleId);
-                        userRoleMapper.insert(userRole);
+                        userRoleMapper.insertUserRole(userRole);
                     }
 
                 });
             }
         } catch (Exception e) {
             log.error("======IamSyncUser===== e = {}", e);
-            return new IamResponse().setResult("-1").setReturnMessage("同步用户失败！");
+            throw new BaseException("同步用户失败！");
         }
         return new IamResponse().setResult("0").setReturnMessage("success");
     }

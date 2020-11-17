@@ -9,8 +9,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tech.piis.common.utils.http.HttpClientUtils;
+import tech.piis.framework.security.LoginUser;
+import tech.piis.framework.security.service.SysPermissionService;
+import tech.piis.framework.security.service.TokenService;
 import tech.piis.framework.web.domain.AjaxResult;
+import tech.piis.modules.common.domain.UserAuthResponse;
+import tech.piis.modules.system.domain.SysUser;
+import tech.piis.modules.system.domain.vo.UserVO;
 import tech.piis.modules.system.mapper.SysUserDetailMapper;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -95,16 +105,23 @@ public class IAMAuth {
     @Autowired
     private SysUserDetailMapper sysUserDetailMapper;
 
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private SysPermissionService permissionService;
+
 
     /**
      * 获取code
-     * @param code code
+     *
+     * @param code  code
      * @param state 应用系统标识
      * @return
      * @throws Exception
      */
     @RequestMapping("auth/v1/init")
-    public AjaxResult getCode(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "state", required = false) String state) throws Exception {
+    public AjaxResult getCode(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "state", required = false) String state, HttpServletResponse response) throws Exception {
         if (StringUtils.isEmpty(code)) {
             String url = code_url +
                     con + "client_id" + eq + clientId +
@@ -113,7 +130,8 @@ public class IAMAuth {
                     and + "response_type" + eq + response_type +
                     and + "state" + eq + state;
             log.info("###IAM认证### Get code url = {}", url);
-            HttpClientUtils.doGet(url);
+            response.sendRedirect(url);
+//            HttpClientUtils.doGet(url);
             return AjaxResult.success("###IAM认证###获取code start");
         }
         log.info("###IAM认证### code = {}, state = {}", code, state);
@@ -128,13 +146,16 @@ public class IAMAuth {
      */
     private String getAccess_token(String code) throws Exception {
         log.info("###IAM认证 Get accessToken code = {}", code);
-        String url = access_token_url +
-                con + "client_id" + eq + clientId +
-                and + "client_secret" + eq + clientSecret +
-                and + "code" + eq + code +
-                and + "grant_type" + eq + grantType +
-                and + "redirect_uri" + eq + redirectUrl;
-        String result = HttpClientUtils.doPostParamToUrl(url, null);
+        String url = access_token_url;
+        Map<String, String> params = new HashMap<>();
+        params.put("client_id", clientId);
+        params.put("client_secret", clientSecret);
+        params.put("code", code);
+        params.put("grant_type", grantType);
+        params.put("redirect_uri", redirectUrl);
+        log.info("###IAM认证 getAccess_token url = {}", url);
+        String result = HttpClientUtils.doPostParamToBody(url, params);
+        log.info("###IAM认证 getAccess_token result = {}", result);
         String access_token = null;
         if (!StringUtils.isEmpty(result)) {
             JSONObject resultJson = JSONObject.parseObject(result);
@@ -159,11 +180,12 @@ public class IAMAuth {
         if (StringUtils.isEmpty(access_token)) {
             return AjaxResult.error("token is null!");
         }
-
-        String url = userInfo_url + con + "access_token" + eq + access_token;
+        Map<String, String> params = new HashMap<>();
+        params.put("access_token", access_token);
+        String url = userInfo_url;
         //获取用户基本信息
         log.info("###IAM认证 userInfo url = {}", url);
-        String userInfo = HttpClientUtils.doPostParamToUrl(url, null);
+        String userInfo = HttpClientUtils.doPostParamToBody(url, params);
         log.info("###IAM认证 userInfo = {}", userInfo);
 
         if (StringUtils.isEmpty(userInfo)) {
@@ -173,7 +195,26 @@ public class IAMAuth {
         JSONObject resultJson = JSONObject.parseObject(userInfo);
         userId = resultJson.getString("username");
         log.info("###IAM认证 userId = {}", userId);
-        return AjaxResult.success(sysUserDetailMapper.selectUserAllByUserId(userId));
+        UserVO userVO = sysUserDetailMapper.selectUserAllByUserId(userId);
+        log.info("###IAM认证 userVo = {}", userVO);
+
+        LoginUser loginUser = new LoginUser();
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(userVO.getUserId());
+        sysUser.setUserName(userVO.getUserName());
+        sysUser.setEmail(userVO.getEmail());
+        sysUser.setPhonenumber(userVO.getPhonenumber());
+        sysUser.setSex(userVO.getSex());
+        sysUser.setDept(userVO.getDepts());
+        sysUser.setRoles(userVO.getRoles());
+        sysUser.setPosts(userVO.getPosts());
+        loginUser.setUser(sysUser);
+        loginUser = new LoginUser(sysUser, permissionService.getMenuPermission(sysUser));
+        String token = tokenService.createToken(loginUser);
+        UserAuthResponse userAuthResponse = new UserAuthResponse()
+                .setToken(token)
+                .setLoginUser(loginUser);
+        return AjaxResult.success(userAuthResponse);
     }
 
 

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface InspectionUnitsMapper extends BaseMapper<InspectionUnitsPO> {
 
-    public int insertBatch(List<InspectionUnitsPO> unitsList);
+    int insertBatch(List<InspectionUnitsPO> unitsList);
 
     /**
      * 根据被巡视单位ID查询被巡视单位下的组员信息
@@ -22,7 +22,7 @@ public interface InspectionUnitsMapper extends BaseMapper<InspectionUnitsPO> {
      * @param unitsId
      * @return
      */
-    public List<InspectionUnitsPO> selectUnitsMember(Long unitsId);
+    InspectionUnitsPO selectUnitsMember(Long unitsId);
 
     List<InspectionUnitsPO> selectUnitsOrderBy(String planId);
 

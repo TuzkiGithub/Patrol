@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.http.HttpClientUtils;
 import tech.piis.framework.redis.RedisCache;
 import tech.piis.framework.web.domain.AjaxResult;
@@ -156,7 +157,13 @@ public class ExAuth {
      * @return
      */
     private String getAccessToken() {
-        String token = redisCache.getCacheObject("EX_TOKEN");
+        String token = null;
+        try {
+            token = redisCache.getCacheObject("EX_TOKEN");
+        } catch (Exception e) {
+            log.info("###EX认证 缓存中获取Token失败！");
+            throw new BaseException("###EX认证 缓存中获取Token失败！");
+        }
         if (!StringUtils.isEmpty(token)) {
             return token;
         } else {

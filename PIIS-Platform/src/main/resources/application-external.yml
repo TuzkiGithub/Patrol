@@ -22,7 +22,7 @@ iam:
   user:
     url: http://iamtest.ebchina.com/4a-app/oauth2-service/sso-account
   redirect:
-    url: http://25.2.16.160:18081/iam/auth
+    url: http://25.2.16.160:18081/iam/auth/v1/init
   clientId: 2d89cdeb-a84a-43cd-a33d-757364a174b1
   clientSecret: 591b874d-b374-4c42-9412-26459aeda7ac
   responseType: code

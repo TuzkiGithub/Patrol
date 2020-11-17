@@ -35,8 +35,26 @@ public enum FileEnum {
     IMPORTANT_SPORT_FILE("重要报告相关附件", 52L),
     APPROVAL_FILE("审批表", 53L),
     HANDOVER_FILE("交接单", 54L),
-    COMMITTEE_OTHER_FILE("党委会相关附件", 55L);
-
+    COMMITTEE_OTHER_FILE("党委会相关附件", 55L),
+    REPORT_APPROVAL_FILE("报请审批附件", 56L),
+    TEMP_BRANCH_FILE("临时支部成立文件", 57L),
+    LEARN_TRAIN_FILE("学习培训会议通知文件", 58L),
+    GENERAL_SECRETARY_FILE("总书记重要讲话文件", 59L),
+    AUTH_APPOINT_FILE("授权任职决定文件", 60L),
+    MOBILIZATION_DEPLOYMENT_FILE("动员部署讲话文件", 61L),
+    PIIS_PROJECT_FILE("巡视项目附件", 62L),
+    PIIS_SITE_ARRANGEMENT_FILE("巡视现场安排文件", 63L),
+    PIIS_WORK_RULE_FILE("巡视组工作制度文件", 64L),
+    PIIS_NEGATIVE_TALK_FILE("巡视谈话负面清单文件", 65L),
+    PIIS_TEMP_BRANCH_FILE("巡视组临时党支部文件", 66L),
+    OPERATION_OTHER_FILE("工作人员手册其他文件", 67L),
+    NOTICE_CONTENT_FILE("通报内容文件", 68L),
+    INVITATION_OTHER_FILE("邀请函文件", 69L),
+    PRINT_TOPIC_FILE("印发通知文件", 70L),
+    SPOT_MATERIALS_FILE("进驻材料参会领导讲话文件", 71L),
+    GROUP_SPEECH_FILE("组长讲话文件", 72L),
+    SPOT_NEWS_FILE("进驻新闻通告", 73L),
+    SPOT_OTHER_FILE("进驻材料其他文件", 74L);
 
     private String name;
 

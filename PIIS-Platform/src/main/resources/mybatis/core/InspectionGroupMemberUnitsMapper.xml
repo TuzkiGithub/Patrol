@@ -12,9 +12,9 @@
     </resultMap>
 
     <insert id="insertGroupMemberUnitsBatch" parameterType="java.util.List">
-        insert into inspection_group_member_units(group_member_id,units_id,group_id) values
+        insert into inspection_group_member_units(group_member_id,units_id) values
         <foreach item="item" index="index" collection="list" separator=",">
-            (#{item.groupMemberId},#{item.unitsId},#{item.groupId})
+            (#{item.groupMemberId},#{item.unitsId})
         </foreach>
     </insert>
 

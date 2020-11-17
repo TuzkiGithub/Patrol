@@ -1,5 +1,6 @@
 package tech.piis.modules.system.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Value;
 import tech.piis.framework.aspectj.lang.annotation.Excel;
@@ -133,6 +134,12 @@ public class SysUser extends BaseEntity {
      * 职务信息
      */
     private String post;
+
+    /**
+     * 职务列表
+     */
+    @TableField(exist = false)
+    private List<SysPost> posts;
 
     public SysUser() {
 
@@ -317,6 +324,14 @@ public class SysUser extends BaseEntity {
         this.postIds = postIds;
     }
 
+    public List<SysPost> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<SysPost> posts) {
+        this.posts = posts;
+    }
+
     @Override
     public String toString() {
         return "SysUser{" +
@@ -340,6 +355,7 @@ public class SysUser extends BaseEntity {
                 ", roleIds=" + Arrays.toString(roleIds) +
                 ", postIds=" + Arrays.toString(postIds) +
                 ", post='" + post + '\'' +
+                ", posts=" + posts +
                 '}';
     }
 }
