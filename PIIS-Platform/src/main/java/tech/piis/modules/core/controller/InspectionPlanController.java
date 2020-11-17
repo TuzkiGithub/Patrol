@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.PiisConstants;
 import tech.piis.common.enums.ResultEnum;
+import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.framework.utils.SecurityUtils;
 import tech.piis.framework.web.controller.BaseController;
 import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.framework.web.page.TableDataInfo;
 import tech.piis.modules.core.domain.po.InspectionPlanPO;
+import tech.piis.modules.core.domain.vo.PlanMemberCountVO;
 import tech.piis.modules.core.service.IInspectionPlanService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
@@ -56,9 +58,9 @@ public class InspectionPlanController extends BaseController {
                     if (pageSize > list.size()) {
                         pageSize = list.size();
                     }
-                    if(pageNum <= pageSize){
+                    if (pageNum <= pageSize) {
                         list = list.subList(pageNum, pageSize);
-                    }else {
+                    } else {
                         list = new ArrayList<>();
                     }
                 }
@@ -93,6 +95,17 @@ public class InspectionPlanController extends BaseController {
     }
 
     /**
+     * 统计公司巡视参与人员数量
+     *
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('piis:plan:query')")
+    @RequestMapping(value = "/member/count", method = RequestMethod.GET)
+    public AjaxResult countPlanMember(PlanMemberCountVO planMemberCountVO) {
+        return AjaxResult.success(inspectionPlanService.selectMemberCountByTime(planMemberCountVO));
+    }
+
+    /**
      * 获取巡视文件
      *
      * @param planId
@@ -101,7 +114,7 @@ public class InspectionPlanController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('piis:plan:query')")
     @GetMapping("file")
-    public AjaxResult getPlanFile(String planId) throws Exception {
+    public AjaxResult getPlanFile(String planId) throws BaseException {
         return AjaxResult.success(documentService.getFileListByBizId(planId));
     }
 

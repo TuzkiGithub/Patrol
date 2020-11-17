@@ -70,8 +70,8 @@ public class InspectionUnitsPO extends PIBaseEntity {
      * 巡视组组员
      */
     @Valid
-    @NotEmpty(message = "组员信息不能为空！")
     @TableField(exist = false)
+    @NotEmpty(message = "组员信息不能为空！")
     private List<InspectionGroupMemberPO> groupMemberList;
 
 }

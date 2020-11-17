@@ -52,8 +52,6 @@
         <result property="orgId" column="ORG_ID"/>
         <result property="orgName" column="ORG_NAME"/>
         <result property="createdTime" column="CREATED_TIME"/>
-        <collection property="groupMemberList" javaType="java.util.List"
-                    resultMap="inspectionGroupMemberResultMap"/>
     </resultMap>
 
     <!--巡视组组员ResultMap-->
@@ -72,16 +70,10 @@
     <!--巡视动员resultMap-->
     <resultMap id="inspectionMobilizeResultMap" type="InspectionMobilizePO">
         <id property="mobilizeId" column="MOBILIZE_ID"/>
-        <result property="planId" column="PLAN_ID"/>
         <result property="meetName" column="MEET_NAME"/>
         <result property="meetPlace" column="MEET_PLACE"/>
         <result property="meetTime" column="MEET_TIME"/>
         <result property="meetDesc" column="MEET_DESC"/>
-        <result property="createdBy" column="CREATED_BY"/>
-        <result property="createdTime" column="CREATED_TIME"/>
-        <result property="updatedBy" column="UPDATED_BY"/>
-        <result property="updatedTime" column="UPDATED_TIME"/>
-        <result property="entId" column="ENT_ID"/>
         <collection property="inspectionMobilizeAttendeeList" javaType="java.util.List"
                     resultMap="inspectionMobilizeAttendeeResultMap"/>
     </resultMap>
@@ -89,7 +81,6 @@
     <!--巡视动员参会人员ResultMap-->
     <resultMap id="inspectionMobilizeAttendeeResultMap"
                type="InspectionMobilizeAttendeePO">
-        <id property="mobilizeAttendeeId" column="MOBILIZE_ATTENDEE_ID"/>
         <result property="mobilizeId" column="MOBILIZE_ID"/>
         <result property="attendeeId" column="ATTENDEE_ID"/>
         <result property="attendeeName" column="ATTENDEE_NAME"/>
@@ -109,6 +100,27 @@
         <result property="count" column="count"/>
     </resultMap>
 
+
+    <resultMap id="planMemberCountResultMap" type="PlanMemberCountVO">
+        <result property="planCompanyId" column="PLAN_COMPANY_ID"/>
+        <result property="planCompanyName" column="PLAN_COMPANY_NAME"/>
+        <result property="leaderCount" column="leaderCount"/>
+        <result property="deputyCount" column="deputyCount"/>
+        <result property="connectCount" column="connectCount"/>
+        <result property="memberCount" column="memberCount"/>
+    </resultMap>
+
+    <resultMap id="piisConditionResultMap" type="PlanConditionVO">
+        <result property="piisType" column="piisType"/>
+        <result property="planName" column="planName"/>
+        <result property="groupName" column="groupName"/>
+        <result property="leaderPost" column="leaderPost"/>
+        <result property="deputyPost" column="deputyPost"/>
+        <result property="connectorPost" column="connectorPost"/>
+        <result property="memberPost" column="memberPost"/>
+        <result property="beginTime" column="beginTime"/>
+        <result property="endTime" column="endTime"/>
+    </resultMap>
 
     <select id="selectPlanList" resultMap="inspectionPlanResultMap">
         select
@@ -178,19 +190,17 @@
             <if test="planCompanyId!=null and planCompanyId!=''">
                 AND PLAN_COMPANY_ID = #{planCompanyId}
             </if>
+
+            <if test="planType != null" >
+                AND PLAN_TYPE = #{planType}
+            </if>
         </where>
-        order by CREATED_TIME desc
         ) p
         left join inspection_group g on p.PLAN_ID = g.PLAN_ID
-        left join inspection_group_member m on g.GROUP_ID = m.GROUP_ID
-        left join inspection_group_member_units gmn on gmn.group_member_id = m.GROUP_MEMBER_ID
-        left join inspection_units u on u.UNITS_ID = gmn.units_id
+        left join inspection_group_member m on m.GROUP_ID = g.GROUP_ID
+        left join inspection_units u on u.GROUP_ID = g.GROUP_ID
         left join inspection_mobilize mb on mb.PLAN_ID = p.PLAN_ID
         left join inspection_mobilize_attendee mba on mba.MOBILIZE_ID = mb.MOBILIZE_ID
-        where m.GROUP_MEMBER_ID = gmn.group_member_id
-        and u.UNITS_ID = gmn.units_id
-        and g.GROUP_ID = gmn.group_id
-        order by u.CREATED_TIME, u.UNITS_ID desc
     </select>
 
     <select id="selectPlanCompanyTotal" resultMap="selectPlanCompanyTotalResultMap">
@@ -204,5 +214,87 @@
             AND date_format(begin_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
         </if>
         group by PLAN_COMPANY_ID
+    </select>
+
+    <select id="selectMemberCountByTime" parameterType="PlanMemberCountVO" resultMap="planMemberCountResultMap">
+        select
+        PLAN_COMPANY_ID,
+        PLAN_COMPANY_NAME,
+        count(distinct (LEADER_ID)) as leaderCount,
+        count(distinct (DEPUTY_LEADER_ID)) as deputyCount,
+        count(distinct (CONNECTOR_ID)) as connectCount,
+        count(m.GROUP_MEMBER_ID) as memberCount
+        from inspection_plan p
+        left join inspection_group g on p.PLAN_ID = g.PLAN_ID
+        left join inspection_group_member m on g.GROUP_ID = m.GROUP_ID
+        <where>
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                AND date_format(p.CREATED_TIME,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null"><!-- 结束时间检索 -->
+                AND date_format(p.CREATED_TIME,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+        group by p.PLAN_COMPANY_ID;
+    </select>
+
+
+    <select id="selectPiisConditionByUserId" parameterType="java.lang.String" resultMap="piisConditionResultMap">
+      select
+          p.PLAN_ID as planId,
+          PLAN_NAME as planName,
+          GROUP_NAME as groupName,
+          case p.PLAN_TYPE
+          when 0
+            then '巡视'
+          when 1
+            then '巡察' end  as piisType,
+          case when g.LEADER_ID = #{userId}
+            then '组长' end  as leaderPost,
+          case when g.DEPUTY_LEADER_ID = #{userId}
+            then '副组长' end as deputyPost,
+          case when g.CONNECTOR_ID = #{userId}
+            then '联络员' end as connectorPost,
+          null             as memberPost,
+          BEGIN_TIME,
+          END_TIME
+        from inspection_plan p, inspection_group g
+        where p.PLAN_ID = g.PLAN_ID
+        group by p.PLAN_ID, g.GROUP_ID, LEADER_ID, DEPUTY_LEADER_ID, CONNECTOR_ID
+        having LEADER_ID = #{userId} or DEPUTY_LEADER_ID = #{userId} or CONNECTOR_ID = #{userId}
+    union
+      select
+          p.PLAN_ID,
+          PLAN_NAME,
+          GROUP_NAME,
+          case p.PLAN_TYPE
+          when 0
+            then '巡视'
+          when 1
+            then '巡察' end  as piisType,
+          null             as leaderPost,
+          null             as deputyPost,
+          null             as connectorPost,
+          case when MEMBER_ID = #{userId}
+            then '组员' end as memberPost,
+          BEGIN_TIME,
+          END_TIME
+        from inspection_plan p, inspection_group g, inspection_group_member m
+        where p.PLAN_ID = g.PLAN_ID
+        and m.GROUP_ID = g.GROUP_ID
+        group by MEMBER_ID
+        having MEMBER_ID = #{userId}
+    </select>
+
+    <select id="selectPiisProjectCount" resultType="PiisProjectCountVO">
+    select
+      PLAN_COMPANY_NAME as orgName,
+      count(distinct(p.PLAN_ID)) as planCount,
+      count(distinct(g.GROUP_ID)) as groupCount,
+      count(distinct(UNITS_ID)) as unitsCount
+    from inspection_plan p,inspection_group g,inspection_units u
+    where p.PLAN_ID = g.PLAN_ID
+    and  p.PLAN_ID = u.PLAN_ID
+    group by PLAN_COMPANY_ID
     </select>
 </mapper> 

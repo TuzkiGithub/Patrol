@@ -29,7 +29,7 @@ import java.util.List;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class InspectionPlanPO extends PIBaseEntity {
+public class InspectionPlanPO extends PIBaseApprovalEntityPO {
     /**
      * 编号
      */
@@ -79,6 +79,11 @@ public class InspectionPlanPO extends PIBaseEntity {
     private String planCompanyName;
 
     /**
+     * 审批状态：1：已通过；0：进行中，NULL无需审批
+     */
+    private Integer wfApprovalFlag;
+
+    /**
      * 巡视组
      */
     @Valid
@@ -92,6 +97,7 @@ public class InspectionPlanPO extends PIBaseEntity {
     @NotEmpty(message = "文件信息不能为空！")
     @TableField(exist = false)
     private List<PiisDocumentPO> documents;
+
 
     /**
      * 巡视动员

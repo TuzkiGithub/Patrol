@@ -31,6 +31,4 @@ public class InspectionGroupMemberUnitsPO {
 
     @NotNull(message = "巡被巡视单位ID不能为空！")
     private Long unitsId;
-
-    private String groupId;
 }

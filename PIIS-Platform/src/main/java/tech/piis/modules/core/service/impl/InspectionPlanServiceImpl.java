@@ -8,20 +8,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import tech.piis.common.enums.FileEnum;
+import tech.piis.common.enums.OrgEnum;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.file.FileUploadUtils;
 import tech.piis.modules.core.domain.po.*;
+import tech.piis.modules.core.domain.vo.PiisProjectCountVO;
 import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
+import tech.piis.modules.core.domain.vo.PlanConditionVO;
+import tech.piis.modules.core.domain.vo.PlanMemberCountVO;
 import tech.piis.modules.core.mapper.*;
 import tech.piis.modules.core.service.IInspectionPlanService;
+import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
+import tech.piis.modules.workflow.service.IWfWorkflowBusinessService;
+import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.*;
+import static tech.piis.common.constant.PiisConstants.*;
 
 /**
  * 巡视计划 Service业务层处理
@@ -52,6 +60,12 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     private InspectionTalkOutlineMapper talkOutlineMapper;
 
     @Autowired
+    private IWfWorkflowBusinessService wfWorkflowBusinessService;
+
+    @Autowired
+    private IWfWorkflowTodoService wfWorkflowTodoService;
+
+    @Autowired
     private PiisDocumentMapper documentMapper;
 
     @Value("${piis.profile}")
@@ -69,7 +83,28 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
      */
     @Override
     public List<InspectionPlanPO> selectPlanList(InspectionPlanPO inspectionPlanPO) {
-        return planMapper.selectPlanList(inspectionPlanPO);
+        List<InspectionPlanPO> planList = planMapper.selectPlanList(inspectionPlanPO);
+        //查询被巡视单位-巡视组组员关系
+        if (!CollectionUtils.isEmpty(planList)) {
+            planList.forEach(plan -> {
+                List<InspectionGroupPO> groupList = plan.getInspectionGroupList();
+                if (!CollectionUtils.isEmpty(groupList)) {
+                    groupList.forEach(group -> {
+                        List<InspectionUnitsPO> unitsList = group.getInspectionUnitsList();
+                        if (!CollectionUtils.isEmpty(unitsList)) {
+                            unitsList.forEach(units -> {
+                                InspectionUnitsPO unitsPO = unitsMapper.selectUnitsMember(units.getUnitsId());
+                                if (null != unitsPO) {
+                                    units.setGroupMemberList(unitsPO.getGroupMemberList());
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        return planList;
     }
 
     /**
@@ -87,6 +122,7 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
             if (!StringUtils.isEmpty(plan.getPlanCompanyId())) {
                 queryWrapper.eq("PLAN_COMPANY_ID", plan.getPlanCompanyId());
             }
+            queryWrapper.eq("PLAN_TYPE", plan.getPlanType());
         }
         return planMapper.selectCount(queryWrapper);
     }
@@ -99,6 +135,38 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     @Override
     public List<PlanCompanyCountVO> selectCountByCompany(InspectionPlanPO plan) {
         return this.planMapper.selectPlanCompanyTotal(plan);
+    }
+
+    /**
+     * 统计公司巡视成员数量
+     *
+     * @param planMemberCountVO
+     * @return
+     */
+    @Override
+    public List<PlanCompanyCountVO> selectMemberCountByTime(PlanMemberCountVO planMemberCountVO) {
+        return this.planMapper.selectMemberCountByTime(planMemberCountVO);
+    }
+
+    /**
+     * 根据用户ID查询历史参与巡视情况
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<PlanConditionVO> selectPiisConditionByUserId(String userId) {
+        return planMapper.selectPiisConditionByUserId(userId);
+    }
+
+    /**
+     * 统计巡视巡察项目、被巡视单位、巡视组数量
+     *
+     * @return
+     */
+    @Override
+    public List<PiisProjectCountVO> selectPiisProjectCount() {
+        return planMapper.selectPiisProjectCount();
     }
 
 
@@ -126,9 +194,14 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
 
         //新增默认谈话纲要分类
         saveTalkOutline(planId);
-        return planMapper.insert(inspectionPlanPO.setInspectionGroupList(null));
 
+        if (PIIS_TYPE != inspectionPlanPO.getPlanType()) {
+            inspectionPlanPO.setPlanCompanyName(OrgEnum.EB.getOrgName());
+            inspectionPlanPO.setPlanCompanyId(OrgEnum.EB.getOrgId());
+        }
+        return planMapper.insert(inspectionPlanPO.setInspectionGroupList(null));
     }
+
 
     /**
      * 修改巡视计划
@@ -247,6 +320,19 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         }
     }
 
+    /**
+     * 创建代办
+     *
+     * @param inspectionPlanPO
+     */
+    private void saveToDo(InspectionPlanPO inspectionPlanPO) {
+        WfWorkFlowTodoPO wfWorkFlowTodo = new WfWorkFlowTodoPO()
+                .setTodoName("新增巡视计划待审批")
+                .setTodoStatus(TODO_NEED)
+                .setApproverId(inspectionPlanPO.getApproverId())
+                .setApproverName(inspectionPlanPO.getApproverName());
+        wfWorkflowTodoService.saveWorkflowTodo(wfWorkFlowTodo);
+    }
 
     /**
      * 批量新增巡视组
@@ -324,6 +410,7 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                     saveGroupMembers(groupMemberList);
                 }
 
+
                 List<InspectionGroupMemberUnitsPO> groupMemberUnitsList = new ArrayList<>();
                 //批量新增被巡视单位
                 List<InspectionUnitsPO> unitsList = group.getInspectionUnitsList();
@@ -352,7 +439,6 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                             InspectionGroupMemberUnitsPO groupMemberUnits = new InspectionGroupMemberUnitsPO();
                             groupMemberUnits.setUnitsId(unitsId);
                             groupMemberUnits.setGroupMemberId(var);
-                            groupMemberUnits.setGroupId(groupId);
                             groupMemberUnitsList.add(groupMemberUnits);
                         });
 
@@ -417,6 +503,14 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
         //删除关联被巡视单位
         unitsMapper.deleteByMap(params);
         //删除组员和被巡视单位关系
-        groupMemberUnitsMapper.deleteByMap(params);
+        List<InspectionUnitsPO> unitsList = group.getInspectionUnitsList();
+        if (!CollectionUtils.isEmpty(unitsList)) {
+            unitsList.forEach(units -> {
+                Long unitsId = units.getUnitsId();
+                Map<String, Object> delUnitsMemberParams = new HashMap<>();
+                delUnitsMemberParams.put("UNITS_ID", unitsId);
+                groupMemberUnitsMapper.deleteByMap(delUnitsMemberParams);
+            });
+        }
     }
 }

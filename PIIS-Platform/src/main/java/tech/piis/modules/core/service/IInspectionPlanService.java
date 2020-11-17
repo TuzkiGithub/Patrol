@@ -6,6 +6,8 @@ import tech.piis.modules.core.domain.dto.InspectionPlanSaveDTO;
 import tech.piis.modules.core.domain.po.InspectionPlanPO;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
 import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
+import tech.piis.modules.core.domain.vo.PlanConditionVO;
+import tech.piis.modules.core.domain.vo.PlanMemberCountVO;
 
 import java.util.List;
 
@@ -57,5 +59,24 @@ public interface IInspectionPlanService {
      * @return
      */
     List<PlanCompanyCountVO> selectCountByCompany(InspectionPlanPO plan);
+
+    /**
+     * 统计公司巡视成员数量
+     * @return
+     */
+    List<PlanCompanyCountVO> selectMemberCountByTime(PlanMemberCountVO planMemberCountVO);
+
+    /**
+     * 根据用户ID查询历史参与巡视情况
+     * @param userId
+     * @return
+     */
+    List<PlanConditionVO> selectPiisConditionByUserId(String userId);
+
+    /**
+     * 统计巡视巡察项目、被巡视单位、巡视组数量
+     * @return
+     */
+    List selectPiisProjectCount();
 
 }
