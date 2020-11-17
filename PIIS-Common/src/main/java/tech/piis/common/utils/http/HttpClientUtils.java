@@ -14,6 +14,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -87,8 +88,8 @@ public class HttpClientUtils {
             // 设置提交方式
             httpPost.addHeader("Content-type", "application/x-www-form-urlencoded");
             //
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            if (mapData.size() != 0) {
+            List<NameValuePair> nameValuePairs = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(mapData)) {
                 // 将mapdata中的key存在set集合中，通过迭代器取出所有的key，再获取每一个键对应的值
                 Set keySet = mapData.keySet();
                 Iterator it = keySet.iterator();
@@ -97,8 +98,8 @@ public class HttpClientUtils {
                     String v = mapData.get(k);// value
                     nameValuePairs.add(new BasicNameValuePair(k, v));
                 }
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             }
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             // 执行http请求
             response = httpClient.execute(httpPost);
             // 获得http响应体

@@ -29,4 +29,21 @@ public class PiisConstants {
      */
     public static final int PIIS_TYPE = 1;
 
+    /**
+     * 需要审批
+     */
+    public static final int IS_APPROVAL = 1;
+
+    /**
+     * 审批中
+     */
+    public static final int APPROVALING = 0;
+
+    /**
+     * 代办状态 0 代办、1已办
+     */
+    public static final int TODO_NEED = 0;
+    public static final int TODO_FINISH = 1;
+
+
 }
