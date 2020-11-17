@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tech.piis.modules.managment.mapper.DailyTrainingMapper">
+    <!--日常培训ResultMap-->
+    <resultMap id="dailyTrainingResultMap" type="tech.piis.modules.managment.domain.DailyTrainingPO">
+        <id property="dailyId" column="DAILY_ID"/>
+        <result property="orgId" column="ORG_ID"/>
+        <result property="initiator" column="INITIATOR"/>
+        <result property="initiatorId" column="INITIATOR_ID"/>
+        <result property="firstBranchId" column="FIRST_BRANCH_ID"/>
+        <result property="trainingYear" column="TRAINING_YEAR"/>
+        <result property="trainingName" column="TRAINING_NAME"/>
+        <result property="trainingType" column="TRAINING_TYPE"/>
+        <!--<result property="trainingNumber" column="TRAINING_NUMBER"/>-->
+        <result property="beginDate" column="BEGIN_DATE"/>
+        <result property="endDate" column="END_DATE"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+    <resultMap id="dailyTrainingInfoResultMap" type="tech.piis.modules.managment.domain.vo.DailyTrainingVO">
+        <id property="dailyId" column="DAILY_ID"/>
+        <result property="trainingName" column="TRAINING_NAME"/>
+        <result property="trainingType" column="TRAINING_TYPE"/>
+        <result property="beginDate" column="BEGIN_DATE"/>
+        <result property="endDate" column="END_DATE"/>
+        <result property="memberPost" column="MEMBER_POST"/>
+        <!--<association property="dailyTrainingMember" javaType="tech.piis.modules.managment.domain.DailyTrainingMemberPO">
+            <id column="MEMBER_ID" property="memberId" />
+
+        </association>-->
+    </resultMap>
+    <!--sql语句-->
+    <!--日常培训总览根据机构ID分组-->
+    <select id="selectDailyTrainingByOrgId" resultMap="dailyTrainingResultMap">
+        select
+        DAILY_ID,
+        d.dept_name as FIRST_BRANCH_ID,
+        count(ORG_ID) as trainingNumber
+        from  daily_training b
+        join  sys_dept d on b.ORG_ID = d.dept_id
+        group by ORG_ID
+
+    </select>
+    <select id="selectDailyTrainingListByConditions" resultMap="dailyTrainingResultMap">
+        select
+        count(member_id) as trainingNumber,
+        t.daily_id,
+        d.TRAINING_NAME,
+        d.TRAINING_YEAR,
+        d.BEGIN_DATE,
+        d.END_DATE,
+        d.ORG_ID,
+        d.TRAINING_TYPE
+        from daily_training_member t
+        join daily_training d on t.daily_id = d.daily_id
+        <where>
+            <if test="initiator != null and initiator !=''">
+                INITIATOR = #{initiator}
+            </if>
+            <if test="trainingName != null and trainingName != ''">
+                and TRAINING_NAME like concat('%', #{trainingName}, '%')
+            </if>
+            <if test="trainingYear != null">
+                and TRAINING_YEAR = #{trainingYear}
+            </if>
+        </where>
+        group by  daily_id
+    </select>
+    <select id="selectDailyTrainingInfo" resultMap="dailyTrainingInfoResultMap">
+        select
+        d.TRAINING_NAME,
+        d.TRAINING_TYPE,
+        d.DAILY_ID,
+        m.MEMBER_POST,
+        d.BEGIN_DATE,
+        d.END_DATE
+        from daily_training d
+        JOIN daily_training_member m on d.DAILY_ID = m.DAILY_ID
+        where MEMBER_ID = #{memberId}
+    </select>
+</mapper>

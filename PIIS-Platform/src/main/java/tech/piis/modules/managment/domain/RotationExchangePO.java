@@ -1,6 +1,5 @@
 package tech.piis.modules.managment.domain;
 
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,35 +12,33 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
- * ClassName : RecommendBest
+ * ClassName : RotationExchangePO
  * Package : tech.piis.modules.managment.domain
  * Description :
- *  择优推荐
+ *  轮岗交流
  * @author : chenhui@xvco.com
  */
-@TableName(value = "recommend_best")
 @Data
-public class RecommendBestPO extends MABaseEntity {
+@TableName("rotation_exchange")
+public class RotationExchangePO extends MABaseEntity{
     /**
-     * 主键
+     * 轮岗交流编号
      */
-    @TableId(value = "recommend_id", type = IdType.AUTO)
-    private Long recommendId;
+    @TableId(value = "rotation_id",type = IdType.AUTO)
+    private Long rotationId;
     /**
      * 机构编号
      */
-    @NotBlank(message = "机构编号不能为空")
     private String orgId;
     /**
-     * 所属一级子机构编号
+     * 所归一级子机构编号
      */
     private String firstbranchId;
     /**
-     * 年度
+     * 轮岗年度
      */
-    @NotNull(message = "年度不能为空")
-    @JsonFormat(pattern = "yyyy")
-    private Date recommendYear;
+
+    private Date rotationYear;
     /**
      * 成员编号
      */
@@ -52,51 +49,43 @@ public class RecommendBestPO extends MABaseEntity {
     @NotBlank(message = "成员姓名不能为空")
     private String memberName;
     /**
-     * 成员单位
+     *  成员单位
      */
-    @NotBlank(message = "所在单位不能为空")
+    @NotBlank(message = "成员单位不能为空")
     private String memberUnit;
     /**
-     * 成员职位
+     * 成员职务
      */
-    @NotBlank(message = "所在职位不能为空")
+    @NotBlank(message = "成员职务不能为空")
     private String memberPost;
     /**
-     * 择优推荐类型 0 中巡办培训 1 中央巡视 2 中巡办干部交流 3 其他
+     * 联系方式
      */
-    @NotNull(message = "择优推荐类型不能为空")
-    private Integer recommendType;
+    @NotBlank(message = "联系方式不能为空")
+    private String phoneNo;
     /**
-     * 培训版名称
-     */
-    @NotNull(message = "培训版名称不能为空")
-    private String trainingName;
-    /**
-     * 培训开始日期
+     * 轮岗交流开始时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "培训开始日期不能为空")
     private Date beginDate;
     /**
-     * 培训结束日期
+     * 轮岗交流结束时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "培训结束日期不能为空")
     private Date endDate;
     /**
-     * 培训地点
+     * 交流前单位
      */
-    @NotNull(message = "培训地点不能为空")
-    private String trainingPlace;
+    @NotBlank(message = "交流前单位不能为空")
+    private String beforeUnit;
     /**
-     * 备注
+     * 交流后单位
      */
-    private String remark;
-
+    @NotBlank(message = "交流后单位不能为空")
+    private String afterUnit;
     /**
-     * 择优推荐次数
+     * 轮岗交流次数
      */
     @TableField(exist = false)
     private Long amount;
-
 }

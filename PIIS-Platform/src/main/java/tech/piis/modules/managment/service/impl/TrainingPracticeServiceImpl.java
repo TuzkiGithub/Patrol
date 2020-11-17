@@ -1,0 +1,126 @@
+package tech.piis.modules.managment.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tech.piis.common.constant.ManagmentConstants;
+import tech.piis.modules.managment.domain.TrainingPracticePO;
+import tech.piis.modules.managment.mapper.TrainingPracticeMapper;
+import tech.piis.modules.managment.service.ITrainingPracticeService;
+import tech.piis.modules.system.domain.SysDept;
+import tech.piis.modules.system.mapper.SysDeptMapper;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * ClassName : ITrainingPracticeServiceImpl
+ * Package : tech.piis.modules.managment.service.impl
+ * Description : 以干代训 业务处理层
+ *
+ * @author : chenhui@xvco.com
+ */
+@Slf4j
+@Service
+@Transactional
+public class TrainingPracticeServiceImpl implements ITrainingPracticeService {
+
+    @Autowired
+    private TrainingPracticeMapper trainingPracticeMapper;
+
+    @Autowired
+    private SysDeptMapper sysDeptMapper;
+
+    /**
+     * 新增以干代训
+     *
+     * @param trainingPracticePO
+     * @return
+     */
+    @Override
+    public int saveRecommendBest(TrainingPracticePO trainingPracticePO) {
+        String parentId = trainingPracticePO.getOrgId();
+        if (!ManagmentConstants.FIRST_BRANCH_UNION_ID.contains(parentId)) {
+            parentId = getParentId(trainingPracticePO.getOrgId());
+        }
+        trainingPracticePO.setFirstbranchId(parentId);
+        return trainingPracticeMapper.insert(trainingPracticePO);
+    }
+
+    private String getParentId(String orgId) {
+        SysDept dept = sysDeptMapper.selectDeptById(orgId);
+        String parentId = dept.getParentId();
+        if (!ManagmentConstants.FIRST_BRANCH_UNION_ID.contains(parentId)) {
+            parentId = getParentId(parentId);
+        }
+        return parentId;
+    }
+
+    /**
+     * 删除以干代训
+     *
+     * @param ids
+     * @return
+     */
+    @Override
+    public int delRecommendByIds(String[] ids) {
+        List<String> idList = Arrays.asList(ids);
+        return trainingPracticeMapper.deleteBatchIds(idList);
+    }
+
+    /**
+     * 根据以干代训ID查询以干代训信息
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public TrainingPracticePO getRecommendById(String id) {
+        return trainingPracticeMapper.selectById(id);
+    }
+
+    /**
+     * 获取以干代训记录列表
+     *
+     * @param trainingPracticePO
+     * @return
+     */
+    @Override
+    public List<TrainingPracticePO> selectPracticeList(TrainingPracticePO trainingPracticePO) {
+        QueryWrapper<TrainingPracticePO> queryWrapper = new QueryWrapper<>();
+        Map<String,Object> paramMap = new HashMap<>();
+        paramMap.put("member_name", trainingPracticePO.getMemberName());
+        paramMap.put("member_unit", trainingPracticePO.getMemberUnit());
+        paramMap.put("training_type", trainingPracticePO.getTrainingType());
+        queryWrapper.allEq(paramMap,false);
+        return trainingPracticeMapper.selectList(queryWrapper);
+    }
+
+    /**
+     * 以干代训总览根据机构分组查询以干代训次数
+     *
+     * @return
+     */
+    @Override
+    public List<TrainingPracticePO> selectPracticeListByOrgId() {
+        return trainingPracticeMapper.selectPracticeListByOrgId();
+    }
+
+    /**
+     * 修改以干代训
+     *
+     * @param trainingPracticePO
+     * @return
+     */
+    @Override
+    public int update(TrainingPracticePO trainingPracticePO) {
+        return trainingPracticeMapper.updateById(trainingPracticePO);
+    }
+
+
+}

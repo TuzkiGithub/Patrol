@@ -5,7 +5,7 @@
 
 <mapper namespace="tech.piis.modules.managment.mapper.FullPartOrgMapper">
     <!--专兼职管理ResultMap-->
-    <resultMap id="fullPartOrgResultMap" type="tech.piis.modules.managment.domain.FullPartOrg">
+    <resultMap id="fullPartOrgResultMap" type="tech.piis.modules.managment.domain.FullPartOrgPO">
         <id property="id" column="ID"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="orgName" column="ORG_NAME"/>

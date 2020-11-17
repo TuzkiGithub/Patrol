@@ -7,9 +7,9 @@
 
     <!--择优推荐-->
     <resultMap id="recommendBestResultMap" type="tech.piis.modules.managment.domain.RecommendBestPO">
-        <id property="id" column="ID"/>
+        <id property="recommendId" column="RECOMMEND_ID"/>
         <result property="orgId" column="ORG_ID"/>
-        <result property="year" column="YEAR"/>
+        <result property="recommendYear" column="RECOMMEND_YEAR"/>
         <result property="memberId" column="MEMBER_ID"/>
         <result property="memberName" column="MEMBER_NAME"/>
         <result property="memberUnit" column="MEMBER_UNIT"/>
@@ -20,16 +20,26 @@
         <result property="endDate" column="END_DATE"/>
         <result property="trainingPlace" column="TRAINING_PLACE"/>
         <result property="remark" column="REMARK"/>
-        <result property="createBy" column="CREATE_BY"/>
-        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
         <result property="updatedBy" column="UPDATED_BY"/>
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
     </resultMap>
-    <!--根据条件动态查询择优推荐-->
-    <select id="selectListByConditions" resultMap="recommendBestResultMap">
+    <!--择优推荐总览根据机构ID分组-->
+    <select id="selectRecommendListByOrgId" resultMap="recommendBestResultMap">
         select
-        ID,
+        RECOMMEND_ID,
+        d.dept_name as MEMBER_UNIT,
+        count(FIRSTBRANCH_ID) as amount
+        from  recommend_best b
+        join  sys_dept d on b.FIRSTBRANCH_ID = d.dept_id
+        group by FIRSTBRANCH_ID
+    </select>
+    <!--根据条件动态查询择优推荐-->
+    <!--<select id="selectListByConditions" resultMap="recommendBestResultMap">
+        select
+        RECOMMEND_ID,
         ORG_ID,
         RECOMMEND_YEAR,
         MEMBER_ID,
@@ -44,43 +54,18 @@
         from
         recommend_best
         <where>
-            <if test="memberUnit != null and memberUnit != ''">
-                MEMBER_UNIT = #{memberUnit}
+            <if test="memberUnit !=null and memberUnit !=''">
+                AND MEMBER_UNIT = #{memberUnit}
             </if>
-            <if test="memberUnit != null and memberUnit != ''">
-                and MEMBER_NAME = #{memberName}
+            <if test="memberName !=null and memberName !=''">
+                AND MEMBER_NAME = #{memberName}
             </if>
-            <if test="memberUnit != null and memberUnit != ''">
-                and RECOMMEND_TYPE = #{memberType}
+            <if test="recommendYear !=null and recommendYear !=''">
+                AND RECOMMEND_YEAR = #{recommendYear}
             </if>
-            <if test="memberUnit != null and memberUnit != ''">
-                and RECOMMEND_YEAR = #{recommendYear}
-            </if>
-        </where>
-        limit #{pageNum},#{pageSize}
-        order by RECOMMEND_YEAR desc
-    </select>
-
-    <select id="selectTotal" >
-        select
-          count(*)
-        from
-        recommend_best
-        <where>
-            <if test="memberUnit != null and memberUnit != ''">
-                MEMBER_UNIT = #{memberUnit}
-            </if>
-            <if test="memberUnit != null and memberUnit != ''">
-                and MEMBER_NAME = #{memberName}
-            </if>
-            <if test="memberUnit != null and memberUnit != ''">
-                and RECOMMEND_TYPE = #{memberType}
-            </if>
-            <if test="memberUnit != null and memberUnit != ''">
-                and RECOMMEND_YEAR = #{recommendYear}
+            <if test="recommendType !=null and recommendType !=''">
+                AND RECOMMEND_TYPE = #{recommendType}
             </if>
         </where>
-        limit #{pageNum},#{pageSize}
-        order by RECOMMEND_YEAR desc
-    </select>
+    </select>-->
 </mapper>

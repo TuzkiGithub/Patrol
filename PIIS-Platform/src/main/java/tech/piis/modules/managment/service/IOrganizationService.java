@@ -1,5 +1,7 @@
 package tech.piis.modules.managment.service;
 
+import java.util.Map;
+
 /**
  * ClassName : OrganizationService
  * Package : tech.piis.modules.managment.service
@@ -8,7 +10,7 @@ package tech.piis.modules.managment.service;
  * @author : chenhui@xvco.com
  */
 
-public interface OrganizationService {
+public interface IOrganizationService {
     /**
      *  获取机构表中巡察机构全称
      * @param organId
@@ -22,4 +24,11 @@ public interface OrganizationService {
      * @return
      */
     Object getPageInfo(String organId);
+
+    /**
+     * 查询人员基础情况
+     * @param memberId
+     * @return
+     */
+    Map<String,Object> selectBasicInfoByMemberId(String memberId);
 }

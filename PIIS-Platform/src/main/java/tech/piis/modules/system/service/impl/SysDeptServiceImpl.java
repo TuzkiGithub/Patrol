@@ -312,5 +312,4 @@ public class SysDeptServiceImpl implements ISysDeptService {
         return getChildList(list, t).size() > 0 ? true : false;
     }
 
-
 }

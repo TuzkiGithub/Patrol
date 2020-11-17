@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import tech.piis.modules.managment.domain.RecommendBestPO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * ClassName : RecommendBestMapper
@@ -15,16 +14,8 @@ import java.util.Map;
  */
 public interface RecommendBestMapper extends BaseMapper<RecommendBestPO> {
     /**
-     * 获取择优推荐列表
-     * @param recommendBestPO
+     * 择优推荐总览根据机构分组查询择优推荐次数
      * @return
      */
-    List<RecommendBestPO> selectListByConditions(RecommendBestPO recommendBestPO);
-
-    /**
-     * 获取总记录条数
-     * @param recommendBestPO
-     * @return
-     */
-    long selectTotal(RecommendBestPO recommendBestPO);
+    List<RecommendBestPO> selectRecommendListByOrgId();
 }

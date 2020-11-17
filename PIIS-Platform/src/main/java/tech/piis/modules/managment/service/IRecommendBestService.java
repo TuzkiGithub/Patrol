@@ -3,7 +3,6 @@ package tech.piis.modules.managment.service;
 import tech.piis.modules.managment.domain.RecommendBestPO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * ClassName : RecommendBestService
@@ -12,7 +11,7 @@ import java.util.Map;
  *
  * @author : chenhui@xvco.com
  */
-public interface RecommendBestService {
+public interface IRecommendBestService {
     /**
      * 新增择优推荐
      * @param recommendBestPO
@@ -39,12 +38,18 @@ public interface RecommendBestService {
      * @param recommendBestPO
      * @return
      */
-    List<?> selectRecommendList(RecommendBestPO recommendBestPO);
+    List<RecommendBestPO> selectRecommendList(RecommendBestPO recommendBestPO);
 
     /**
-     * 查询总记录条数
+     * 择优推荐总览根据机构分组查询择优推荐次数
+     * @return
+     */
+    List<RecommendBestPO> selectRecommendListByOrgId();
+
+    /**
+     * 修改择优推荐
      * @param recommendBestPO
      * @return
      */
-    long selectCount(RecommendBestPO recommendBestPO);
+    int update(RecommendBestPO recommendBestPO);
 }

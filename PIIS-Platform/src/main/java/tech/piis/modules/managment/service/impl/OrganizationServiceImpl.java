@@ -1,14 +1,16 @@
 package tech.piis.modules.managment.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.piis.common.constant.ManagmentConstants;
-import tech.piis.modules.managment.domain.FullPartOrg;
-import tech.piis.modules.managment.mapper.FullPartOrgMapper;
-import tech.piis.modules.managment.mapper.OrganizationMapper;
-import tech.piis.modules.managment.service.OrganizationService;
+import tech.piis.modules.managment.domain.FullPartOrgPO;
+import tech.piis.modules.managment.domain.MemberResumeFamilyPO;
+import tech.piis.modules.managment.domain.vo.DailyTrainingVO;
+import tech.piis.modules.managment.mapper.*;
+import tech.piis.modules.managment.service.IOrganizationService;
 import tech.piis.modules.system.domain.SysDept;
 import tech.piis.modules.system.mapper.SysDeptMapper;
 import com.alibaba.fastjson.JSONObject;
@@ -27,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @Transactional
-public class IOrganizationServiceImpl implements OrganizationService {
+public class OrganizationServiceImpl implements IOrganizationService {
 
     @Autowired
     private OrganizationMapper organizationMapper;
@@ -35,6 +37,16 @@ public class IOrganizationServiceImpl implements OrganizationService {
     private SysDeptMapper sysDeptMapper;
     @Autowired
     private FullPartOrgMapper fullPartOrgMapper;
+    @Autowired
+    private MemberResumeFamilyMapper memberResumeFamilyMapper;
+    @Autowired
+    private DailyTrainingMapper dailyTrainingMapper;
+    @Autowired
+    private DailyTrainingMemberMapper dailyTrainingMemberMapper;
+    @Autowired
+    private DailyTrainingClassMapper dailyTrainingClassMapper;
+
+
 
     @Override
     public String getInspectionOrganWholeName(String organId) {
@@ -72,7 +84,7 @@ public class IOrganizationServiceImpl implements OrganizationService {
             sonJsonObject.put(ManagmentConstants.PIIS_WHOLE_NAME, wholeName);
 
             // 获取子公司专职、兼职人数 ，以及专职兼职人数之和sum
-            FullPartOrg fullPartObj = fullPartOrgMapper.getFullPartNumByOrganId(dept.getDeptId());
+            FullPartOrgPO fullPartObj = fullPartOrgMapper.getFullPartNumByOrganId(dept.getDeptId());
             sonJsonObject.put(ManagmentConstants.FULL_NUM,fullPartObj.getFullNumber());
             sonJsonObject.put(ManagmentConstants.PART_NUM,fullPartObj.getFullNumber());
             int exact = Math.addExact(fullPartObj.getFullNumber(), fullPartObj.getPartNumber());
@@ -108,15 +120,38 @@ public class IOrganizationServiceImpl implements OrganizationService {
         return null;
     }
 
+    @Override
+    public Map<String, Object> selectBasicInfoByMemberId(String memberId) {
+        Map<String,Object> resultMap = new HashMap<>();
+
+        // 查询人员家庭情况
+        QueryWrapper<MemberResumeFamilyPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("member_id", memberId);
+        List<MemberResumeFamilyPO> memberResumeFamilyPOS = memberResumeFamilyMapper.selectList(queryWrapper);
+        resultMap.put("memberResumeFamilyList", memberResumeFamilyPOS);
+
+        //todo
+        // 查询专业培训情况，确定培训地点
+//        QueryWrapper<DailyTrainingPO> wrapper = new QueryWrapper<>();
+//        wrapper.eq("member_id", memberId);
+        List<DailyTrainingVO> dailyTrainingPOList = dailyTrainingMapper.selectDailyTrainingInfo(memberId);
+        resultMap.put("dailyTrainingList", dailyTrainingPOList);
+
+        //todo
+        // 查询人员参与巡视巡察情况
+
+        return resultMap;
+    }
+
     private Map<String, Object> getFullPartNumByOrganId(String organId) {
 
         Map<String,Object> resultMap = new HashMap<>();
 
-        FullPartOrg fullPartOrg = fullPartOrgMapper.getFullPartNumByOrganId(organId);
-        resultMap.put(ManagmentConstants.FULL_NUM,fullPartOrg.getFullNumber());
-        resultMap.put(ManagmentConstants.PART_NUM,fullPartOrg.getPartNumber());
+        FullPartOrgPO fullPartOrgPO = fullPartOrgMapper.getFullPartNumByOrganId(organId);
+        resultMap.put(ManagmentConstants.FULL_NUM, fullPartOrgPO.getFullNumber());
+        resultMap.put(ManagmentConstants.PART_NUM, fullPartOrgPO.getPartNumber());
 
-        int sum = Math.addExact(fullPartOrg.getFullNumber(), fullPartOrg.getPartNumber());
+        int sum = Math.addExact(fullPartOrgPO.getFullNumber(), fullPartOrgPO.getPartNumber());
         resultMap.put(ManagmentConstants.FULL_PART_SUM, sum);
         return resultMap;
     }

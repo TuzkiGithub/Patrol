@@ -117,9 +117,9 @@ public class ControllerTest {
     }
 
 
-    @GetMapping("transaction")
+    /*@GetMapping("transaction")
     public int testTransaction() throws Exception{
         planService.testTransaction();
         return 0;
-    }
+    }*/
 }
