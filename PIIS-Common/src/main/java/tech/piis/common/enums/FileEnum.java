@@ -54,7 +54,10 @@ public enum FileEnum {
     SPOT_MATERIALS_FILE("进驻材料参会领导讲话文件", 71L),
     GROUP_SPEECH_FILE("组长讲话文件", 72L),
     SPOT_NEWS_FILE("进驻新闻通告", 73L),
-    SPOT_OTHER_FILE("进驻材料其他文件", 74L);
+    SPOT_OTHER_FILE("进驻材料其他文件", 74L),
+    GROUP_FILE("巡视组任命文件", 75L),
+    AGENDA_FILE("会议议程文件", 76L),
+    SECRETARY_SPEECH_FILE("被巡视党组织党委书记表态讲话文件", 77L);
 
     private String name;
 

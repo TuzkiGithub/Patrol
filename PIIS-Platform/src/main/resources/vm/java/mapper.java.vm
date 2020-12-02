@@ -1,9 +1,9 @@
 package ${packageName}.mapper;
 
 import ${packageName}.domain.po.${ClassName}PO;
+import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import tech.piis.common.exception.BaseException;
-import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 import java.util.List;
 /**
  * ${functionName}Mapper接口
@@ -12,7 +12,6 @@ import java.util.List;
  * @date ${datetime}
  */
 public interface ${ClassName}Mapper extends BaseMapper<${ClassName}PO> {
-
     /**
      * 统计巡视方案下被巡视单位${ClassName}次数
      * @param planId 巡视计划ID

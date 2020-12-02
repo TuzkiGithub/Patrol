@@ -76,8 +76,6 @@ public class InspectionFeedbackPO extends PIBaseEntity {
     /**
      * 待办时限
      */
-
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date toDoTime;
 

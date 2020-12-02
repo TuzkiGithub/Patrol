@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.survey.mapper.SurveyResultMapper">
+
+    <resultMap id="SurveyPaperResult" type="SurveyResultPO">
+        <id property="resultId" column="RESULT_ID"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="paperQuestionId" column="PAPER_QUESTION_ID"/>
+        <result property="answer" column="ANSWER"/>
+        <result property="answerFlag" column="ANSWER_FLAG"/>
+        <result property="optionMapping" column="OPTION_MAPPING"/>
+        <association property="paper" javaType="SurveyPaperPO" resultMap="SurveyPaperResult"/>
+    </resultMap>
+
+    <resultMap type="SurveyPaperPO" id="SurveyPaperResult">
+        <result property="paperId" column="PAPER_ID"/>
+        <result property="paperName" column="PAPER_NAME"/>
+        <result property="paperType" column="PAPER_TYPE"/>
+        <result property="paperBusinessType" column="PAPER_BUSINESS_TYPE"/>
+        <result property="startDate" column="START_DATE"/>
+        <result property="endDate" column="END_DATE"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+        <collection property="questionList" javaType="java.util.List" resultMap="SurveyQuestionResult"/>
+    </resultMap>
+
+    <resultMap type="SurveyQuestionPO" id="SurveyQuestionResult">
+        <result property="questionId" column="QUESTION_ID"/>
+        <result property="paperQuestionId" column="PAPER_QUESTION_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="questionName" column="QUESTION_NAME"/>
+        <result property="questionType" column="QUESTION_TYPE"/>
+        <result property="type" column="TYPE"/>
+        <result property="score" column="SCORE"/>
+        <result property="rangeId" column="RANGE_ID"/>
+        <result property="rangeName" column="RANGE_NAME"/>
+        <result property="requiredFlag" column="REQUIRED_FLAG"/>
+        <result property="businessType" column="BUSINESS_TYPE"/>
+        <result property="referenceAnswer" column="REFERENCE_ANSWER"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+        <collection property="optionList" javaType="java.util.List" resultMap="optionResultMap"/>
+    </resultMap>
+
+    <resultMap id="optionResultMap" type="SurveyOptionPO">
+        <result property="optionId" column="OPTION_ID"/>
+        <result property="optionName" column="OPTION_NAME"/>
+    </resultMap>
+
+    <select id="selectPaperResultList" parameterType="PaperResultDTO" resultMap="SurveyPaperResult">
+        select
+          r.RESULT_ID,
+          r.USER_ID,
+          u.USER_NAME,
+          p.PAPER_ID,
+          p.PAPER_NAME,
+          p.PAPER_TYPE,
+          P.PAPER_BUSINESS_TYPE,
+          p.START_DATE,
+          p.END_DATE,
+          p.CREATED_BY,
+          p.CREATED_TIME,
+          p.UPDATED_BY,
+          p.UPDATED_TIME,
+          q.QUESTION_ID,
+          q.PLAN_ID,
+          q.QUESTION_TYPE,
+          q.SCORE,
+          q.REQUIRED_FLAG,
+          q.BUSINESS_TYPE,
+          q.TYPE,
+          q.RANGE_ID,
+          q.RANGE_NAME,
+          pq.PAPER_QUESTION_ID,
+          o.OPTION_ID,
+          q.QUESTION_NAME,
+          o.OPTION_NAME,
+          q.REFERENCE_ANSWER,
+          r.ANSWER,
+          q.CREATED_BY,
+          q.CREATED_TIME,
+          q.UPDATED_BY,
+          q.UPDATED_TIME
+        from (
+               select
+                 PAPER_ID,
+                 PAPER_NAME,
+                 PAPER_TYPE,
+                 PAPER_BUSINESS_TYPE,
+                 START_DATE,
+                 END_DATE,
+                 CREATED_BY,
+                 CREATED_TIME,
+                 UPDATED_BY,
+                 UPDATED_TIME,
+                 ENT_ID
+               from survey_paper
+               where PAPER_ID = #{paperId}
+               limit #{pageNum}, #{pageSize}
+             ) p
+          left join survey_paper_question pq on pq.PAPER_ID = p.PAPER_ID
+          left join survey_question q on pq.QUESTION_ID = q.QUESTION_ID
+          left join survey_option o on q.QUESTION_ID = o.QUESTION_ID
+          left join survey_result r on r.PAPER_QUESTION_ID = pq.PAPER_QUESTION_ID
+          left join sys_user u on u.USER_ID = r.USER_ID
+          where u.USER_ID = r.USER_ID
+        order by p.CREATED_TIME
+    </select>
+
+</mapper>

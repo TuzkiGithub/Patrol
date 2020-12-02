@@ -58,6 +58,7 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
 
     /**
      * 统计巡视方案下被巡视单位InspectionOrganizationMeetings次数
+     * *
      *
      * @param planId           巡视计划ID
      * @param organizationType 组织类型
@@ -72,8 +73,7 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
                 }
             });
         }
-
-
+        unitsBizCountVOS.removeIf(unitsBizCountVO -> (null != unitsBizCountVO.getOrganizationType()) && (!unitsBizCountVO.getOrganizationType().equals(organizationType)));
         return unitsBizCountVOS;
     }
 

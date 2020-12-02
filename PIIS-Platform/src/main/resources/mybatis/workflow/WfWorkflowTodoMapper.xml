@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.workflow.mapper.WfWorkflowTodoMapper">
+
+    <resultMap type="WfWorkflowTodoPO" id="WfWorkflowTodoResult">
+        <result property="workFlowTodoId" column="WORK_FLOW_TODO_ID"/>
+        <result property="todoName" column="TODO_NAME"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="businessId" column="BUSINESS_ID"/>
+        <result property="todoStatus" column="TODO_STATUS"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+
+    <sql id="selectWfWorkflowTodoVo">
+        select WORK_FLOW_TODO_ID, TODO_NAME, APPROVER_ID, APPROVER_NAME, BUSINESS_ID, TODO_STATUS, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from wf_workflow_todo
+    </sql>
+
+    <select id="selectCount" parameterType="WfWorkflowTodoPO" resultType="TodoCountVO">
+select
+  (select count(1) from wf_workflow_todo
+  where APPROVER_ID = #{approverId}
+        and TODO_STATUS = 1) as doCount,
+  (select count(1) from wf_workflow_todo
+  where APPROVER_ID = #{approverId}
+        and TODO_STATUS = 0) as undoCount
+    </select>
+
+</mapper>

@@ -57,4 +57,10 @@ public interface IInspectionConsultInfoService {
      * @return
      */
     int count(InspectionConsultInfoPO inspectionConsultInfo);
+
+    /**
+     * 审批
+     * @param inspectionConsultInfoList
+     */
+    void doApprovals(List<InspectionConsultInfoPO> inspectionConsultInfoList);
 }

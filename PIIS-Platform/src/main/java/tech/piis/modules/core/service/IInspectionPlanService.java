@@ -1,10 +1,10 @@
 package tech.piis.modules.core.service;
 
 
-import org.springframework.web.multipart.MultipartFile;
-import tech.piis.modules.core.domain.dto.InspectionPlanSaveDTO;
+import tech.piis.common.exception.BaseException;
+import tech.piis.modules.core.domain.dto.PlanBriefDTO;
 import tech.piis.modules.core.domain.po.InspectionPlanPO;
-import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.domain.vo.PlanBriefVO;
 import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
 import tech.piis.modules.core.domain.vo.PlanConditionVO;
 import tech.piis.modules.core.domain.vo.PlanMemberCountVO;
@@ -28,6 +28,7 @@ public interface IInspectionPlanService {
 
     /**
      * 新增巡视计划
+     *
      * @param inspectionPlanPO
      * @return
      */
@@ -36,6 +37,7 @@ public interface IInspectionPlanService {
 
     /**
      * 修改巡视计划
+     *
      * @param inspectionPlanPO
      * @return
      */
@@ -43,6 +45,7 @@ public interface IInspectionPlanService {
 
     /**
      * 根据ID删除巡视计划
+     *
      * @param planIds
      * @return
      */
@@ -50,24 +53,28 @@ public interface IInspectionPlanService {
 
     /**
      * 查询总记录数
+     *
      * @return
      */
     int selectCount(InspectionPlanPO plan);
 
     /**
      * 统计公司巡察次数
+     *
      * @return
      */
     List<PlanCompanyCountVO> selectCountByCompany(InspectionPlanPO plan);
 
     /**
      * 统计公司巡视成员数量
+     *
      * @return
      */
     List<PlanCompanyCountVO> selectMemberCountByTime(PlanMemberCountVO planMemberCountVO);
 
     /**
      * 根据用户ID查询历史参与巡视情况
+     *
      * @param userId
      * @return
      */
@@ -75,8 +82,18 @@ public interface IInspectionPlanService {
 
     /**
      * 统计巡视巡察项目、被巡视单位、巡视组数量
+     *
      * @return
      */
     List selectPiisProjectCount();
+
+    /**
+     * 查询巡视简要信息
+     *
+     * @param planBriefDTO
+     * @return
+     * @throws BaseException
+     */
+    PlanBriefVO selectPiisBrief(PlanBriefDTO planBriefDTO) throws BaseException;
 
 }

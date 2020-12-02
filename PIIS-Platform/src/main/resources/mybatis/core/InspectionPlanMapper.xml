@@ -191,7 +191,7 @@
                 AND PLAN_COMPANY_ID = #{planCompanyId}
             </if>
 
-            <if test="planType != null" >
+            <if test="planType != null">
                 AND PLAN_TYPE = #{planType}
             </if>
         </where>
@@ -260,6 +260,7 @@
           END_TIME
         from inspection_plan p, inspection_group g
         where p.PLAN_ID = g.PLAN_ID
+        and p.STATUS != 2
         group by p.PLAN_ID, g.GROUP_ID, LEADER_ID, DEPUTY_LEADER_ID, CONNECTOR_ID
         having LEADER_ID = #{userId} or DEPUTY_LEADER_ID = #{userId} or CONNECTOR_ID = #{userId}
     union
@@ -281,6 +282,7 @@
           END_TIME
         from inspection_plan p, inspection_group g, inspection_group_member m
         where p.PLAN_ID = g.PLAN_ID
+        and p.STATUS != 2
         and m.GROUP_ID = g.GROUP_ID
         group by MEMBER_ID
         having MEMBER_ID = #{userId}
@@ -296,5 +298,23 @@
     where p.PLAN_ID = g.PLAN_ID
     and  p.PLAN_ID = u.PLAN_ID
     group by PLAN_COMPANY_ID
+    </select>
+
+    <select id="selectPiisBrief" parameterType="tech.piis.modules.core.domain.dto.PlanBriefDTO" resultType="PlanBriefVO">
+      select
+      p.PLAN_ID as planId,
+      p.PLAN_NAME as planName,
+      g.GROUP_ID as groupId,
+      g.GROUP_NAME as groupName,
+      u.UNITS_ID as unitsId,
+      u.ORG_ID as orgId,
+      u.ORG_NAME as orgName
+    from
+      inspection_plan p
+      left join inspection_group g on p.PLAN_ID = g.PLAN_ID
+      left join inspection_units u on u.GROUP_ID = g.GROUP_ID
+    where p.PLAN_ID = #{planId}
+    and u.UNITS_ID = #{unitsId}
+    limit 1
     </select>
 </mapper> 

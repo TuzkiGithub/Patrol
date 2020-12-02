@@ -3,6 +3,7 @@ package ${packageName}.controller;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
@@ -15,6 +16,8 @@ import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.framework.web.page.TableDataInfo;
 import tech.piis.modules.core.service.IPiisDocumentService;
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
+import tech.piis.common.enums.ApprovalEnum;
 
 import javax.validation.Valid;
 
@@ -27,8 +30,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("/piis/${businessName}")
-public class ${ClassName}Controller extends BaseController
-{
+public class ${ClassName}Controller extends BaseController {
     @Autowired
     private I${ClassName}Service ${className}Service;
 
@@ -79,8 +81,28 @@ public class ${ClassName}Controller extends BaseController
         if (null == ${className}) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        if (NO_APPROVAL == ${className}.getIsApproval()) {
+            ${className}.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            ${className}.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
+        }
         BizUtils.setCreatedOperation(${ClassName}PO.class, ${className});
         return toAjax(${className}Service.save(${className}));
+    }
+
+    /**
+     * 审批${functionName}
+     * @param  ${className}
+     */
+    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:approval')")
+    @Log(title = "${functionName}", businessType = BusinessType.INSERT)
+    @PostMapping("approval")
+    public AjaxResult add(@RequestBody List<${ClassName}PO> ${className}List) {
+        if (CollectionUtils.isEmpty(${className}List)) {
+            return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        ${className}Service.doApprovals(${className}List);
+        return AjaxResult.success();
     }
 
     /**
@@ -93,6 +115,11 @@ public class ${ClassName}Controller extends BaseController
     public AjaxResult edit(@RequestBody ${ClassName}PO ${className}) throws BaseException{
         if (null == ${className}) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == ${className}.getIsApproval()) {
+            ${className}.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            ${className}.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         BizUtils.setUpdatedOperation(${ClassName}PO.class, ${className});
         return toAjax(${className}Service.update(${className}));

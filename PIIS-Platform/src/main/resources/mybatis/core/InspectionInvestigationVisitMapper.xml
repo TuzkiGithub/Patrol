@@ -15,13 +15,31 @@
         <result property="recordPersonId" column="RECORD_PERSON_ID"/>
         <result property="recordPersonName" column="RECORD_PERSON_NAME"/>
         <result property="recordContent" column="RECORD_CONTENT"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
         <result property="createdBy" column="CREATED_BY"/>
         <result property="createdTime" column="CREATED_TIME"/>
         <result property="updatedBy" column="UPDATED_BY"/>
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
+        <collection property="documents" javaType="java.util.List" resultMap="documentResultMap"/>
         <collection property="investigationVisitPersonList" javaType="java.util.List"
                     resultMap="inspectionInvestigationVisitPersonResult"/>
+    </resultMap>
+
+    <resultMap id="documentResultMap" type="PiisDocumentPO">
+        <result property="piisDocId" column="PIIS_DOC_ID"/>
+        <result property="objectId" column="OBJECT_ID"/>
+        <result property="fileDictId" column="FILE_DICT_ID"/>
+        <result property="fileName" column="FILE_NAME"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+        <result property="filePath" column="FILE_PATH"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
     </resultMap>
 
     <resultMap type="InspectionInvestigationVisitPersonPO" id="inspectionInvestigationVisitPersonResult">
@@ -51,6 +69,9 @@
           RECORD_PERSON_ID,
           RECORD_PERSON_NAME,
           RECORD_CONTENT,
+          APPROVER_ID,
+          APPROVER_NAME,
+          APPROVAL_FLAG,
           v.CREATED_BY,
           v.CREATED_TIME,
           v.UPDATED_BY,
@@ -75,7 +96,10 @@
                  CREATED_TIME,
                  UPDATED_BY,
                  UPDATED_TIME,
-                 ENT_ID
+                 ENT_ID,
+                 APPROVER_ID,
+                 APPROVER_NAME,
+                 APPROVAL_FLAG
                from inspection_investigation_visit
                where PLAN_ID = #{planId}
                      and UNITS_ID = #{unitsId}
@@ -94,5 +118,41 @@
         where u.plan_id = #{planId}
         group by u.UNITS_ID
         order by u.created_time, u.UNITS_ID desc
+    </select>
+
+    <select id="selectInvestigationVisitWithFile" parameterType="InspectionInvestigationVisitPO"
+            resultMap="InspectionInvestigationVisitResult">
+        select
+          v.INVESTIGATION_VISIT_ID,
+          PLAN_ID,
+          VISIT_COMPANY_ID,
+          VISIT_COMPANY_NAME,
+          VISIT_TIME,
+          RECORD_PERSON_ID,
+          RECORD_PERSON_NAME,
+          RECORD_CONTENT,
+          APPROVER_ID,
+          APPROVER_NAME,
+          APPROVAL_FLAG,
+          v.CREATED_BY,
+          v.CREATED_TIME,
+          v.UPDATED_BY,
+          v.UPDATED_TIME,
+          v.ENT_ID,
+          INVESTIGATION_VISIT_PERSON_ID,
+          PERSON_ID,
+          PERSON_NAME,
+          POST_NAME,
+          PERSON_TYPE,
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH
+        from inspection_investigation_visit v
+          left join piis_document doc on concat('InvestigationVisit', v.INVESTIGATION_VISIT_ID) = doc.OBJECT_ID
+          left join inspection_investigation_visit_person p on v.INVESTIGATION_VISIT_ID = p.INVESTIGATION_VISIT_ID
+          where v.INVESTIGATION_VISIT_ID = #{investigationVisitId}
     </select>
 </mapper>

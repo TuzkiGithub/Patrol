@@ -16,7 +16,7 @@
         <result property="entId" column="ENT_ID"/>
     </resultMap>
 
-    <insert id="insertOptionBatch" parameterType="java.util.List">
+    <insert id="insertOptionBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="optionId">
         insert into survey_option (QUESTION_ID,OPTION_NAME,REMARK) values
         <foreach collection="list" item="option" separator=",">
             (#{option.questionId},#{option.optionName},#{option.remark})

@@ -63,7 +63,7 @@ public interface ISurveyPaperService {
     void saveByCreate(SurveyPaperPO surveyPaper) throws BaseException;
 
     /**
-     * 创建试卷，导入题库
+     * 创建试卷，导入模板
      * @param paperType
      * @param file
      * @return

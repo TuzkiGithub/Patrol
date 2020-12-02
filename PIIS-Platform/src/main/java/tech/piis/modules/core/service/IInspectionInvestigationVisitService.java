@@ -57,4 +57,10 @@ public interface IInspectionInvestigationVisitService {
      * @return
      */
     int count(InspectionInvestigationVisitPO inspectionInvestigationVisit) throws BaseException;
+
+    /**
+     * 审批
+     * @param investigationVisitList
+     */
+    void doApprovals(List<InspectionInvestigationVisitPO> investigationVisitList);
 }

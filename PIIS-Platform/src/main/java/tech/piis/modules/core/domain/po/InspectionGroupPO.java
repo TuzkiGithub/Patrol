@@ -105,4 +105,7 @@ public class InspectionGroupPO extends PIBaseEntity {
      */
     @TableField(exist = false)
     private Integer operationType;
+
+    @TableField(exist = false)
+    private List<PiisDocumentPO> documents;
 }

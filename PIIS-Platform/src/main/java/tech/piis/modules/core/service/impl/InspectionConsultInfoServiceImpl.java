@@ -1,28 +1,39 @@
 package tech.piis.modules.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.FileEnum;
+import tech.piis.common.enums.OperationEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
 import tech.piis.framework.utils.BizUtils;
+import tech.piis.modules.core.domain.dto.PlanBriefDTO;
 import tech.piis.modules.core.domain.po.InspectionConsultInfoDetailPO;
 import tech.piis.modules.core.domain.po.InspectionConsultInfoPO;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.domain.vo.PlanBriefVO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import tech.piis.modules.core.event.WorkFlowEvent;
 import tech.piis.modules.core.mapper.InspectionConsultInfoDetailMapper;
 import tech.piis.modules.core.mapper.InspectionConsultInfoMapper;
 import tech.piis.modules.core.service.IInspectionConsultInfoService;
+import tech.piis.modules.core.service.IInspectionPlanService;
 import tech.piis.modules.core.service.IPiisDocumentService;
+import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
+import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static tech.piis.common.constant.OperationConstants.*;
+import static tech.piis.common.constant.PiisConstants.*;
 
 /**
  * 查阅资料Service业务层处理
@@ -32,12 +43,19 @@ import static tech.piis.common.constant.OperationConstants.*;
  */
 @Transactional
 @Service
-public class InspectionConsultInfoServiceImpl implements IInspectionConsultInfoService {
+@Slf4j
+public class InspectionConsultInfoServiceImpl implements IInspectionConsultInfoService, ApplicationListener<WorkFlowEvent> {
     @Autowired
     private InspectionConsultInfoMapper consultInfoMapper;
 
     @Autowired
     private InspectionConsultInfoDetailMapper consultInfoDetailMapper;
+
+    @Autowired
+    private IInspectionPlanService planService;
+
+    @Autowired
+    private IWfWorkflowTodoService todoService;
 
     @Autowired
     private IPiisDocumentService documentService;
@@ -97,7 +115,7 @@ public class InspectionConsultInfoServiceImpl implements IInspectionConsultInfoS
             }
         }
         BizUtils.setCreatedOperation(InspectionConsultInfoPO.class, inspectionConsultInfo);
-        return consultInfoMapper.insert(inspectionConsultInfo.setConsultInfoDetailList(null));
+        return consultInfoMapper.insert(inspectionConsultInfo.setConsultInfoDetailList(null).setDocuments(null));
     }
 
     /**
@@ -134,7 +152,7 @@ public class InspectionConsultInfoServiceImpl implements IInspectionConsultInfoS
                 }
             }
         }
-        return consultInfoMapper.updateById(inspectionConsultInfo.setConsultInfoDetailList(null));
+        return consultInfoMapper.updateById(inspectionConsultInfo.setConsultInfoDetailList(null).setDocuments(null));
     }
 
     /**
@@ -190,5 +208,85 @@ public class InspectionConsultInfoServiceImpl implements IInspectionConsultInfoS
         }
     }
 
+    /**
+     * 新增代办
+     *
+     * @param inspectionConsultInfo
+     */
+    private void handleTodo(InspectionConsultInfoPO inspectionConsultInfo) {
+        String planId = inspectionConsultInfo.getPlanId();
+        Long unitsId = inspectionConsultInfo.getUnitsId();
+        PlanBriefDTO planBriefDTO = new PlanBriefDTO()
+                .setPlanId(planId)
+                .setUnitsId(unitsId);
+        PlanBriefVO planPO = planService.selectPiisBrief(planBriefDTO);
+        WfWorkFlowTodoPO wfWorkFlowTodoPO = new WfWorkFlowTodoPO()
+                .setLookStatus(NO_LOOK)
+                .setTodoName("[查阅资料]-" + planPO.getPlanName() + "-" + planPO.getGroupName() + "-" + planPO.getOrgName())
+                .setBusinessId(String.valueOf(inspectionConsultInfo.getConsultInfoId()))
+                .setTodoStatus(TODO_NEED)
+                .setApproverId(inspectionConsultInfo.getApproverId())
+                .setApproverName(inspectionConsultInfo.getApproverName());
+        BizUtils.setCreatedOperation(WfWorkFlowTodoPO.class, wfWorkFlowTodoPO);
+        todoService.saveWorkflowTodo(wfWorkFlowTodoPO);
+    }
 
+
+    /**
+     * 审批
+     *
+     * @param inspectionConsultInfoList
+     */
+    @Override
+    public void doApprovals(List<InspectionConsultInfoPO> inspectionConsultInfoList) {
+        if (!CollectionUtils.isEmpty(inspectionConsultInfoList)) {
+            inspectionConsultInfoList.forEach(consultInfo -> {
+                consultInfo.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                consultInfoMapper.updateById(consultInfo.setConsultInfoDetailList(null).setDocuments(null));
+                handleTodo(consultInfo);
+            });
+        }
+    }
+
+    /**
+     * Handle an application event.
+     *
+     * @param event the event to respond to
+     */
+    @Override
+    public void onApplicationEvent(WorkFlowEvent event) {
+        System.out.println("###ApplicationListener notify event [查阅资料]###");
+        log.info("###ApplicationListener notify event [查阅资料]###");
+        Object object = event.getSource();
+        if (object instanceof InspectionConsultInfoServiceImpl) {
+            Integer eventType = event.getEventType();
+            if (OperationEnum.SELECT.getCode() == eventType) {
+                InspectionConsultInfoPO inspectionConsultInfo = consultInfoMapper.selectInspectionConsultInfoById(event.getBizId());
+                List<InspectionConsultInfoDetailPO> consultInfoDetailList = inspectionConsultInfo.getConsultInfoDetailList();
+                if (!CollectionUtils.isEmpty(consultInfoDetailList)) {
+                    consultInfoDetailList.forEach(consultInfoDetail -> {
+                        List<PiisDocumentPO> documents = documentService.getFileListByBizId("ConsultInfoDetail" + consultInfoDetail.getConsultInfoDetailId());
+                        consultInfoDetail.setDocuments(documents);
+                    });
+                }
+                event.setData(inspectionConsultInfo);
+            } else if (OperationEnum.UPDATE.getCode() == eventType) {
+                Integer continueApprovalFlag = event.getContinueApprovalFlag();
+                Integer agreeFlag = event.getAgreeFlag();
+                InspectionConsultInfoPO inspectionConsultInfoPO = new InspectionConsultInfoPO()
+                        .setConsultInfoId(event.getBizId());
+                if (NO_APPROVAL == continueApprovalFlag) {
+                    if (AGREE == agreeFlag) {
+                        inspectionConsultInfoPO.setApprovalFlag(ApprovalEnum.PASSED.getCode());
+                    } else {
+                        inspectionConsultInfoPO.setApprovalFlag(ApprovalEnum.REJECTED.getCode());
+                    }
+                } else {
+                    inspectionConsultInfoPO.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                }
+                BizUtils.setUpdatedOperation(InspectionConsultInfoPO.class, inspectionConsultInfoPO);
+                consultInfoMapper.updateById(inspectionConsultInfoPO);
+            }
+        }
+    }
 }

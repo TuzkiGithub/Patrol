@@ -1,9 +1,9 @@
 package ${packageName}.service;
 
 import tech.piis.common.exception.BaseException;
-import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 import ${packageName}.domain.po.${ClassName}PO;
 import java.util.List;
+import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 
 /**
  * ${functionName}Service接口
@@ -50,11 +50,13 @@ public interface I${ClassName}Service {
      *
      * @return
      */
-    int deleteBy${ClassName}Ids(${pkColumn.javaType}[] ${pkColumn.javaField}s);
+    int deleteBy${ClassName}Ids(${pkColumn.javaType}[] ${pkColumn.javaField}s) throws BaseException;
+
+
 
     /**
-     * 统计总数
-     * @return
-     */
-    int count();
+    * 批量审批
+    * @throws BaseException
+    */
+    void doApprovals(List<${ClassName}PO> ${className}List) throws BaseException;
 }

@@ -24,7 +24,7 @@ import java.util.List;
 @Data
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionCallVisitPO extends PIBaseEntity {
+public class InspectionCallVisitPO extends PIBaseApprovalEntityPO {
     /**
      * 来电编号
      */
@@ -37,7 +37,7 @@ public class InspectionCallVisitPO extends PIBaseEntity {
     /**
      * 被巡视单位ID
      */
-    private String unitsId;
+    private Long unitsId;
     /**
      * 来电时间
      */

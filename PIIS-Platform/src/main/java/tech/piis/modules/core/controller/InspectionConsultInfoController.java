@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
@@ -19,6 +20,8 @@ import tech.piis.modules.core.service.IPiisDocumentService;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
 
 
 /**
@@ -104,8 +107,25 @@ public class InspectionConsultInfoController extends BaseController {
         if (null == inspectionConsultInfo) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        if (NO_APPROVAL == inspectionConsultInfo.getIsApproval()) {
+            inspectionConsultInfo.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionConsultInfo.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
+        }
         BizUtils.setCreatedOperation(InspectionConsultInfoPO.class, inspectionConsultInfo);
         return toAjax(inspectionConsultInfoService.save(inspectionConsultInfo));
+    }
+
+    /**
+     * 批量审批
+     *
+     * @param inspectionConsultInfoList
+     * @return
+     */
+    @PostMapping("approval")
+    public AjaxResult doApproval(@RequestBody List<InspectionConsultInfoPO> inspectionConsultInfoList) {
+        inspectionConsultInfoService.doApprovals(inspectionConsultInfoList);
+        return AjaxResult.success();
     }
 
     /**
@@ -119,6 +139,11 @@ public class InspectionConsultInfoController extends BaseController {
     public AjaxResult edit(@RequestBody InspectionConsultInfoPO inspectionConsultInfo) throws BaseException {
         if (null == inspectionConsultInfo) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionConsultInfo.getIsApproval()) {
+            inspectionConsultInfo.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionConsultInfo.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         BizUtils.setUpdatedOperation(InspectionConsultInfoPO.class, inspectionConsultInfo);
         return toAjax(inspectionConsultInfoService.update(inspectionConsultInfo));

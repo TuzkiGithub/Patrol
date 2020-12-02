@@ -2,6 +2,7 @@ package tech.piis.modules.system.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import tech.piis.common.constant.UserConstants;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.utils.SecurityUtils;
@@ -19,8 +20,6 @@ import java.util.stream.Collectors;
 
 /**
  * 菜单 业务层处理
- *
- * @author Kevin<EastascendWang   @   gmail.com>
  */
 @Service
 public class SysMenuServiceImpl implements ISysMenuService {
@@ -28,7 +27,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
 
     @Autowired
     private SysMenuMapper menuMapper;
-
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
 
@@ -56,6 +54,9 @@ public class SysMenuServiceImpl implements ISysMenuService {
         if (SysUser.isAdmin(userId)) {
             menuList = menuMapper.selectMenuList(menu);
         } else {
+            if (CollectionUtils.isEmpty(menu.getParams())) {
+                menu.setParams(new HashMap<>());
+            }
             menu.getParams().put("userId", userId);
             menuList = menuMapper.selectMenuListByUserId(menu);
         }
@@ -115,7 +116,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public List<RouterVo> buildMenus(List<SysMenu> menus) {
-        List<RouterVo> routers = new LinkedList<RouterVo>();
+        List<RouterVo> routers = new LinkedList<>();
         for (SysMenu menu : menus) {
             RouterVo router = new RouterVo();
             router.setName(StringUtils.capitalize(menu.getPath()));
@@ -132,6 +133,38 @@ public class SysMenuServiceImpl implements ISysMenuService {
         }
         return routers;
     }
+
+//    /**
+//     * 构建前端路由所需要的菜单
+//     *
+//     * @param menus 菜单列表
+//     * @return 路由列表
+//     */
+//    @Override
+//    public List<RouterVo> buildMenus(List<SysMenu> menus) {
+//        List<RouterVo> routers = new LinkedList<RouterVo>();
+//        for (SysMenu menu : menus) {
+//            RouterVo router = new RouterVo();
+//            router.setRouterId(menu.getMenuId());
+//            if ("F".equals(menu.getMenuType())) {
+//                router.setName(menu.getMenuName());
+//                routers.add(router);
+//                continue;
+//            }
+//            router.setName(StringUtils.capitalize(menu.getPath()));
+//            router.setPath(getRouterPath(menu));
+//            router.setComponent(StringUtils.isEmpty(menu.getComponent()) ? "Layout" : menu.getComponent());
+//            router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
+//            List<SysMenu> cMenus = menu.getChildren();
+//            if (!cMenus.isEmpty()) {
+//                router.setAlwaysShow(true);
+//                router.setRedirect("noRedirect");
+//                router.setChildren(buildMenus(cMenus));
+//            }
+//            routers.add(router);
+//        }
+//        return routers;
+//    }
 
     /**
      * 构建前端所需要树结构
@@ -275,9 +308,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return String
      */
     public List<SysMenu> getChildPerms(List<SysMenu> list, int parentId) {
-        List<SysMenu> returnList = new ArrayList<SysMenu>();
-        for (Iterator<SysMenu> iterator = list.iterator(); iterator.hasNext(); ) {
-            SysMenu t = (SysMenu) iterator.next();
+        List<SysMenu> returnList = new ArrayList<>();
+        for (SysMenu t : list) {
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
             if (t.getParentId() == parentId) {
                 recursionFn(list, t);
@@ -285,6 +317,81 @@ public class SysMenuServiceImpl implements ISysMenuService {
             }
         }
         return returnList;
+    }
+
+    /**
+     * 根据父节点的ID获取所有子节点
+     *
+     * @param list 分类表
+     * @return String
+     */
+    public List<SysMenu> getChildPerms(List<SysMenu> list) {
+        Long parentId = 0L;
+        List<SysMenu> mList = new ArrayList<>();
+        for (SysMenu menu : list) {
+            // 获取目录路由
+            if (menu.getParentId().equals(parentId)) {
+                mList.add(menu);
+            }
+        }
+
+        List<SysMenu> cList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(mList)) {
+            mList.forEach(menu -> {
+                //获取菜单路由
+                List<SysMenu> tempList = new ArrayList<>();
+                for (SysMenu sysMenu : list) {
+                    if (sysMenu.getParentId().equals(menu.getMenuId())) {
+                        tempList.add(sysMenu);
+                        cList.add(sysMenu);
+                    }
+                }
+                menu.setChildren(tempList);
+            });
+        }
+
+        if (!CollectionUtils.isEmpty(cList)) {
+            cList.forEach(menu -> {
+                //获取按钮路由
+                List<SysMenu> fList = new ArrayList<>();
+                for (SysMenu sysMenu : list) {
+                    if (sysMenu.getParentId().equals(menu.getMenuId())) {
+                        fList.add(sysMenu);
+                    }
+                }
+                menu.setChildren(fList);
+            });
+        }
+        return mList;
+    }
+
+    /**
+     * 在内存中构建树型结构
+     *
+     * @param menuList
+     * @return
+     */
+    private List<SysMenu> buildMenuRelation(List<SysMenu> menuList) {
+        HashMap<Long, List<SysMenu>> menuMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(menuList)) {
+            menuList.forEach(menu -> {
+                Long menuId = menu.getParentId();
+                if (!menuMap.containsKey(menuId)) {
+                    menuMap.put(menuId, new ArrayList<>());
+                } else {
+                    menuMap.get(menuId).add(menu);
+                }
+            });
+        }
+
+        menuList.forEach(menu -> {
+            Long menuId = menu.getMenuId();
+            if (menuMap.containsKey(menuId)) {
+                menu.setChildren(menuMap.get(menuId));
+            }
+        });
+        menuList.removeIf(menu -> !"M".equals(menu.getMenuType()));
+        return menuList;
     }
 
     /**
@@ -300,9 +407,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         for (SysMenu tChild : childList) {
             if (hasChild(list, tChild)) {
                 // 判断是否有子节点
-                Iterator<SysMenu> it = childList.iterator();
-                while (it.hasNext()) {
-                    SysMenu n = (SysMenu) it.next();
+                for (SysMenu n : childList) {
                     recursionFn(list, n);
                 }
             }
@@ -313,10 +418,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * 得到子节点列表
      */
     private List<SysMenu> getChildList(List<SysMenu> list, SysMenu t) {
-        List<SysMenu> tlist = new ArrayList<SysMenu>();
-        Iterator<SysMenu> it = list.iterator();
-        while (it.hasNext()) {
-            SysMenu n = (SysMenu) it.next();
+        List<SysMenu> tlist = new ArrayList<>();
+        for (SysMenu n : list) {
             if (n.getParentId().longValue() == t.getMenuId().longValue()) {
                 tlist.add(n);
             }
@@ -328,6 +431,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * 判断是否有子节点
      */
     private boolean hasChild(List<SysMenu> list, SysMenu t) {
-        return getChildList(list, t).size() > 0 ? true : false;
+        return getChildList(list, t).size() > 0;
     }
 }

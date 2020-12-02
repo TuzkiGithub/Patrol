@@ -2,6 +2,7 @@ package tech.piis.modules.survey.domain.po;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.annotation.ExcelCollection;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -97,6 +98,9 @@ public class SurveyQuestionPO extends PIBaseEntity {
      */
     @ExcelCollection(name = "选项", orderNum = "6")
     private List<SurveyOptionPO> optionList;
+
+    @TableField(exist = false)
+    private Long paperQuestionId;
 
     public SurveyQuestionPO() {
 

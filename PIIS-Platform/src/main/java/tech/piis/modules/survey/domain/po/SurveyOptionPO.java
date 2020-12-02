@@ -1,6 +1,8 @@
 package tech.piis.modules.survey.domain.po;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,6 +26,7 @@ public class SurveyOptionPO extends PIBaseEntity {
     /**
      * 选项ID
      */
+    @TableId(value = "OPTION_ID", type = IdType.AUTO)
     private Long optionId;
     /**
      * 题目ID

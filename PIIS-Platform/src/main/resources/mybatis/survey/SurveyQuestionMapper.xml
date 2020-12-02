@@ -74,6 +74,63 @@
     order by q.CREATED_TIME desc
     </select>
 
+    <select id="selectQuestionRandom" resultMap="SurveyQuestionResult" parameterType="QuestionCountVO">
+        (SELECT *
+ FROM survey_question AS t1
+   JOIN (SELECT ROUND(RAND() * ((SELECT MAX(QUESTION_ID)
+                                 FROM survey_question) - (SELECT MIN(QUESTION_ID)
+                                                          FROM survey_question)) + (SELECT MIN(QUESTION_ID)
+                                                                                    FROM survey_question)) AS id) AS t2
+ WHERE t1.QUESTION_ID >= t2.id
+       and QUESTION_TYPE = 1
+ ORDER BY t1.QUESTION_ID
+ LIMIT 1)
+union
+(SELECT *
+ FROM survey_question AS t1
+   JOIN (SELECT ROUND(RAND() * ((SELECT MAX(QUESTION_ID)
+                                 FROM survey_question) - (SELECT MIN(QUESTION_ID)
+                                                          FROM survey_question)) + (SELECT MIN(QUESTION_ID)
+                                                                                    FROM survey_question)) AS id) AS t2
+ WHERE t1.QUESTION_ID >= t2.id
+       and QUESTION_TYPE = 2
+ ORDER BY t1.QUESTION_ID
+ LIMIT 1)
+union
+(SELECT *
+ FROM survey_question AS t1
+   JOIN (SELECT ROUND(RAND() * ((SELECT MAX(QUESTION_ID)
+                                 FROM survey_question) - (SELECT MIN(QUESTION_ID)
+                                                          FROM survey_question)) + (SELECT MIN(QUESTION_ID)
+                                                                                    FROM survey_question)) AS id) AS t2
+ WHERE t1.QUESTION_ID >= t2.id
+       and QUESTION_TYPE = 3
+ ORDER BY t1.QUESTION_ID
+ LIMIT 1)
+union
+(SELECT *
+ FROM survey_question AS t1
+   JOIN (SELECT ROUND(RAND() * ((SELECT MAX(QUESTION_ID)
+                                 FROM survey_question) - (SELECT MIN(QUESTION_ID)
+                                                          FROM survey_question)) + (SELECT MIN(QUESTION_ID)
+                                                                                    FROM survey_question)) AS id) AS t2
+ WHERE t1.QUESTION_ID >= t2.id
+       and QUESTION_TYPE = 4
+ ORDER BY t1.QUESTION_ID
+ LIMIT 1)
+union
+(SELECT *
+ FROM survey_question AS t1
+   JOIN (SELECT ROUND(RAND() * ((SELECT MAX(QUESTION_ID)
+                                 FROM survey_question) - (SELECT MIN(QUESTION_ID)
+                                                          FROM survey_question)) + (SELECT MIN(QUESTION_ID)
+                                                                                    FROM survey_question)) AS id) AS t2
+ WHERE t1.QUESTION_ID >= t2.id
+       and QUESTION_TYPE = 5
+ ORDER BY t1.QUESTION_ID
+ LIMIT 1)
+
+    </select>
     <insert id="insertQuestionBatch" parameterType="java.util.List">
         insert into survey_question
         (QUESTION_ID,PLAN_ID,QUESTION_NAME,QUESTION_TYPE,TYPE,SCORE,REQUIRED_FLAG,RANGE_ID,RANGE_NAME,BUSINESS_TYPE,REFERENCE_ANSWER,CREATED_BY,CREATED_TIME)

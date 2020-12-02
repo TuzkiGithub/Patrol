@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import tech.piis.common.enums.PaperTypeEnum;
 import tech.piis.common.enums.QuestionTypeEnum;
@@ -14,7 +15,6 @@ import tech.piis.common.exception.BaseException;
 import tech.piis.common.exception.file.QuestionFileException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
-import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.modules.survey.domain.po.SurveyOptionPO;
 import tech.piis.modules.survey.domain.po.SurveyQuestionPO;
@@ -22,9 +22,9 @@ import tech.piis.modules.survey.mapper.SurveyOptionMapper;
 import tech.piis.modules.survey.mapper.SurveyQuestionMapper;
 import tech.piis.modules.survey.service.ISurveyQuestionService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+
+import static tech.piis.common.constant.GenConstants.*;
 
 /**
  * 题目Service业务层处理
@@ -50,7 +50,7 @@ public class SurveyQuestionServiceImpl implements ISurveyQuestionService {
      */
     @Override
     public List<SurveyQuestionPO> selectSurveyQuestionList(SurveyQuestionPO surveyQuestion) throws BaseException {
-        return surveyQuestionMapper.selectSurveyQuestionList(surveyQuestion);
+        return handleAnswerFiled(surveyQuestionMapper.selectSurveyQuestionList(surveyQuestion));
     }
 
     /**
@@ -62,18 +62,22 @@ public class SurveyQuestionServiceImpl implements ISurveyQuestionService {
      */
     @Override
     public int save(SurveyQuestionPO surveyQuestion) throws BaseException {
-        String id = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
-        surveyQuestion.setQuestionId(id);
+        String questionId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
+        surveyQuestion.setQuestionId(questionId);
         List<SurveyOptionPO> optionList = surveyQuestion.getOptionList();
-        int result = surveyQuestionMapper.insert(surveyQuestion.setOptionList(null));
+        Map<String, String> optionMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(optionList)) {
             optionList.forEach(option -> {
-                option.setQuestionId(id);
+                option.setQuestionId(questionId);
                 surveyOptionMapper.insert(option);
+                String key = questionId + LINE_CHAR + option.getOptionName();
+                optionMap.put(key, String.valueOf(option.getOptionId()));
             });
         }
-        return result;
+        convertReferAnswer(surveyQuestion, optionMap);
+        return surveyQuestionMapper.insert(surveyQuestion.setOptionList(null));
     }
+
 
     /**
      * 根据ID修改题目
@@ -92,12 +96,17 @@ public class SurveyQuestionServiceImpl implements ISurveyQuestionService {
         surveyOptionMapper.delete(delQueryWrapper);
 
         //新增题目关联的选项
+        Map<String, String> optionMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(optionList)) {
             optionList.forEach(option -> {
-                option.setQuestionId(surveyQuestion.getQuestionId());
+                String questionId = surveyQuestion.getQuestionId();
+                option.setQuestionId(questionId);
                 surveyOptionMapper.insert(option);
+                String key = questionId + LINE_CHAR + option.getOptionName();
+                optionMap.put(key, String.valueOf(option.getOptionId()));
             });
         }
+        convertReferAnswer(surveyQuestion, optionMap);
         return surveyQuestionMapper.updateById(surveyQuestion.setOptionList(null));
     }
 
@@ -142,12 +151,13 @@ public class SurveyQuestionServiceImpl implements ISurveyQuestionService {
         //校验字段
         validQuestion(questionList);
         List<SurveyOptionPO> optionList = new ArrayList<>();
+        Map<String, String> optionMap = new HashMap<>();
         //填充实体
         if (!CollectionUtils.isEmpty(questionList)) {
             questionList.forEach(question -> {
-                String id = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
+                String questionId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
                 Integer questionType = question.getQuestionType();
-                question.setQuestionId(id);
+                question.setQuestionId(questionId);
                 question.setRangeId(BizUtils.getOrgIdByName(question.getRangeName()));
                 question.setType(type);
                 BizUtils.setCreatedOperation(SurveyQuestionPO.class, question);
@@ -155,8 +165,9 @@ public class SurveyQuestionServiceImpl implements ISurveyQuestionService {
                 if (!CollectionUtils.isEmpty(tempOptionList)) {
                     tempOptionList.forEach(option -> {
                         if (QuestionTypeEnum.SINGLE.getCode().equals(questionType) || QuestionTypeEnum.DOUBLE.getCode().equals(questionType)) {
-                            option.setQuestionId(id);
+                            option.setQuestionId(questionId);
                         }
+                        optionMap.put(questionId + LINE_CHAR, option.getOptionName());
                     });
                 }
                 optionList.addAll(tempOptionList);
@@ -166,6 +177,7 @@ public class SurveyQuestionServiceImpl implements ISurveyQuestionService {
         BizUtils.filterOptionName(optionList);
         //批量导入题目，选项
         surveyOptionMapper.insertOptionBatch(optionList);
+        convertReferAnswer(questionList, optionMap);
         surveyQuestionMapper.insertQuestionBatch(questionList);
     }
 
@@ -181,6 +193,26 @@ public class SurveyQuestionServiceImpl implements ISurveyQuestionService {
         QueryWrapper<SurveyQuestionPO> questionPOQueryWrapper = new QueryWrapper<>();
         questionPOQueryWrapper.eq("TYPE", type);
         return surveyQuestionMapper.selectCount(questionPOQueryWrapper);
+    }
+
+    /**
+     * 处理多选题中的参考答案字段
+     *
+     * @param questionList
+     * @throws BaseException
+     */
+    @Override
+    public List<SurveyQuestionPO> handleAnswerFiled(List<SurveyQuestionPO> questionList) throws BaseException {
+        if (!CollectionUtils.isEmpty(questionList)) {
+            questionList.forEach(question -> {
+                String referenceAnswer = question.getReferenceAnswer();
+                if (QuestionTypeEnum.DOUBLE.getCode().equals(question.getQuestionType())) {
+                    referenceAnswer = referenceAnswer.replace(REPLACE_CHAR, SPLIT_CHAR);
+                    question.setReferenceAnswer(referenceAnswer);
+                }
+            });
+        }
+        return questionList;
     }
 
     /**
@@ -234,6 +266,52 @@ public class SurveyQuestionServiceImpl implements ISurveyQuestionService {
         } else {
             throw new QuestionFileException("题目不能为空！");
         }
+    }
+
+    /**
+     * 批量处理参考答案字段
+     *
+     * @param questionList 题目实体
+     * @param optionMap    选项名称和ID map
+     */
+    public void convertReferAnswer(List<SurveyQuestionPO> questionList, Map<String, String> optionMap) {
+        if (!CollectionUtils.isEmpty(questionList)) {
+            questionList.forEach(question -> convertReferAnswer(question, optionMap));
+        }
+    }
+
+    /**
+     * 处理参考答案字段
+     *
+     * @param surveyQuestion 题目实体
+     * @param optionMap      选项名称和ID map
+     */
+    private void convertReferAnswer(SurveyQuestionPO surveyQuestion, Map<String, String> optionMap) {
+        //处理参考答案字段
+        Integer questionType = surveyQuestion.getQuestionType();
+        String questionId = surveyQuestion.getQuestionId();
+        String referenceAnswer = surveyQuestion.getReferenceAnswer();
+        if (QuestionTypeEnum.SINGLE.getCode().equals(questionType)) {
+            String key = questionId + LINE_CHAR + referenceAnswer;
+            if (optionMap.containsKey(key)) {
+                surveyQuestion.setReferenceAnswer(optionMap.get(key));
+            }
+        }
+        if (QuestionTypeEnum.DOUBLE.getCode().equals(questionType)) {
+            String[] optionNames;
+            optionNames = referenceAnswer.split(REPLACE_CHAR);
+            StringBuilder questionOptionIds = new StringBuilder();
+            for (String temp : optionNames) {
+                String key = questionId + LINE_CHAR + temp;
+                if (optionMap.containsKey(key)) {
+                    questionOptionIds.append(optionMap.get(key)).append(SPLIT_CHAR);
+                }
+            }
+            String questionOptionIdsStr = questionOptionIds.toString();
+            questionOptionIdsStr = questionOptionIdsStr.substring(0, questionOptionIdsStr.lastIndexOf(SPLIT_CHAR));
+            surveyQuestion.setReferenceAnswer(questionOptionIdsStr);
+        }
+
     }
 
 }

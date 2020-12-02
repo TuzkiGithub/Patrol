@@ -30,6 +30,7 @@
 
     <resultMap type="SurveyQuestionPO" id="SurveyQuestionResult">
         <result property="questionId" column="QUESTION_ID"/>
+        <result property="paperQuestionId" column="PAPER_QUESTION_ID"/>
         <result property="planId" column="PLAN_ID"/>
         <result property="questionName" column="QUESTION_NAME"/>
         <result property="questionType" column="QUESTION_TYPE"/>
@@ -53,7 +54,7 @@
         <result property="optionName" column="OPTION_NAME"/>
     </resultMap>
 
-    <select id="selectSurveyPaperCount}" parameterType="java.lang.String"
+    <select id="selectSurveyPaperCount" parameterType="java.lang.String"
             resultMap="unitsBizCountResultMap">
         select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
         from inspection_units u
@@ -90,6 +91,7 @@
           q.CREATED_TIME,
           q.UPDATED_BY,
           q.UPDATED_TIME,
+          pq.PAPER_QUESTION_ID,
           o.OPTION_ID,
           o.OPTION_NAME
         from (
@@ -106,6 +108,7 @@
                  UPDATED_TIME,
                  ENT_ID
                from survey_paper
+               where PAPER_TYPE = #{paperType}
                limit #{pageNum}, #{pageSize}
              ) p
           left join survey_paper_question pq on pq.PAPER_ID = p.PAPER_ID

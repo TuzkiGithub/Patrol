@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.PiisDocumentMapper">
+
+    <resultMap id="documentResultMap" type="PiisDocumentPO">
+        <result property="piisDocId" column="PIIS_DOC_ID"/>
+        <result property="objectId" column="OBJECT_ID"/>
+        <result property="fileDictId" column="FILE_DICT_ID"/>
+        <result property="fileName" column="FILE_NAME"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+        <result property="filePath" column="FILE_PATH"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+
+    <update id="updateBatch" parameterType="java.util.List">
+        <foreach collection="list" item="document" index="index" separator=";">
+            update piis_document
+            set OBJECT_ID = #{document.objectId}, FILE_DICT_ID = #{document.fileDictId}
+            where PIIS_DOC_ID = #{document.piisDocId}
+        </foreach>
+    </update>
+
+</mapper> 

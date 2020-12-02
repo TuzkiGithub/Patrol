@@ -98,4 +98,11 @@ public class GenConstants
     public static final Integer DEFAULT_PAGE_NUM = 0;
     public static final Integer DEFAULT_PAGE_SIZE = 10;
     public static final Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
+
+    /**
+     * piis 分隔符
+     */
+    public static final String SPLIT_CHAR = "、";
+    public static final String REPLACE_CHAR = "☹";
+    public static final String LINE_CHAR = "|";
 }

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionNotificationMapper">
+    
+    <resultMap type="InspectionNotificationPO" id="InspectionNotificationResult">
+        <result property="notificationId"    column="NOTIFICATION_ID"    />
+        <result property="planId"    column="PLAN_ID"    />
+        <result property="notifierId"    column="NOTIFIER_ID"    />
+        <result property="notifierName"    column="NOTIFIER_NAME"    />
+        <result property="notifierPost"    column="NOTIFIER_POST"    />
+        <result property="notifierCompanyId"    column="NOTIFIER_COMPANY_ID"    />
+        <result property="notifierCompanyName"    column="NOTIFIER_COMPANY_NAME"    />
+        <result property="time"    column="TIME"    />
+        <result property="remark"    column="REMARK"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="createdTime"    column="CREATED_TIME"    />
+        <result property="updatedBy"    column="UPDATED_BY"    />
+        <result property="updatedTime"    column="UPDATED_TIME"    />
+        <result property="entId"    column="ENT_ID"    />
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+    </resultMap>
+
+    <sql id="selectInspectionNotificationVo">
+        select NOTIFICATION_ID, PLAN_ID, NOTIFIER_ID, NOTIFIER_NAME, NOTIFIER_POST, NOTIFIER_COMPANY_ID, NOTIFIER_COMPANY_NAME, TIME, REMARK, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_notification
+    </sql>
+
+    <select id="selectInspectionNotificationCount}" parameterType="java.lang.String"
+            resultMap="unitsBizCountResultMap">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
+        from inspection_units u
+        left join inspection_notification d on u.UNITS_ID = d.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
+        order by u.created_time, u.UNITS_ID desc
+    </select>
+
+    <select id="selectInspectionNotificationList" parameterType="InspectionNotificationPO" resultMap="InspectionNotificationResult">
+        <include refid="selectInspectionNotificationVo"/>
+        <where>  
+            <if test="planId != null  and planId != ''"> and PLAN_ID = #{planId}</if>
+            <if test="notifierId != null  and notifierId != ''"> and NOTIFIER_ID = #{notifierId}</if>
+            <if test="notifierName != null  and notifierName != ''"> and NOTIFIER_NAME like concat('%', #{notifierName}, '%')</if>
+            <if test="notifierPost != null  and notifierPost != ''"> and NOTIFIER_POST = #{notifierPost}</if>
+            <if test="notifierCompanyId != null  and notifierCompanyId != ''"> and NOTIFIER_COMPANY_ID = #{notifierCompanyId}</if>
+            <if test="notifierCompanyName != null  and notifierCompanyName != ''"> and NOTIFIER_COMPANY_NAME like concat('%', #{notifierCompanyName}, '%')</if>
+            <if test="time != null "> and TIME = #{time}</if>
+            <if test="remark != null  and remark != ''"> and REMARK = #{remark}</if>
+            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
+            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
+            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
+            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
+        </where>
+    </select>
+    
+    <select id="selectInspectionNotificationById" parameterType="String" resultMap="InspectionNotificationResult">
+        <include refid="selectInspectionNotificationVo"/>
+        where NOTIFICATION_ID = #{notificationId}
+    </select>
+        
+    <insert id="insertInspectionNotification" parameterType="InspectionNotificationPO">
+        insert into inspection_notification
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="notificationId != null  and notificationId != ''">NOTIFICATION_ID,</if>
+            <if test="planId != null  and planId != ''">PLAN_ID,</if>
+            <if test="notifierId != null  and notifierId != ''">NOTIFIER_ID,</if>
+            <if test="notifierName != null  and notifierName != ''">NOTIFIER_NAME,</if>
+            <if test="notifierPost != null  and notifierPost != ''">NOTIFIER_POST,</if>
+            <if test="notifierCompanyId != null  and notifierCompanyId != ''">NOTIFIER_COMPANY_ID,</if>
+            <if test="notifierCompanyName != null  and notifierCompanyName != ''">NOTIFIER_COMPANY_NAME,</if>
+            <if test="time != null ">TIME,</if>
+            <if test="remark != null  and remark != ''">REMARK,</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
+            <if test="createdTime != null ">CREATED_TIME,</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
+            <if test="updatedTime != null ">UPDATED_TIME,</if>
+            <if test="entId != null  and entId != ''">ENT_ID,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="notificationId != null  and notificationId != ''">#{notificationId},</if>
+            <if test="planId != null  and planId != ''">#{planId},</if>
+            <if test="notifierId != null  and notifierId != ''">#{notifierId},</if>
+            <if test="notifierName != null  and notifierName != ''">#{notifierName},</if>
+            <if test="notifierPost != null  and notifierPost != ''">#{notifierPost},</if>
+            <if test="notifierCompanyId != null  and notifierCompanyId != ''">#{notifierCompanyId},</if>
+            <if test="notifierCompanyName != null  and notifierCompanyName != ''">#{notifierCompanyName},</if>
+            <if test="time != null ">#{time},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
+            <if test="createdTime != null ">#{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
+            <if test="updatedTime != null ">#{updatedTime},</if>
+            <if test="entId != null  and entId != ''">#{entId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateInspectionNotification" parameterType="InspectionNotificationPO">
+        update inspection_notification
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="planId != null  and planId != ''">PLAN_ID = #{planId},</if>
+            <if test="notifierId != null  and notifierId != ''">NOTIFIER_ID = #{notifierId},</if>
+            <if test="notifierName != null  and notifierName != ''">NOTIFIER_NAME = #{notifierName},</if>
+            <if test="notifierPost != null  and notifierPost != ''">NOTIFIER_POST = #{notifierPost},</if>
+            <if test="notifierCompanyId != null  and notifierCompanyId != ''">NOTIFIER_COMPANY_ID = #{notifierCompanyId},</if>
+            <if test="notifierCompanyName != null  and notifierCompanyName != ''">NOTIFIER_COMPANY_NAME = #{notifierCompanyName},</if>
+            <if test="time != null ">TIME = #{time},</if>
+            <if test="remark != null  and remark != ''">REMARK = #{remark},</if>
+            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
+            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
+            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
+            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
+            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
+        </trim>
+        where NOTIFICATION_ID = #{notificationId}
+    </update>
+
+    <delete id="deleteInspectionNotificationById" parameterType="String">
+        delete from inspection_notification where NOTIFICATION_ID = #{notificationId}
+    </delete>
+
+    <delete id="deleteInspectionNotificationByIds" parameterType="String">
+        delete from inspection_notification where NOTIFICATION_ID in 
+        <foreach item="notificationId" collection="array" open="(" separator="," close=")">
+            #{notificationId}
+        </foreach>
+    </delete>
+    
+</mapper>

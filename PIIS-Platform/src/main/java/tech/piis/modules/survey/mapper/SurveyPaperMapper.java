@@ -2,7 +2,6 @@ package tech.piis.modules.survey.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import tech.piis.common.exception.BaseException;
-import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 import tech.piis.modules.survey.domain.po.SurveyPaperPO;
 
 import java.util.List;
@@ -15,5 +14,5 @@ import java.util.List;
  */
 public interface SurveyPaperMapper extends BaseMapper<SurveyPaperPO> {
 
-
+    List<SurveyPaperPO> selectSurveyPaperList(SurveyPaperPO paper) throws BaseException;
 }

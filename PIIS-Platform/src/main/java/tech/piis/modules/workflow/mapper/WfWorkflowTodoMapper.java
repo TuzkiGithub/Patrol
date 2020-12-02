@@ -1,8 +1,9 @@
 package tech.piis.modules.workflow.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import tech.piis.common.exception.BaseException;
 import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
-import tech.piis.modules.workflow.domain.po.WfWorkflowNodePO;
+import tech.piis.modules.workflow.domain.vo.TodoCountVO;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,4 +14,12 @@ import tech.piis.modules.workflow.domain.po.WfWorkflowNodePO;
  * Description:代办mapper
  */
 public interface WfWorkflowTodoMapper extends BaseMapper<WfWorkFlowTodoPO> {
+
+    /**
+     * 查询代办，已办数量
+     * @param wfWorkFlowTodoPO
+     * @return
+     * @throws BaseException
+     */
+    TodoCountVO selectCount(WfWorkFlowTodoPO wfWorkFlowTodoPO) throws BaseException;
 }

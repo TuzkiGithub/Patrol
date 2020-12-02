@@ -1,6 +1,5 @@
 package tech.piis.modules.core.domain.po;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -9,7 +8,6 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +22,7 @@ import java.util.List;
 @Data
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionConsultInfoPO extends PIBaseEntity {
+public class InspectionConsultInfoPO extends PIBaseApprovalEntityPO {
     /**
      * 查阅资料编号
      */
@@ -37,7 +35,7 @@ public class InspectionConsultInfoPO extends PIBaseEntity {
     /**
      * 被巡视单位ID
      */
-    private String unitsId;
+    private Long unitsId;
     /**
      * 组长是否签字
      */
@@ -70,12 +68,10 @@ public class InspectionConsultInfoPO extends PIBaseEntity {
     /**
      * 查询详情对象
      */
-    @Valid
     private List<InspectionConsultInfoDetailPO> consultInfoDetailList;
 
     /**
      * 文件信息
      */
-    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
 }

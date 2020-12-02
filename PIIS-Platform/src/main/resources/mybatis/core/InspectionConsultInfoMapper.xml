@@ -13,6 +13,9 @@
         <result property="checkPersonId" column="CHECK_PERSON_ID"/>
         <result property="checkPersonName" column="CHECK_PERSON_NAME"/>
         <result property="consultContent" column="CONSULT_CONTENT"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
         <result property="checkTime" column="CHECK_TIME"/>
         <result property="createdBy" column="CREATED_BY"/>
         <result property="createdTime" column="CREATED_TIME"/>
@@ -63,6 +66,9 @@
           c.CHECK_TIME,
           c.CREATED_BY,
           c.CREATED_TIME,
+          c.APPROVER_ID,
+          c.APPROVER_NAME,
+          c.APPROVAL_FLAG,
           c.UPDATED_BY,
           c.UPDATED_TIME,
           c.ENT_ID,
@@ -89,6 +95,9 @@
              CHECK_PERSON_NAME,
              CHECK_TIME,
              CONSULT_CONTENT,
+             APPROVER_ID,
+             APPROVER_NAME,
+             APPROVAL_FLAG,
              CREATED_BY,
              CREATED_TIME,
              UPDATED_BY,
@@ -97,9 +106,54 @@
        from inspection_consult_info
        where PLAN_ID =#{planId}
              and UNITS_ID = #{unitsId}
+      order by CREATED_TIME desc
        limit #{pageNum},#{pageSize}
      ) c
       left join inspection_consult_info_detail d on c.CONSULT_INFO_ID = d.CONSULT_INFO_ID
+    </select>
+
+    <select id="selectInspectionConsultInfoById" parameterType="java.lang.String"
+            resultMap="InspectionConsultInfoResult">
+        select
+          c.CONSULT_INFO_ID,
+          c.PLAN_ID,
+          c.SIGN_FLAG,
+          c.SIGN_TIME,
+          c.CHECK_PERSON_ID,
+          c.CHECK_PERSON_NAME,
+          c.CONSULT_CONTENT,
+          c.CHECK_TIME,
+          c.APPROVER_ID,
+          c.APPROVER_NAME,
+          c.APPROVAL_FLAG,
+          c.CREATED_BY,
+          c.CREATED_TIME,
+          c.UPDATED_BY,
+          c.UPDATED_TIME,
+          c.ENT_ID,
+          d.CONSULT_INFO_DETAIL_ID,
+          d.CHECK_INFO_NAME,
+          d.CHECK_INFO_COUNT,
+          d.CHECK_INFO_MATERIAL_TYPE,
+          d.CHECK_INFO_ORIGIN_TYPE,
+          d.TIME_LIMIT,
+          d.PROVIDER_ID,
+          d.PROVIDER_NAME,
+          d.PROVIDER_TIME,
+          d.RETURN_STATUS,
+          d.RETURN_PERSON_ID,
+          d.RETURN_PERSON_NAME,
+          d.RETURN_TIME,
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH
+      from inspection_consult_info c
+      left join inspection_consult_info_detail d on c.CONSULT_INFO_ID = d.CONSULT_INFO_ID
+      left join piis_document doc on concat('ConsultInfo', c.CONSULT_INFO_ID) = doc.OBJECT_ID
+      where c.CONSULT_INFO_ID = #{consultInfoId}
       order by c.CREATED_TIME desc
     </select>
 

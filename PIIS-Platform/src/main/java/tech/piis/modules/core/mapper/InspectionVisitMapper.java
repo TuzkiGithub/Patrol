@@ -19,4 +19,12 @@ public interface InspectionVisitMapper extends BaseMapper<InspectionVisitPO> {
      *
      */
     List<UnitsBizCountVO> selectInspectionVisitCount(String planId) throws BaseException;
+
+    /**
+     * 查询来访及文件
+     * @param inspectionVisitPO
+     * @return
+     * @throws BaseException
+     */
+    InspectionVisitPO selectVisitWithFile(InspectionVisitPO inspectionVisitPO) throws BaseException;
 }

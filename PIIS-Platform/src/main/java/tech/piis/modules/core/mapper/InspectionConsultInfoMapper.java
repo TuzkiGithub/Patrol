@@ -26,4 +26,12 @@ public interface InspectionConsultInfoMapper extends BaseMapper<InspectionConsul
      * @return
      */
     List<InspectionConsultInfoPO> selectInspectionConsultInfoList(InspectionConsultInfoPO inspectionConsultInfo);
+
+    /**
+     * 查询查阅资料
+     * @param consultId
+     * @return
+     * @throws BaseException
+     */
+    InspectionConsultInfoPO selectInspectionConsultInfoById(String consultId) throws BaseException;
 }
