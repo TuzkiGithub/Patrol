@@ -5,7 +5,7 @@
 
 <mapper namespace="tech.piis.modules.managment.mapper.RotationExchangeMapper">
     <!--轮岗交流-->
-    <resultMap id="rotationExchangeResultMap" type="tech.piis.modules.managment.domain.RotationExchangePO">
+    <resultMap id="rotationExchangeResultMap" type="tech.piis.modules.managment.domain.po.RotationExchangePO">
         <id property="rotationId" column="ROTATION_ID"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="rotationYear" column="ROTATION_YEAR"/>
@@ -31,6 +31,6 @@
         count(FIRSTBRANCH_ID) as amount
         from  rotation_exchange r
         JOIN sys_dept d on r.FIRSTBRANCH_ID = d.dept_id
-        group by FIRSTBRANCH_ID
+        group by FIRSTBRANCH_ID order by d.dept_id asc
     </select>
 </mapper>

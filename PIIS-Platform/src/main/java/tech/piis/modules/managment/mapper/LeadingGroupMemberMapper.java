@@ -1,7 +1,8 @@
 package tech.piis.modules.managment.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tech.piis.modules.managment.domain.LeadingGroupMemberPO;
+import tech.piis.modules.managment.domain.po.LeadingGroupFoundPO;
+import tech.piis.modules.managment.domain.po.LeadingGroupMemberPO;
 import tech.piis.modules.managment.domain.vo.InspectionInfoVO;
 
 import java.util.List;
@@ -16,4 +17,6 @@ import java.util.List;
 public interface LeadingGroupMemberMapper extends BaseMapper<LeadingGroupMemberPO> {
 
     List<InspectionInfoVO> queryLeadingInspectionInfo();
+
+    List<LeadingGroupFoundPO> selectMemberCount(String orgId);
 }

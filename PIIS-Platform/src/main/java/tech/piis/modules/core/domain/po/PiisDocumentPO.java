@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 /**
  * 巡视附件 对象 piis_document
  *
@@ -53,12 +55,10 @@ public class PiisDocumentPO extends PIBaseEntity {
      */
     private String filePath;
 
-
     /**  业务字段
      *   操作类型
      * 1 新增 3删除
      */
     @TableField(exist = false)
     private Integer operationType;
-
 }

@@ -1,4 +1,5 @@
 package tech.piis.modules.managment.domain.vo;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -31,7 +32,7 @@ public class DailyTrainingVO {
     /**
      * 培训地点(1413/1520/1201)
      */
-   // private String trainingPlace;
+    private String trainingPlace;
     /**
      * 职务
      */
@@ -39,9 +40,11 @@ public class DailyTrainingVO {
     /**
      * 开始时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date beginDate;
     /**
      * 结束时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 }

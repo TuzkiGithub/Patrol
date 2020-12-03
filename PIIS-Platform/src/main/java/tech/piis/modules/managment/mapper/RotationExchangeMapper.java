@@ -1,7 +1,7 @@
 package tech.piis.modules.managment.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tech.piis.modules.managment.domain.RotationExchangePO;
+import tech.piis.modules.managment.domain.po.RotationExchangePO;
 
 import java.util.List;
 

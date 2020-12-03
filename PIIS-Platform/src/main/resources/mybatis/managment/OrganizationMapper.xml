@@ -5,20 +5,94 @@
 <mapper namespace="tech.piis.modules.managment.mapper.OrganizationMapper">
 
     <!--机构ResultMap-->
-    <resultMap id="organizationResultMap" type="tech.piis.modules.managment.domain.Organization">
-        <id property="id" column="ID"/>
+    <resultMap id="organizationResultMap" type="tech.piis.modules.managment.domain.po.OrganizationPO">
+        <id property="orgId" column="ID"/>
         <result property="pid" column="PID"/>
         <result property="code" column="CODE"/>
         <result property="orgName" column="ORG_NAME"/>
         <result property="piisWholeName" column="PIIS_WHOLE_NAME"/>
-        <result property="createBy" column="CREATE_BY"/>
-        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createdBy" column="CREATE_BY"/>
+        <result property="createdTime" column="CREATE_TIME"/>
         <result property="updatedBy" column="UPDATED_BY"/>
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
     </resultMap>
+
+    <resultMap id="organizationVOResultMap" type="tech.piis.modules.managment.domain.vo.OrganizationVO">
+        <id property="orgId" column="ID"/>
+        <result property="orgName" column="org_name"/>
+        <result property="piisWholeName" column="piis_whole_name"/>
+        <result property="fullNumber" column="full_number"/>
+        <result property="partNumber" column="part_number"/>
+        <result property="sonInspectionOrgNumber" column="sonInspectionOrgNumber"/>
+        <result property="sonInspectionPeopleNumber" column="sonInspectionPeopleNumber"/>
+    </resultMap>
     <!--根据机构ID获取其所属巡察/巡视机构全称-->
     <select id="getInspectionOrganWholeName" resultType="String">
         select PIIS_WHOLE_NAME from orgnization where ID = #{organId}
+    </select>
+
+    <select id="selectListByOrgName" parameterType="String" resultMap="organizationVOResultMap">
+        select
+        aa.PIIS_WHOLE_NAME,
+        aa.FULL_NUMBER,
+        aa.PART_NUMBER,
+        aa.ID,
+        aa.ORG_NAME,
+        bb.sonInspectionPeopleNumber,
+        cc.sonInspectionOrgNumber
+        from (
+                  select o.PIIS_WHOLE_NAME,f.FULL_NUMBER,f.PART_NUMBER,o.ID,o.ORG_NAME
+                  from full_part_org f
+                  join organization o
+                  on f.ORG_ID = o.ID
+                  where ORG_ID in ( select org_id
+                                    from leading_group_found
+                                    <where>
+                                    <if test="orgName!=null and orgName!=''">
+                                      org_name like concat('%', #{orgName}, '%')
+                                    </if>
+                                    </where>
+                                  )
+                  ) aa
+                  right join (
+                        select
+                        f.FATHER_ORG_ID,count(f.FATHER_ORG_ID) as sonInspectionPeopleNumber
+                        from leading_group_member m
+                        join leading_group_found f
+                        on m.ORG_ID  = f.ORG_ID
+                        where m.ORG_ID in (
+                            select f.org_id
+                            from leading_group_found f
+                            JOIN (
+                                select *
+                                from leading_group_found
+                                <where>
+                                    <if test="orgName!=null and orgName!=''">
+                                      org_name like concat('%', #{orgName}, '%')
+                                    </if>
+                                </where>
+                                ) a
+                            on f.FATHER_ORG_ID = a.org_id
+                            ) GROUP BY f.FATHER_ORG_ID
+
+                  ) bb
+                  on aa.ID = bb.FATHER_ORG_ID
+                  right JOIN (
+                        select count(f.FATHER_ORG_ID) as sonInspectionOrgNumber ,f.FATHER_ORG_ID
+                        from leading_group_found f
+                        JOIN (
+                            select *
+                            from leading_group_found
+                            <where>
+                                <if test="orgName!=null and orgName!=''">
+                                      org_name like concat('%', #{orgName}, '%')
+                                </if>
+                            </where>
+                            ) a
+                  on f.FATHER_ORG_ID = a.org_id
+                  group by f.FATHER_ORG_ID
+                  ) cc on aa.ID = cc.FATHER_ORG_ID
+                  order by aa.ID asc
     </select>
 </mapper> 

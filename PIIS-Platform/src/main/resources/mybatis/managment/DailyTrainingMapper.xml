@@ -5,7 +5,7 @@
 
 <mapper namespace="tech.piis.modules.managment.mapper.DailyTrainingMapper">
     <!--日常培训ResultMap-->
-    <resultMap id="dailyTrainingResultMap" type="tech.piis.modules.managment.domain.DailyTrainingPO">
+    <resultMap id="dailyTrainingResultMap" type="tech.piis.modules.managment.domain.po.DailyTrainingPO">
         <id property="dailyId" column="DAILY_ID"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="initiator" column="INITIATOR"/>
@@ -30,10 +30,6 @@
         <result property="beginDate" column="BEGIN_DATE"/>
         <result property="endDate" column="END_DATE"/>
         <result property="memberPost" column="MEMBER_POST"/>
-        <!--<association property="dailyTrainingMember" javaType="tech.piis.modules.managment.domain.DailyTrainingMemberPO">
-            <id column="MEMBER_ID" property="memberId" />
-
-        </association>-->
     </resultMap>
     <!--sql语句-->
     <!--日常培训总览根据机构ID分组-->
@@ -41,10 +37,10 @@
         select
         DAILY_ID,
         d.dept_name as FIRST_BRANCH_ID,
-        count(ORG_ID) as trainingNumber
+        count(ORG_ID) as amount
         from  daily_training b
         join  sys_dept d on b.ORG_ID = d.dept_id
-        group by ORG_ID
+        group by ORG_ID order by d.dept_id asc
 
     </select>
     <select id="selectDailyTrainingListByConditions" resultMap="dailyTrainingResultMap">
@@ -60,17 +56,18 @@
         from daily_training_member t
         join daily_training d on t.daily_id = d.daily_id
         <where>
-            <if test="initiator != null and initiator !=''">
+            <!--<if test="initiator != null and initiator !=''">
                 INITIATOR = #{initiator}
-            </if>
+            </if>-->
             <if test="trainingName != null and trainingName != ''">
-                and TRAINING_NAME like concat('%', #{trainingName}, '%')
+                 TRAINING_NAME like concat('%', #{trainingName}, '%')
             </if>
-            <if test="trainingYear != null">
+            <if test="trainingYear != null and trainingYear != ''">
                 and TRAINING_YEAR = #{trainingYear}
             </if>
         </where>
-        group by  daily_id
+        group by daily_id
+        order by d.TRAINING_YEAR desc
     </select>
     <select id="selectDailyTrainingInfo" resultMap="dailyTrainingInfoResultMap">
         select

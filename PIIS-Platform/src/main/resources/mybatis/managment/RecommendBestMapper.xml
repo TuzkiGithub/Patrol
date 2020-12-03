@@ -6,7 +6,7 @@
 <mapper namespace="tech.piis.modules.managment.mapper.RecommendBestMapper">
 
     <!--择优推荐-->
-    <resultMap id="recommendBestResultMap" type="tech.piis.modules.managment.domain.RecommendBestPO">
+    <resultMap id="recommendBestResultMap" type="tech.piis.modules.managment.domain.po.RecommendBestPO">
         <id property="recommendId" column="RECOMMEND_ID"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="recommendYear" column="RECOMMEND_YEAR"/>

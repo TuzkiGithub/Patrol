@@ -1,6 +1,6 @@
 package tech.piis.modules.managment.service;
 
-import tech.piis.modules.managment.domain.MemberResumePO;
+import tech.piis.modules.managment.domain.po.MemberResumePO;
 
 /**
  * ClassName : IMemberResume

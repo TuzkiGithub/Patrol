@@ -7,16 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.piis.common.constant.ManagmentConstants;
-import tech.piis.modules.managment.domain.RotationExchangePO;
+import tech.piis.common.exception.BaseException;
+import tech.piis.modules.managment.domain.po.RotationExchangePO;
 import tech.piis.modules.managment.mapper.RotationExchangeMapper;
 import tech.piis.modules.managment.service.IRotationExchangeService;
 import tech.piis.modules.system.domain.SysDept;
 import tech.piis.modules.system.mapper.SysDeptMapper;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ClassName : IRotationExchangeServiceImpl
@@ -41,7 +39,7 @@ public class RotationExchangeServiceImpl implements IRotationExchangeService {
      * @return
      */
     @Override
-    public List<RotationExchangePO> selectRecommendListByOrgId() {
+    public List<RotationExchangePO> selectRecommendListByOrgId() throws BaseException {
         return rotationExchangeMapper.selectRecommendListByOrgId();
     }
 
@@ -52,12 +50,15 @@ public class RotationExchangeServiceImpl implements IRotationExchangeService {
      * @return
      */
     @Override
-    public List<RotationExchangePO> selectRotationList(RotationExchangePO rotationExchangePO) {
+    public List<RotationExchangePO> selectRotationList(RotationExchangePO rotationExchangePO) throws BaseException {
         QueryWrapper<RotationExchangePO> queryWrapper = new QueryWrapper<>();
-        Map<String,Object> paramMap = new HashMap<>();
+        queryWrapper.like(StringUtils.isNotBlank(rotationExchangePO.getMemberName()), "member_name", rotationExchangePO.getMemberName());
+        queryWrapper.like(StringUtils.isNotBlank(rotationExchangePO.getMemberUnit()), "member_unit", rotationExchangePO.getMemberUnit());
+        queryWrapper.orderByDesc("created_time");
+        /*Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("member_name", rotationExchangePO.getMemberName());
         paramMap.put("member_unit", rotationExchangePO.getMemberUnit());
-        queryWrapper.allEq(paramMap,false);
+        queryWrapper.allEq(paramMap,false);*/
         return rotationExchangeMapper.selectList(queryWrapper);
     }
 
@@ -68,7 +69,7 @@ public class RotationExchangeServiceImpl implements IRotationExchangeService {
      * @return
      */
     @Override
-    public int saveRotationExchange(RotationExchangePO rotationExchangePO) {
+    public int saveRotationExchange(RotationExchangePO rotationExchangePO) throws BaseException {
         String parentId = rotationExchangePO.getOrgId();
         if (!ManagmentConstants.FIRST_BRANCH_UNION_ID.contains(parentId)) {
             parentId = getParentId(rotationExchangePO.getOrgId());
@@ -94,7 +95,7 @@ public class RotationExchangeServiceImpl implements IRotationExchangeService {
      * @return
      */
     @Override
-    public int delRotationByIds(String[] ids) {
+    public int delRotationByIds(String[] ids) throws BaseException {
         List<String> list = Arrays.asList(ids);
         return rotationExchangeMapper.deleteBatchIds(list);
     }
@@ -106,7 +107,7 @@ public class RotationExchangeServiceImpl implements IRotationExchangeService {
      * @return
      */
     @Override
-    public int update(RotationExchangePO rotationExchangePO) {
+    public int update(RotationExchangePO rotationExchangePO) throws BaseException {
         return rotationExchangeMapper.updateById(rotationExchangePO);
     }
 

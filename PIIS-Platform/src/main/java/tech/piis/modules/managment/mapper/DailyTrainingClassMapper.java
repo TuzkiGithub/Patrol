@@ -1,7 +1,9 @@
 package tech.piis.modules.managment.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tech.piis.modules.managment.domain.DailyTrainingClassPO;
+import tech.piis.modules.managment.domain.po.DailyTrainingClassPO;
+
+import java.util.List;
 
 
 /**
@@ -12,4 +14,5 @@ import tech.piis.modules.managment.domain.DailyTrainingClassPO;
  * @author : chenhui@xvco.com
  */
 public interface DailyTrainingClassMapper extends BaseMapper<DailyTrainingClassPO> {
+    int insertBatch(List<DailyTrainingClassPO> classPOS);
 }

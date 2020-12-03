@@ -1,5 +1,6 @@
-package tech.piis.modules.managment.domain;
+package tech.piis.modules.managment.domain.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -23,13 +24,19 @@ import java.util.Date;
 @TableName("daily_training_member")
 public class DailyTrainingMemberPO extends MABaseEntity{
     /**
+     * 编号
+     */
+    @TableId(value = "id",type = IdType.AUTO)
+    private Long id;
+    /**
      *  培训人员编号
      */
-    @TableId("member_id")
+    @NotEmpty(message = "培训人员编号不能为空")
     private String memberId;
     /**
      * 日常培训编号
      */
+    @NotEmpty(message = "日常培训编号不能为空")
     private String dailyId;
     /**
      * 分组名
@@ -76,9 +83,9 @@ public class DailyTrainingMemberPO extends MABaseEntity{
      */
     @NotNull(message = "出生日期不能为空")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date birthDay;
+    private Date birthday;
     /**
-     * 电话号码
+     * 电话号码d
      */
     @Pattern(regexp = "/^[1][3,4,5,7,8][0-9]{9}$/",message = "手机号码格式不正确")
     @NotBlank(message = "电话号码不能为空")

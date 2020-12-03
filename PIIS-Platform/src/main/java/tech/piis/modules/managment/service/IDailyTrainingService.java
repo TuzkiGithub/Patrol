@@ -1,6 +1,6 @@
 package tech.piis.modules.managment.service;
 
-import tech.piis.modules.managment.domain.DailyTrainingPO;
+import tech.piis.modules.managment.domain.po.DailyTrainingPO;
 
 import java.util.List;
 

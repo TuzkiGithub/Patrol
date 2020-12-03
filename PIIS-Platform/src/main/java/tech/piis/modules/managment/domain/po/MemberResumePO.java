@@ -1,14 +1,18 @@
-package tech.piis.modules.managment.domain;
+package tech.piis.modules.managment.domain.po;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ClassName : MemberResumePO
@@ -20,10 +24,11 @@ import java.util.Date;
 @Data
 @TableName("member_resume")
 public class MemberResumePO extends MABaseEntity{
+
     /**
      * 个人编号
      */
-    @TableId("member_id")
+    @TableId(value = "member_id")
     private String memberId;
     /**
      * 个人编码
@@ -112,8 +117,8 @@ public class MemberResumePO extends MABaseEntity{
     /**
      * 全日制学位
      */
-    @NotBlank(message = "全日制学位不能为空")
-    private String fullTimeGrade;
+    @NotBlank(message = "全日制专业不能为空")
+    private String fullTimeProfession;
     /**
      * 全日制学历
      */
@@ -121,21 +126,21 @@ public class MemberResumePO extends MABaseEntity{
     private String fullTimeEducation;
     /**
      *
-     * 非全日制毕业学校
+     * 在职教育毕业学校
      */
-    @NotBlank(message = "非全日制毕业学校不能为空")
+//    @NotBlank(message = "在职教育毕业学校不能为空")
     private String partTimeSchool;
     /**
      *
-     * 非全日制学位
+     * 在职教育专业
      */
-    @NotBlank(message = "非全日制学位不能为空")
-    private String partTimeGrade;
+//    @NotBlank(message = "在职教育专业不能为空")
+    private String partTimeProfession;
     /**
      *
-     * 非全日制学历
+     * 在职教育学历
      */
-    @NotBlank(message = "非全日制学历不能为空")
+//    @NotBlank(message = "在职教育学历不能为空")
     private String partTimeEducation;
     /**
      *
@@ -159,11 +164,18 @@ public class MemberResumePO extends MABaseEntity{
     /**
      * 任命文件编号
      */
+    @TableField(exist = false)
     private String appointDocuId;
     /**
      * 角色
      */
-    private String memberRole;
+    @TableField(exist = false)
+    private String role;
+    /**
+     * 任命文件
+     */
+    @TableField(exist = false)
+    private List<PiisDocumentPO> appointDocuPOs;
     /**
      *
      * 全日制毕业学校
@@ -173,11 +185,24 @@ public class MemberResumePO extends MABaseEntity{
      *
      * 全日制学位
      */
-    private String fullTimeGrade1;
+    private String fullTimeProfession1;
     /**
      *
      * 全日制学历
      */
     private String fullTimeEducation1;
-;
+    /**
+     * 操作类型 1---新增 2---修改 3---删除
+     */
+    @TableField(exist = false)
+    private Integer operationType;
+
+    @TableField(exist = false)
+    private String leadingMemberId;
+
+    @TableField(exist = false)
+    private String inspectionMemberId;
+
+    @TableField(exist = false)
+    private Map<String, Object> memberBasicMap;
 }

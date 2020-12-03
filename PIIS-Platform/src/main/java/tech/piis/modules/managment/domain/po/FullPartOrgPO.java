@@ -1,6 +1,5 @@
-package tech.piis.modules.managment.domain;
+package tech.piis.modules.managment.domain.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,8 +9,6 @@ import tech.piis.modules.core.domain.po.PiisDocumentPO;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,8 +25,8 @@ public class FullPartOrgPO extends MABaseEntity {
     /**
      * 专兼职管理编号
      */
-    @TableId(value = "full_id",type = IdType.AUTO)
-    private Long fullId;
+    @TableId(value = "full_part_id")
+    private String fullPartId;
     /**
      * 机构编号
      */
@@ -43,8 +40,8 @@ public class FullPartOrgPO extends MABaseEntity {
     /**
      *  是否拥有领导小组 0-->有 1-->无
      */
-    @NotEmpty(message = "领导小组拥有信息不能为空")
-    private String isLeading;
+//    @NotEmpty(message = "领导小组拥有信息不能为空")
+//    private String isLeading;
     /**
      * 巡察办设立模式 0--> 单独设立 1--> 合署办公
      */
@@ -61,22 +58,28 @@ public class FullPartOrgPO extends MABaseEntity {
     @NotNull(message = "兼职人数不能为空")
     private Integer partNumber;
     /**
-     * 巡察要点
+     * 巡察/巡视要点文件编号
      */
     @NotEmpty(message = "巡察要点不能为空")
-    private String inspectionPoint;
+    private String inspectionPointId;
     /**
-     * 备注
+     * 巡察/巡视要点文件
      */
-    private String remark;
+    @TableField(exist = false)
+    private List<PiisDocumentPO> inspectionPointDocs;
     /**
      * 巡察制度文件编号
      */
     @NotNull(message = "巡察制度文件编号不能为空")
-    private Long piisDocId;
+    private String inspectionSystemId;
     /**
-     * 巡察制度文件名称
+     * 巡察制度文件
      */
     @TableField(exist = false)
-    private String fileName;
+    private List<PiisDocumentPO> inspectionSystemDocs;
+    /**
+     * 备注
+     */
+    private String remark;
+
 }

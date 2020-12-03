@@ -2,12 +2,12 @@ package tech.piis.modules.managment.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.piis.common.constant.ManagmentConstants;
-import tech.piis.modules.managment.domain.RecommendBestPO;
+import tech.piis.common.exception.BaseException;
+import tech.piis.modules.managment.domain.po.RecommendBestPO;
 import tech.piis.modules.managment.mapper.RecommendBestMapper;
 import tech.piis.modules.managment.service.IRecommendBestService;
 import tech.piis.modules.system.domain.SysDept;
@@ -40,7 +40,7 @@ public class RecommendBestServiceImpl implements IRecommendBestService {
      * @return
      */
     @Override
-    public int saveRecommendBest(RecommendBestPO recommendBestPO) {
+    public int saveRecommendBest(RecommendBestPO recommendBestPO) throws BaseException {
         String parentId = recommendBestPO.getOrgId();
         if (!ManagmentConstants.FIRST_BRANCH_UNION_ID.contains(parentId)) {
             parentId = getParentId(recommendBestPO.getOrgId());
@@ -65,7 +65,7 @@ public class RecommendBestServiceImpl implements IRecommendBestService {
      * @return
      */
     @Override
-    public int delRecommendByIds(String[] ids) {
+    public int delRecommendByIds(String[] ids) throws BaseException {
         List<String> idList = Arrays.asList(ids);
         return recommendBestMapper.deleteBatchIds(idList);
     }
@@ -77,7 +77,7 @@ public class RecommendBestServiceImpl implements IRecommendBestService {
      * @return
      */
     @Override
-    public RecommendBestPO getRecommendById(String id) {
+    public RecommendBestPO getRecommendById(String id) throws BaseException {
         return recommendBestMapper.selectById(id);
     }
 
@@ -88,14 +88,14 @@ public class RecommendBestServiceImpl implements IRecommendBestService {
      * @return
      */
     @Override
-    public List<RecommendBestPO> selectRecommendList(RecommendBestPO recommendBestPO) {
+    public List<RecommendBestPO> selectRecommendList(RecommendBestPO recommendBestPO) throws BaseException {
         QueryWrapper<RecommendBestPO> queryWrapper = new QueryWrapper<>();
-        Map<String,Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("MEMBER_NAME", recommendBestPO.getMemberName());
         paramMap.put("MEMBER_UNIT", recommendBestPO.getMemberUnit());
         paramMap.put("RECOMMEND_YEAR", recommendBestPO.getRecommendYear());
         paramMap.put("RECOMMEND_TYPE", recommendBestPO.getRecommendType());
-        queryWrapper.allEq(paramMap,false);
+        queryWrapper.allEq(paramMap, false);
         return recommendBestMapper.selectList(queryWrapper);
     }
 
@@ -105,7 +105,7 @@ public class RecommendBestServiceImpl implements IRecommendBestService {
      * @return
      */
     @Override
-    public List<RecommendBestPO> selectRecommendListByOrgId() {
+    public List<RecommendBestPO> selectRecommendListByOrgId() throws BaseException {
 
         return recommendBestMapper.selectRecommendListByOrgId();
     }
@@ -117,7 +117,7 @@ public class RecommendBestServiceImpl implements IRecommendBestService {
      * @return
      */
     @Override
-    public int update(RecommendBestPO recommendBestPO) {
+    public int update(RecommendBestPO recommendBestPO) throws BaseException {
         return recommendBestMapper.updateById(recommendBestPO);
     }
 

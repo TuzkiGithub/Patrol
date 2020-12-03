@@ -235,7 +235,7 @@
                 AND date_format(p.CREATED_TIME,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
         </where>
-        group by p.PLAN_COMPANY_ID;
+        group by p.PLAN_COMPANY_ID order by p.PLAN_COMPANY_ID asc;
     </select>
 
 
@@ -256,7 +256,7 @@
           case when g.CONNECTOR_ID = #{userId}
             then '联络员' end as connectorPost,
           null             as memberPost,
-          BEGIN_TIME,
+          BEGIN_TIME ,
           END_TIME
         from inspection_plan p, inspection_group g
         where p.PLAN_ID = g.PLAN_ID
@@ -277,7 +277,7 @@
           null             as connectorPost,
           case when MEMBER_ID = #{userId}
             then '组员' end as memberPost,
-          BEGIN_TIME,
+          BEGIN_TIME ,
           END_TIME
         from inspection_plan p, inspection_group g, inspection_group_member m
         where p.PLAN_ID = g.PLAN_ID

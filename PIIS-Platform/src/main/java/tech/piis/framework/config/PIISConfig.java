@@ -100,4 +100,12 @@ public class PIISConfig
     {
         return getProfile();
     }
+
+    /**
+     * 获取人员履历照片上传路径
+     */
+    public static String getPhotoPath()
+    {
+        return getProfile() + "/photo";
+    }
 }

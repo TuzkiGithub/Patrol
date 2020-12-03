@@ -2,6 +2,8 @@ package tech.piis.modules.managment.domain.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * ClassName : InspectionInfoVO
  * Package : tech.piis.modules.managment.domain.vo
@@ -23,4 +25,8 @@ public class InspectionInfoVO {
      * 所属巡察机构人员数量
      */
     private Integer memberNum;
+    /**
+     *
+     */
+//    private GroupMemberVO groupMemberVO;
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tech.piis.modules.managment.mapper.DailyTrainingClassMapper">
+
+    <!--sql语句-->
+    <resultMap id="dailyTrainingClassResultMap" type="tech.piis.modules.managment.domain.po.DailyTrainingClassPO">
+        <id property="classId" column="class_id"/>
+        <result property="trainingDate" column="training_date"/>
+        <result property="dailyId" column="daily_id"/>
+        <result property="trainingTime" column="training_time"/>
+        <result property="trainingSection" column="training_section"/>
+        <result property="lecturer" column="lecturer"/>
+        <result property="lecturerUnit" column="lecturer_unit"/>
+        <result property="lecturerPost" column="lecturer_post"/>
+        <result property="lecturerPlace" column="lecturer_place"/>
+        <result property="members" column="members"/>
+    </resultMap>
+    <insert id="insertBatch" parameterType="tech.piis.modules.managment.domain.po.DailyTrainingClassPO">
+        insert into
+        daily_training_class(class_id,training_date,daily_id,training_time,training_section,lecturer,lecturer_unit,lecturer_post,lecturer_place,members) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.classId},
+            #{item.trainingDate},#{item.dailyId},#{item.trainingTime},#{item.trainingSection},#{item.lecturer},#{item.lecturerUnit},#{item.lecturerPost},#{item.lecturerPlace},#{item.members})
+        </foreach>
+    </insert>
+</mapper>

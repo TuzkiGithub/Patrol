@@ -1,4 +1,4 @@
-package tech.piis.modules.managment.domain;
+package tech.piis.modules.managment.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -50,8 +50,8 @@ public class DailyTrainingPO extends MABaseEntity{
      * 培训年度
      */
     @NotNull(message = "培训年度不能为空")
-    @JsonFormat(pattern = "yyyy")
-    private Date trainingYear;
+//    @JsonFormat(pattern = "yyyy")
+    private String trainingYear;
     /**
      * 培训类型 0--中央培训，1--内部培训
      */
@@ -93,7 +93,24 @@ public class DailyTrainingPO extends MABaseEntity{
     @TableField(exist = false)
     @NotEmpty(message = "培训人员不能为空")
     private List<DailyTrainingMemberPO> memberPOS;
-
+    /**
+     * 参与培训人数
+     */
     @TableField(exist = false)
     private Integer trainingNumber;
+    /**
+     * 单位发起培训次数
+     */
+    @TableField(exist = false)
+    private Integer amount;
+    /**
+     * 删除人员编号数组
+     */
+    @TableField(exist = false)
+    private Integer[] memberDelete;
+    /**
+     * 删除课程编号数组
+     */
+    @TableField(exist = false)
+    private Integer[] classDelete;
 }

@@ -5,13 +5,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
+import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.SecurityUtils;
 import tech.piis.framework.web.controller.BaseController;
 import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.framework.web.page.TableDataInfo;
-import tech.piis.modules.managment.domain.RecommendBestPO;
+import tech.piis.modules.managment.domain.po.RecommendBestPO;
 import tech.piis.modules.managment.service.IRecommendBestService;
 import tech.piis.modules.system.service.ISysDeptService;
 
@@ -41,19 +42,20 @@ public class RecommendBestController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('managment:recommend:query')")
     @GetMapping("/count")
-    public TableDataInfo count(){
+    public TableDataInfo count() throws BaseException {
 
         startPage();
         List<RecommendBestPO> recommendBestPOList = iRecommendBestService.selectRecommendListByOrgId();
         return getDataTable(recommendBestPOList);
     }
+
     /**
      * 根据择优推荐ID查询择优推荐
      */
     @PreAuthorize("@ss.hasPermi('managment:recommend:query')")
     @GetMapping("/{id}")
-    public AjaxResult getRecommendById(@PathVariable String id) throws Exception {
-        if (StringUtils.isEmpty(id)){
+    public AjaxResult getRecommendById(@PathVariable String id) throws BaseException {
+        if (StringUtils.isEmpty(id)) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
         RecommendBestPO recommendBestPO = iRecommendBestService.getRecommendById(id);
@@ -65,7 +67,7 @@ public class RecommendBestController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('managment:recommend:query')")
     @GetMapping("/list")
-    public TableDataInfo getRecommendByConditions(RecommendBestPO recommendBestPO) throws Exception {
+    public TableDataInfo getRecommendByConditions(RecommendBestPO recommendBestPO) throws BaseException {
         startPage();
         List<RecommendBestPO> recommendList = iRecommendBestService.selectRecommendList(recommendBestPO);
         return getDataTable(recommendList);
@@ -76,7 +78,7 @@ public class RecommendBestController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('managment:recommend:add')")
     @PostMapping
-    public AjaxResult add(@Valid @RequestBody RecommendBestPO recommendBestPO) throws Exception {
+    public AjaxResult add(@Valid @RequestBody RecommendBestPO recommendBestPO) throws BaseException {
         if (null == recommendBestPO) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
@@ -90,7 +92,7 @@ public class RecommendBestController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('managment:recommend:remove')")
     @DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable String[] ids) {
+    public AjaxResult remove(@PathVariable String[] ids) throws BaseException {
         if (ids.length == 0) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
@@ -102,7 +104,7 @@ public class RecommendBestController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('managment:recommend:edit')")
     @PutMapping
-    public AjaxResult edit(@Valid @RequestBody RecommendBestPO recommendBestPO){
+    public AjaxResult edit(@Valid @RequestBody RecommendBestPO recommendBestPO) throws BaseException {
         recommendBestPO.setUpdatedBy(SecurityUtils.getUsername());
         recommendBestPO.setUpdatedTime(DateUtils.getNowDate());
         return toAjax(iRecommendBestService.update(recommendBestPO));

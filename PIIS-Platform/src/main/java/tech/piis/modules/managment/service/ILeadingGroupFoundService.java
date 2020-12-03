@@ -1,10 +1,8 @@
 package tech.piis.modules.managment.service;
 
-import tech.piis.modules.managment.domain.LeadingGroupFoundPO;
 import tech.piis.modules.managment.domain.vo.InspectionInfoVO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * ClassName : ILeadingGroupFoundService
@@ -19,7 +17,7 @@ public interface ILeadingGroupFoundService {
      * @param leadingGroupFoundPO
      * @return
      */
-    int save(LeadingGroupFoundPO leadingGroupFoundPO);
+//    int save(LeadingGroupFoundPO leadingGroupFoundPO);
 
     /**
      * 子公司巡察机构、人员数量预览

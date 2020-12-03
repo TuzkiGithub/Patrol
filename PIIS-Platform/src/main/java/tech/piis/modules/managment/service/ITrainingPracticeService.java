@@ -1,7 +1,7 @@
 package tech.piis.modules.managment.service;
 
 
-import tech.piis.modules.managment.domain.TrainingPracticePO;
+import tech.piis.modules.managment.domain.po.TrainingPracticePO;
 
 import java.util.List;
 

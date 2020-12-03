@@ -1,9 +1,12 @@
-package tech.piis.modules.managment.domain;
+package tech.piis.modules.managment.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
+
+import java.util.List;
 
 /**
  * ClassName : LeadingGroupMemberPO
@@ -16,15 +19,19 @@ import lombok.Data;
 @TableName("leading_group_member")
 public class LeadingGroupMemberPO extends MABaseEntity{
     /**
+     *  编号
+     */
+    @TableId(value = "leading_member_id")
+    private String leadingMemberId;
+    /**
      *
      * 人员编号
      */
-    @TableId("member_id")
     private String memberId;
     /**
      * 所属领导小组编号
      */
-    private Long leadingGroupId;
+    private String leadingGroupId;
     /**
      * 机构编号
      */
@@ -41,19 +48,18 @@ public class LeadingGroupMemberPO extends MABaseEntity{
      * 角色
      */
     private String memberRole;
-    /**
-     * 专兼职
-     */
-//    private String fullOrPart;
-    /**
-     * 任命文件编号
-     */
-    private String appointDocumentId;
 
-//    private String memberType;
     /**
      * 不同机构所属人员数量
      */
     @TableField(exist = false)
     private Integer memberNum;
+
+    /**
+     * 任命文件
+     */
+    @TableField(exist = false)
+    private List<PiisDocumentPO> piisDocumentPO;
+
+
 }

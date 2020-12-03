@@ -1,6 +1,6 @@
 package tech.piis.modules.managment.service;
 
-import tech.piis.modules.managment.domain.RecommendBestPO;
+import tech.piis.modules.managment.domain.po.RecommendBestPO;
 
 import java.util.List;
 

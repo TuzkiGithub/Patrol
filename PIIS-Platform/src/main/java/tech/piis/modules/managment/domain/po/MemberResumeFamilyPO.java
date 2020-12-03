@@ -1,4 +1,4 @@
-package tech.piis.modules.managment.domain;
+package tech.piis.modules.managment.domain.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

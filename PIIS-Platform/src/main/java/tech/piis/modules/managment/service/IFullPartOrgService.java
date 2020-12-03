@@ -1,6 +1,6 @@
 package tech.piis.modules.managment.service;
 
-import tech.piis.modules.managment.domain.FullPartOrgPO;
+import tech.piis.modules.managment.domain.po.FullPartOrgPO;
 
 import java.util.List;
 
@@ -35,8 +35,8 @@ public interface IFullPartOrgService {
 
     /**
      * 查询专兼职管理
-     * @param fullPartOrgPO
+     * @param OrgName
      * @return
      */
-    List<FullPartOrgPO> selectByWholeName(FullPartOrgPO fullPartOrgPO);
+    List<FullPartOrgPO> selectByWholeName(String OrgName);
 }

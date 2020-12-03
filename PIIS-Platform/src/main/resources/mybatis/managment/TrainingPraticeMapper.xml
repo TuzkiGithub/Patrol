@@ -5,7 +5,7 @@
 
 <mapper namespace="tech.piis.modules.managment.mapper.TrainingPracticeMapper">
     <!--以干代训-->
-    <resultMap id="trainingPracticeResultMap" type="tech.piis.modules.managment.domain.TrainingPracticePO">
+    <resultMap id="trainingPracticeResultMap" type="tech.piis.modules.managment.domain.po.TrainingPracticePO">
         <id property="practiceId" column="PRACTICE_ID"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="practiceYear" column="PRACTICE_YEAR"/>
@@ -32,7 +32,7 @@
         count(FIRSTBRANCH_ID) as amount
         from  training_practice p
         join sys_dept s on p.FIRSTBRANCH_ID = s.DEPT_ID
-        group by FIRSTBRANCH_ID
+        group by FIRSTBRANCH_ID order by s.DEPT_ID asc
     </select>
     <!--根据条件动态查询以干代训-->
     <!--<select id="selectListByConditions" resultMap="trainingPracticeResultMap">

@@ -1,6 +1,5 @@
-package tech.piis.modules.managment.domain;
+package tech.piis.modules.managment.domain.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -27,11 +26,12 @@ public class DailyTrainingClassPO extends MABaseEntity{
     /**
      * 培训课程编号
      */
-    @TableId(value = "class_id",type= IdType.AUTO)
-    private Long classId;
+    @TableId(value = "class_id")
+    private String classId;
     /**
      * 日常培训编号
      */
+    @NotBlank(message = "日常培训编号不能为空")
     private String dailyId;
     /**
      * 培训日期
@@ -62,7 +62,7 @@ public class DailyTrainingClassPO extends MABaseEntity{
     /**
      * 授课人职位
      */
-    @NotBlank(message = "授课人职位不能为空")
+//    @NotBlank(message = "授课人职位不能为空")
     private String lecturerPost;
     /**
      * 授课地点
@@ -72,16 +72,21 @@ public class DailyTrainingClassPO extends MABaseEntity{
     /**
      * 参与人员
      */
-    @NotBlank(message = "参与人员不能为空")
+    @NotEmpty(message = "参与人员不能为空")
+    @TableField(exist = false)
+    private List<String> memberList;
+    /**
+     * 参与人员
+     */
     private String members;
-
     /**
      * 课件编号
      */
-    private String piisDocuId;
+//    private String piisDocuId;
 
-    @TableField(exist = false)
+
     @NotEmpty(message = "课件文件对象不能为空")
+    @TableField(exist = false)
     private List<PiisDocumentPO> piisDocumentPOS;
     /**
      * 操作类型 (1--新增  2--修改 3--删除)

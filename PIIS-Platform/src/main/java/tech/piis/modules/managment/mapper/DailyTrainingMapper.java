@@ -1,7 +1,7 @@
 package tech.piis.modules.managment.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import tech.piis.modules.managment.domain.DailyTrainingPO;
+import tech.piis.modules.managment.domain.po.DailyTrainingPO;
 import tech.piis.modules.managment.domain.vo.DailyTrainingVO;
 
 import java.util.List;

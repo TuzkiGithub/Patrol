@@ -5,11 +5,11 @@
 
 <mapper namespace="tech.piis.modules.managment.mapper.FullPartOrgMapper">
     <!--专兼职管理ResultMap-->
-    <resultMap id="fullPartOrgResultMap" type="tech.piis.modules.managment.domain.FullPartOrgPO">
-        <id property="id" column="ID"/>
+    <resultMap id="fullPartOrgResultMap" type="tech.piis.modules.managment.domain.po.FullPartOrgPO">
+        <id property="fullPartId" column="ID"/>
         <result property="orgId" column="ORG_ID"/>
         <result property="orgName" column="ORG_NAME"/>
-        <result property="isLeading" column="IS_LEADING"/>
+        <!--<result property="isLeading" column="IS_LEADING"/>-->
         <result property="officeMode" column="OFFICE_MODE"/>
         <result property="fullNumber" column="FULL_NUMBER"/>
         <result property="partNumber" column="PART_NUMBER"/>
