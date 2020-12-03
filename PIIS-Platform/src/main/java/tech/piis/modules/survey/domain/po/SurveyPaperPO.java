@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -56,46 +57,54 @@ public class SurveyPaperPO extends PIBaseEntity {
      * 答题开始时间
      */
     @Excel(name = "答题开始时间", orderNum = "2", width = 25, needMerge = true)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
     /**
      * 答题截至时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "答题截至时间", orderNum = "3", width = 25, needMerge = true)
     private Date endDate;
 
     /**
      * 题目列表
      */
-    @NotEmpty(message = "题目列表不能为空！")
+//    @NotEmpty(message = "题目列表不能为空！")
     private List<SurveyQuestionPO> questionList;
+
+    /**
+     * 题目ID数组
+     */
+    @TableField(exist = false)
+    private String[] questionIds;
 
     /**
      * 单选题数量
      */
     @TableField(exist = false)
-    private Integer singleCount;
+    private Integer singleCount = 1;
 
     /**
      * 多选题数量
      */
     @TableField(exist = false)
-    private Integer doubleCount;
+    private Integer doubleCount = 1;
 
     /**
      * 判断题数量
      */
     @TableField(exist = false)
-    private Integer judgeCount;
+    private Integer judgeCount = 1;
 
     /**
      * 填空题数量
      */
     @TableField(exist = false)
-    private Integer blankCount;
+    private Integer blankCount = 1;
 
     /**
      * 简答题数量
      */
     @TableField(exist = false)
-    private Integer qaCount;
+    private Integer qaCount = 1;
 }

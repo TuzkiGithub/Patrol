@@ -5,6 +5,48 @@
 <mapper namespace="tech.piis.modules.core.mapper.InspectionVisitMapper">
 
 
+    <resultMap type="InspectionVisitPO" id="InspectionVisitResult">
+        <result property="visitId" column="VISIT_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="visitTime" column="VISIT_TIME"/>
+        <result property="visitCompanyId" column="VISIT_COMPANY_ID"/>
+        <result property="visitCompanyName" column="VISIT_COMPANY_NAME"/>
+        <result property="visitPersonId" column="VISIT_PERSON_ID"/>
+        <result property="visitPersonName" column="VISIT_PERSON_NAME"/>
+        <result property="visitPersonPost" column="VISIT_PERSON_POST"/>
+        <result property="visitOrigin" column="VISIT_ORIGIN"/>
+        <result property="cadreFlag" column="CADRE_FLAG"/>
+        <result property="visitSummary" column="VISIT_SUMMARY"/>
+        <result property="agentId" column="AGENT_ID"/>
+        <result property="agentName" column="AGENT_NAME"/>
+        <result property="agentTime" column="AGENT_TIME"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
+        <collection property="documents" javaType="java.util.List" resultMap="documentResultMap"/>
+    </resultMap>
+
+
+    <resultMap id="documentResultMap" type="PiisDocumentPO">
+        <result property="piisDocId" column="PIIS_DOC_ID"/>
+        <result property="objectId" column="OBJECT_ID"/>
+        <result property="fileDictId" column="FILE_DICT_ID"/>
+        <result property="fileName" column="FILE_NAME"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+        <result property="filePath" column="FILE_PATH"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
         <result property="unitsId" column="units_id"/>
         <result property="orgId" column="org_id"/>
@@ -25,17 +67,28 @@
                 from inspection_visit v
                 where v.PLAN_ID = #{planId}
                       and v.UNITS_ID = u.UNITS_ID
-                group by v.VISIT_ID),0)
+                ),0)
             as visitCount,
           ifnull ((select count(c.CALL_VISIT_ID)
            from inspection_call_visit c
            where c.PLAN_ID = #{planId}
                  and c.UNITS_ID = u.UNITS_ID
-           group by c.CALL_VISIT_ID),0)
+           ),0)
             as callCount
         from inspection_units u
         where PLAN_ID = #{planId}
         order by u.created_time, u.UNITS_ID desc
     </select>
+
+    <select id="selectVisitWithFile" parameterType="InspectionVisitPO" resultMap="InspectionVisitResult">
+        select VISIT_ID, UNITS_ID, PLAN_ID, VISIT_TIME, VISIT_COMPANY_ID, VISIT_COMPANY_NAME, VISIT_PERSON_ID, VISIT_PERSON_NAME, VISIT_PERSON_POST, VISIT_ORIGIN, CADRE_FLAG, VISIT_SUMMARY, AGENT_ID, AGENT_NAME, AGENT_TIME, v.CREATED_BY, v.CREATED_TIME, v.UPDATED_BY, v.UPDATED_TIME, v.ENT_ID, APPROVER_ID, APPROVER_NAME, APPROVAL_FLAG,doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH from inspection_visit v
+      left join piis_document doc on concat('Visit', v.VISIT_ID) = doc.OBJECT_ID
+      where v.VISIT_ID = #{visitId}
+     </select>
 
 </mapper>

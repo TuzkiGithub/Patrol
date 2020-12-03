@@ -1,9 +1,10 @@
 package tech.piis.modules.core.mapper;
 
-import tech.piis.modules.core.domain.po.InspectionInvestigationVisitPO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import tech.piis.common.exception.BaseException;
+import tech.piis.modules.core.domain.po.InspectionInvestigationVisitPO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+
 import java.util.List;
 /**
  * 调研走访Mapper接口
@@ -27,4 +28,12 @@ public interface InspectionInvestigationVisitMapper extends BaseMapper<Inspectio
      * @throws BaseException
      */
     List<InspectionInvestigationVisitPO> selectInvestigationVisitList(InspectionInvestigationVisitPO inspectionInvestigationVisitPO) throws BaseException;
+
+    /**
+     * 查询调研走访以及文件
+     * @param inspectionInvestigationVisitPO
+     * @return
+     * @throws BaseException
+     */
+    InspectionInvestigationVisitPO selectInvestigationVisitWithFile(InspectionInvestigationVisitPO inspectionInvestigationVisitPO) throws BaseException;
 }

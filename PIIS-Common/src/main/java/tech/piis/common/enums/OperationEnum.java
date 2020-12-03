@@ -9,14 +9,14 @@ package tech.piis.common.enums;
  * Description:数据库操作类型枚举类
  */
 public enum OperationEnum {
-    INSERT("INSERT",1),UPDATE("UPDATE",2),DELETE("DELETE",3);
+    SELECT("SELECT", 0), INSERT("INSERT", 1), UPDATE("UPDATE", 2), DELETE("DELETE", 3);
 
 
     private String name;
 
     private int code;
 
-    OperationEnum(String name,int code){
+    OperationEnum(String name, int code) {
         this.name = name;
         this.code = code;
     }

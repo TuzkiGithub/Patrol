@@ -24,7 +24,7 @@ import java.util.List;
 @Data
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionVisitPO extends PIBaseEntity {
+public class InspectionVisitPO extends PIBaseApprovalEntityPO {
     /**
      * 来访编号
      */
@@ -37,7 +37,7 @@ public class InspectionVisitPO extends PIBaseEntity {
     /**
      * 被巡视单位ID
      */
-    private String unitsId;
+    private Long unitsId;
     /**
      * 受理时间
      */
@@ -92,7 +92,7 @@ public class InspectionVisitPO extends PIBaseEntity {
     /**
      * 文件信息
      */
-    @NotEmpty(message = "文件不能为空！")
     @TableField(exist = false)
+    @NotEmpty(message = "文件不能为空！")
     private List<PiisDocumentPO> documents;
 }

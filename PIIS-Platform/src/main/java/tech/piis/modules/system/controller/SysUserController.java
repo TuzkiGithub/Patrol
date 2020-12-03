@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.UserConstants;
 import tech.piis.common.enums.ResultEnum;
+import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.ServletUtils;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.aspectj.lang.annotation.Log;
@@ -118,7 +119,7 @@ public class SysUserController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping(value = {"/", "/{userId}"})
-    public AjaxResult getInfo(@PathVariable(value = "userId", required = false) String userId) {
+    public AjaxResult getInfo(@PathVariable(value = "userId") String userId) throws BaseException {
         AjaxResult ajax = AjaxResult.success();
         ajax.put("roles", roleService.selectRoleAll());
         ajax.put("posts", postService.selectPostAll());

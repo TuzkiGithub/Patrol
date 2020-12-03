@@ -2,6 +2,7 @@ package tech.piis.modules.survey.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import tech.piis.common.exception.BaseException;
+import tech.piis.modules.survey.domain.po.QuestionCountVO;
 import tech.piis.modules.survey.domain.po.SurveyQuestionPO;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public interface SurveyQuestionMapper extends BaseMapper<SurveyQuestionPO> {
      * @return
      * @throws BaseException
      */
-    List<SurveyQuestionPO> selectQuestionRandom() throws BaseException;
+    List<SurveyQuestionPO> selectQuestionRandom(QuestionCountVO questionCountVO) throws BaseException;
 
 
 }

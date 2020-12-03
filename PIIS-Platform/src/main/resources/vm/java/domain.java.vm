@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import tech.piis.modules.core.domain.po.PIBaseApprovalEntityPO;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
 import java.util.List;
 
@@ -36,8 +37,7 @@ import ${import};
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class ${ClassName}PO extends PIBaseEntity
-{
+public class ${ClassName}PO extends PIBaseApprovalEntityPO {
 #foreach ($column in $columns)
 #if(!$table.isSuperColumn($column.javaField))
     /** $column.columnComment */
@@ -52,7 +52,5 @@ public class ${ClassName}PO extends PIBaseEntity
     private $column.javaType $column.javaField;
 #end
 #end
-
-    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
 }

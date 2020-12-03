@@ -18,6 +18,8 @@ import tech.piis.common.exception.DemoModeException;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.framework.web.domain.AjaxResult;
 
+import java.util.Objects;
+
 /**
  * 全局异常处理器
  * 
@@ -110,7 +112,7 @@ public class GlobalExceptionHandler
     public Object validExceptionHandler(MethodArgumentNotValidException e)
     {
         log.error(e.getMessage(), e);
-        String message = e.getBindingResult().getFieldError().getDefaultMessage();
+        String message = Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage();
         return AjaxResult.error(message);
     }
 

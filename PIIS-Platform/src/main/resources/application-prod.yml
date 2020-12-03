@@ -4,7 +4,8 @@ piis:
   profile: /piis/file/upload
   ##
   serverAddr: 25.2.16.160:8181
-
+  pc_app_url: http://25.2.16.161:8888
+  mobile_app_url: http:25.2.16.160:18080
 server:
   # HTTP Port
   port: 18081
@@ -14,7 +15,7 @@ spring:
         driverClassName: com.mysql.cj.jdbc.Driver
         druid:
             master:
-                url: jdbc:mysql://192.168.0.220:13309/piis_sys?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+                url: jdbc:mysql://192.168.0.220:13309/piis_sys?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
                 username: check
                 password: check@2020
             slave:

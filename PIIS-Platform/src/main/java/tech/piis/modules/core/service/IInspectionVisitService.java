@@ -51,4 +51,10 @@ public interface IInspectionVisitService {
      * @return
      */
     int deleteByInspectionVisitIds(String[] callVisitIds);
+
+    /**
+     * 审批
+     * @param visitList
+     */
+    void doApprovals(List<InspectionVisitPO> visitList);
 }

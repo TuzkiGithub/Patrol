@@ -38,13 +38,16 @@
 			<if test="visible != null and visible != ''">
 				AND visible = #{visible}
 			</if>
+			<if test="menuType != null and menuType != ''">
+				AND menu_type = #{menuType}
+			</if>
 		</where>
 		order by parent_id, order_num
 	</select>
 	
 	<select id="selectMenuTreeAll" resultMap="SysMenuResult">
 		select distinct m.menu_id, m.parent_id, m.menu_name, m.path, m.component, m.visible, ifnull(m.perms,'') as perms, m.is_frame, m.menu_type, m.icon, m.order_num, m.create_time
-		from sys_menu m where m.menu_type in ('M', 'C') and m.visible = 0
+		from sys_menu m where m.menu_type in ('M', 'C', 'F') and m.visible = 0
 		order by m.parent_id, m.order_num
 	</select>
 	
@@ -61,6 +64,9 @@
 		<if test="visible != null and visible != ''">
             AND visible = #{visible}
 		</if>
+		<if test="menuType != null and menuType != ''">
+			AND menu_type = #{menuType}
+		</if>
 		order by m.parent_id, m.order_num
 	</select>
     
@@ -71,7 +77,7 @@
 			 left join sys_user_role ur on rm.role_id = ur.role_id
 			 left join sys_role ro on ur.role_id = ro.role_id
 			 left join sys_user u on ur.user_id = u.user_id
-		where u.user_id = #{userId} and m.menu_type in ('M', 'C') and m.visible = 0  AND ro.status = 0
+		where u.user_id = #{userId} and m.menu_type in ('M', 'C', 'F') and m.visible = 0  AND ro.status = 0
 		order by m.parent_id, m.order_num
 	</select>
 	

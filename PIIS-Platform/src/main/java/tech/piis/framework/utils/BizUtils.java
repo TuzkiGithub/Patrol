@@ -5,13 +5,13 @@ import org.springframework.util.CollectionUtils;
 import tech.piis.common.enums.OrgEnum;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.StringUtils;
+import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.domain.vo.UserBriefVO;
 import tech.piis.modules.survey.domain.po.SurveyOptionPO;
 import tech.piis.modules.survey.domain.po.SurveyQuestionPO;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static tech.piis.common.constant.OrgConstants.*;
 
@@ -306,5 +306,65 @@ public class BizUtils {
                 }
             });
         }
+    }
+
+    /**
+     * 实际文件字典 《 - 》 临时文件字典
+     * key -> value
+     * @param documents
+     */
+    public static void convertFileDict(List<PiisDocumentPO> documents, Map<Long, Long> mapping) {
+        if (!CollectionUtils.isEmpty(documents)) {
+            documents.forEach(document -> {
+                Long DictId = document.getFileDictId();
+                document.setFileDictId(mapping.get(DictId));
+            });
+        }
+    }
+
+    /**
+     * 将人员拼接字符串转为List
+     *
+     * @param userId
+     * @param userName
+     */
+    public static List<UserBriefVO> paramsCovert2List(String userId, String userName) {
+        List<UserBriefVO> result = new ArrayList<>();
+        if (!org.springframework.util.StringUtils.isEmpty(userId) && !org.springframework.util.StringUtils.isEmpty(userName)) {
+            String[] userIdsArr = userId.split(",");
+            String[] userNamesArr = userName.split(",");
+            if (userNamesArr.length != 0 && userIdsArr.length != 0) {
+                int length = userNamesArr.length;
+                for (int i = 0; i < length; i++) {
+                    UserBriefVO userBriefVO = new UserBriefVO();
+                    userBriefVO.setUserName(userNamesArr[i]);
+                    userBriefVO.setUserId(userIdsArr[i]);
+                    result.add(userBriefVO);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 将人员对象数组转为字符串  以，分割
+     *
+     * @param data
+     */
+    public static List<String> paramsCovert2String(List<UserBriefVO> data) {
+        List<String> result = new ArrayList<>();
+        StringBuilder userId = new StringBuilder();
+        StringBuilder userName = new StringBuilder();
+        if (!CollectionUtils.isEmpty(data)) {
+            data.forEach(var -> {
+                userId.append(var.getUserId()).append(",");
+                userName.append(var.getUserName()).append(",");
+            });
+        }
+        String userIdStr = userId.toString().substring(0, userId.toString().lastIndexOf(","));
+        String userNameStr = userName.toString().substring(0, userName.toString().lastIndexOf(","));
+        result.add(userIdStr);
+        result.add(userNameStr);
+        return result;
     }
 }

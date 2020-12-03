@@ -21,4 +21,11 @@ public interface InspectionOrganizationMeetingsMapper extends BaseMapper<Inspect
      *
      */
     List<UnitsBizCountVO> selectInspectionOrganizationMeetingsCount(@Param("planId") String planId, @Param("organizationType") Integer organizationType) throws BaseException;
+
+    /**
+     * 查询组织会议以及文件
+     * @param inspectionConsultInfo
+     * @return
+     */
+    InspectionOrganizationMeetingsPO selectOrganizationMeetingsWithFile(InspectionOrganizationMeetingsPO inspectionConsultInfo);
 }

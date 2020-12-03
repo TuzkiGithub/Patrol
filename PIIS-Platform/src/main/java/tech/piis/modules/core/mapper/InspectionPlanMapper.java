@@ -1,11 +1,10 @@
 package tech.piis.modules.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import tech.piis.common.exception.BaseException;
+import tech.piis.modules.core.domain.dto.PlanBriefDTO;
 import tech.piis.modules.core.domain.po.InspectionPlanPO;
-import tech.piis.modules.core.domain.vo.PiisProjectCountVO;
-import tech.piis.modules.core.domain.vo.PlanCompanyCountVO;
-import tech.piis.modules.core.domain.vo.PlanConditionVO;
-import tech.piis.modules.core.domain.vo.PlanMemberCountVO;
+import tech.piis.modules.core.domain.vo.*;
 
 import java.util.List;
 
@@ -49,4 +48,12 @@ public interface InspectionPlanMapper extends BaseMapper<InspectionPlanPO> {
      * @return
      */
     List<PiisProjectCountVO> selectPiisProjectCount();
+
+    /**
+     * 查询巡视简要信息
+     * @param planBriefDTO
+     * @return
+     * @throws BaseException
+     */
+    PlanBriefVO selectPiisBrief(PlanBriefDTO planBriefDTO) throws BaseException;
 }

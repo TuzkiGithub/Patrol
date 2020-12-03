@@ -10,10 +10,8 @@ import tech.piis.common.enums.QuestionTypeEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
-import tech.piis.modules.survey.domain.po.SurveyOptionPO;
-import tech.piis.modules.survey.domain.po.SurveyPaperPO;
-import tech.piis.modules.survey.domain.po.SurveyPaperQuestionPO;
-import tech.piis.modules.survey.domain.po.SurveyQuestionPO;
+import tech.piis.framework.utils.BizUtils;
+import tech.piis.modules.survey.domain.po.*;
 import tech.piis.modules.survey.mapper.SurveyPaperMapper;
 import tech.piis.modules.survey.mapper.SurveyPaperQuestionMapper;
 import tech.piis.modules.survey.mapper.SurveyQuestionMapper;
@@ -52,8 +50,15 @@ public class SurveyPaperServiceImpl implements ISurveyPaperService {
      */
     @Override
     public List<SurveyPaperPO> selectSurveyPaperList(SurveyPaperPO surveyPaper) throws BaseException {
-        QueryWrapper<SurveyPaperPO> queryWrapper = new QueryWrapper<>();
-        return surveyPaperMapper.selectList(queryWrapper);
+        List<SurveyPaperPO> paperList = surveyPaperMapper.selectSurveyPaperList(surveyPaper);
+        if (!CollectionUtils.isEmpty(paperList)) {
+            paperList.forEach(paper -> {
+                List<SurveyQuestionPO> questionList = paper.getQuestionList();
+                BizUtils.addOptionName(questionList);
+                disorderOptionOrder(questionList);
+            });
+        }
+        return paperList;
     }
 
     /**
@@ -121,8 +126,15 @@ public class SurveyPaperServiceImpl implements ISurveyPaperService {
         String id = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
         surveyPaper.setPaperId(id);
         List<SurveyPaperQuestionPO> paperQuestionList = new ArrayList<>();
-        List<SurveyQuestionPO> questionList = surveyPaper.getQuestionList();
+        String[] questionIds = surveyPaper.getQuestionIds();
+        List<SurveyQuestionPO> questionList = new ArrayList<>();
+        for (String questionId : questionIds) {
+            SurveyQuestionPO questionPO = new SurveyQuestionPO();
+            questionPO.setQuestionId(questionId);
+            questionList.add(questionPO);
+        }
         //新增试卷
+        BizUtils.setCreatedOperation(SurveyPaperPO.class, surveyPaper);
         int row = surveyPaperMapper.insert(surveyPaper.setQuestionList(null));
         //新增试卷、题目关联
         buildPaperQuestionRelation(surveyPaper, paperQuestionList, questionList);
@@ -140,20 +152,26 @@ public class SurveyPaperServiceImpl implements ISurveyPaperService {
     @Override
     public void saveByCreate(SurveyPaperPO surveyPaper) throws BaseException {
         List<SurveyPaperQuestionPO> paperQuestionList = new ArrayList<>();
-        List<SurveyQuestionPO> questionList = surveyQuestionMapper.selectQuestionRandom();
+        QuestionCountVO questionCountVO = new QuestionCountVO()
+                .setSingleCount(surveyPaper.getSingleCount())
+                .setDoubleCount(surveyPaper.getDoubleCount())
+                .setBlankCount(surveyPaper.getBlankCount())
+                .setJudgeCount(surveyPaper.getJudgeCount())
+                .setQaCount(surveyPaper.getQaCount());
+        List<SurveyQuestionPO> questionList = surveyQuestionMapper.selectQuestionRandom(questionCountVO);
 
         //新增试卷
         String paperId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
-        SurveyPaperPO paper = new SurveyPaperPO()
-                .setPaperId(paperId);
-        surveyPaperMapper.insert(paper);
-        buildPaperQuestionRelation(paper, paperQuestionList, questionList);
+        surveyPaper.setPaperId(paperId);
+        BizUtils.setCreatedOperation(SurveyPaperPO.class, surveyPaper);
+        surveyPaperMapper.insert(surveyPaper);
+        buildPaperQuestionRelation(surveyPaper, paperQuestionList, questionList);
         //新增试卷、题目关联
         surveyPaperQuestionMapper.insertPaperQuestionBatch(paperQuestionList);
     }
 
     /**
-     * 创建试卷，导入题库
+     * 创建试卷，导入模板
      *
      * @param paperType
      * @param file
@@ -162,6 +180,32 @@ public class SurveyPaperServiceImpl implements ISurveyPaperService {
      */
     @Override
     public void saveByImport(Integer paperType, MultipartFile file) throws BaseException {
+        //TODO...从模板中获取paperName、questionList
+        String paperName = "";
+        List<SurveyQuestionPO> questionList = new ArrayList<>();
+
+        List<SurveyPaperQuestionPO> paperQuestionList = new ArrayList<>();
+        //新增试卷
+        String paperId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
+        SurveyPaperPO paper = new SurveyPaperPO()
+                .setPaperId(paperId)
+                .setPaperName(paperName)
+                .setPaperType(paperType);
+        surveyPaperMapper.insert(paper);
+        if (!CollectionUtils.isEmpty(questionList)) {
+            for (SurveyQuestionPO questionPO : questionList) {
+                SurveyPaperQuestionPO surveyPaperQuestionPO = new SurveyPaperQuestionPO();
+                String questionId = DateUtils.dateTime() + IdUtils.simpleUUID().substring(0, 6);
+                questionPO.setQuestionId(questionId);
+                surveyPaperQuestionPO.setQuestionId(questionId)
+                        .setPaperId(paperId);
+                paperQuestionList.add(surveyPaperQuestionPO);
+            }
+        }
+        //新增题目
+        surveyQuestionMapper.insertQuestionBatch(questionList);
+        //新增试卷、题目关联
+        surveyPaperQuestionMapper.insertPaperQuestionBatch(paperQuestionList);
     }
 
 
@@ -192,7 +236,6 @@ public class SurveyPaperServiceImpl implements ISurveyPaperService {
         if (!CollectionUtils.isEmpty(questionList)) {
             questionList.forEach(question -> question.setReferenceAnswer(null));
         }
-
     }
 
 

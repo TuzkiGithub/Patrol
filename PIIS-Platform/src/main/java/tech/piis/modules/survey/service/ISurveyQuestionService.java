@@ -64,4 +64,7 @@ public interface ISurveyQuestionService {
      * @return
      */
     int count(SurveyQuestionPO surveyQuestion) throws BaseException;
+
+
+    List<SurveyQuestionPO> handleAnswerFiled(List<SurveyQuestionPO> questionList) throws BaseException;
 }

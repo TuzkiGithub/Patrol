@@ -51,5 +51,11 @@ public interface IInspectionOrganizationMeetingsService {
      *
      * @return
      */
-    int deleteByInspectionOrganizationMeetingsIds(Long[] organizationMeetingsIds);
+    int deleteByInspectionOrganizationMeetingsIds(Long[] organizationMeetingsIds) throws BaseException;
+
+    /**
+     * 审批
+     * @param organizationMeetingsList
+     */
+    void doApprovals(List<InspectionOrganizationMeetingsPO> organizationMeetingsList);
 }

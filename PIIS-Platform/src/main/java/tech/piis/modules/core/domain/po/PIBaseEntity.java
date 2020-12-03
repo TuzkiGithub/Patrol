@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,6 +19,18 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class PIBaseEntity {
+    /**
+     * 巡视计划ID参数，数据过滤使用
+     */
+    @TableField(exist = false)
+    private Set<String> planIdSet;
+
+    /**
+     * 巡视组ID参数，数据过滤使用
+     */
+    @TableField(exist = false)
+    private Set<String> groupIdSet;
+
     /**
      * 创建人
      */
@@ -46,5 +59,4 @@ public class PIBaseEntity {
 
     @TableField(exist = false)
     private Integer pageSize;
-
 }

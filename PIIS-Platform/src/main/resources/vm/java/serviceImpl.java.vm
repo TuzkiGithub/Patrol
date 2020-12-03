@@ -4,10 +4,23 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tech.piis.common.enums.OperationEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
-import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 import tech.piis.modules.core.service.IPiisDocumentService;
+import org.springframework.context.ApplicationListener;
+import tech.piis.modules.core.event.WorkFlowEvent;
+import tech.piis.modules.core.domain.vo.PlanBriefVO;
+import tech.piis.modules.core.service.IInspectionPlanService;
+import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
+import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
+import tech.piis.framework.utils.BizUtils;
+import org.springframework.util.CollectionUtils;
+import tech.piis.common.enums.ApprovalEnum;
+import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import tech.piis.modules.core.domain.vo.PlanBriefVO;
+import static tech.piis.common.constant.PiisConstants.*;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,13 +39,18 @@ import  ${packageName}.service.I${ClassName}Service;
  */
 @Transactional
 @Service
-public class ${ClassName}ServiceImpl implements I${ClassName}Service {
+public class ${ClassName}ServiceImpl implements I${ClassName}Service, ApplicationListener<WorkFlowEvent>  {
     @Autowired
     private ${ClassName}Mapper ${className}Mapper;
 
     @Autowired
     private IPiisDocumentService documentService;
 
+    @Autowired
+    private IInspectionPlanService planService;
+
+    @Autowired
+    private IWfWorkflowTodoService todoService;
 
     /**
      * 统计巡视方案下被巡视单位${ClassName}次数
@@ -55,7 +73,13 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         QueryWrapper<${ClassName}PO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("units_id", ${className}.getUnitsId());
         queryWrapper.eq("plan_id", ${className}.getPlanId());
-        return ${className}Mapper.selectList(queryWrapper);
+        List<${ClassName}PO> ${className}List = ${className}Mapper.selectList(queryWrapper);
+        if(!CollectionUtils.isEmpty(${className}List)){
+                ${className}List.forEach(${className} -> {
+                    ${className}.setDocuments(documentService.getFileListByBizId("${ClassName}"));
+                });
+        }
+        return ${className}List;
     }
 
     /**
@@ -94,18 +118,83 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
      * @return
      */
     @Override
-    public int deleteBy${ClassName}Ids(${pkColumn.javaType}[]${pkColumn.javaField}s) {
+    public int deleteBy${ClassName}Ids(${pkColumn.javaType}[]${pkColumn.javaField}s) throws BaseException {
         List<Long> list = Arrays.asList(${pkColumn.javaField}s);
         return ${className}Mapper.deleteBatchIds(list);
     }
 
 
     /**
-    * 统计总数
-    * @return
-    */
+     * 新增代办
+     *
+     * @param ${className}
+     */
+    private void handleTodo(${ClassName}PO ${className}) {
+        String planId = ${className}.getPlanId();
+        Long unitsId = ${className}.getUnitsId();
+        PlanBriefDTO planBriefDTO = new PlanBriefDTO()
+                .setPlanId(planId)
+                .setUnitsId(unitsId);
+        PlanBriefVO planPO = planService.selectPiisBrief(planBriefDTO);
+        WfWorkFlowTodoPO wfWorkFlowTodoPO = new WfWorkFlowTodoPO()
+                .setLookStatus(NO_LOOK)
+                .setTodoName("[XX]-" + planPO.getPlanName() + "-" + planPO.getGroupName() + "-" + planPO.getOrgName())
+                .setBusinessId("")
+                .setTodoStatus(TODO_NEED)
+                .setApproverId(${className}.getApproverId())
+                .setApproverName(${className}.getApproverName());
+        BizUtils.setCreatedOperation(WfWorkFlowTodoPO.class, wfWorkFlowTodoPO);
+        todoService.saveWorkflowTodo(wfWorkFlowTodoPO);
+    }
+
+   /**
+   * 批量审批
+   * @throws BaseException
+   */
     @Override
-    public int count() {
-        return ${className}Mapper.selectCount(null);
+    public void doApprovals(List<${ClassName}PO> ${className}List) throws BaseException {
+        if (!CollectionUtils.isEmpty(${className}List)) {
+                ${className}List.forEach(${className} -> {
+                ${className}.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                ${className}Mapper.updateById(${className}.setDocuments(null));
+                handleTodo(${className});
+            });
+        }
+
+        }
+
+    /**
+   * Handle an application event.
+   *
+   * @param event the event to respond to
+   */
+    @Override
+    public void onApplicationEvent(WorkFlowEvent event) {
+        Object object = event.getSource();
+        System.out.println(object.getClass());
+        if (object instanceof ${ClassName}ServiceImpl) {
+            Integer eventType = event.getEventType();
+            if(OperationEnum.SELECT.getCode() == eventType){
+                QueryWrapper<${ClassName}PO> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("","");
+                ${ClassName}PO ${className} = ${className}Mapper.selectOne(queryWrapper);
+                event.setData(${className});
+            }else if(OperationEnum.UPDATE.getCode() == eventType){
+                Integer continueApprovalFlag = event.getContinueApprovalFlag();
+                Integer agreeFlag = event.getAgreeFlag();
+                ${ClassName}PO ${className} = new ${ClassName}PO();
+                if (NO_APPROVAL == continueApprovalFlag) {
+                    if (AGREE == agreeFlag) {
+                        ${className}.setApprovalFlag(ApprovalEnum.PASSED.getCode());
+                    } else {
+                        ${className}.setApprovalFlag(ApprovalEnum.REJECTED.getCode());
+                    }
+                } else {
+                    ${className}.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                }
+                BizUtils.setUpdatedOperation(${ClassName}PO .class, ${className});
+                ${className}Mapper.updateById(${className});
+            }
+        }
     }
 }

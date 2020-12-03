@@ -329,7 +329,6 @@
             <if test="userName != null and userName != ''">
                 AND u.user_name like concat('%', #{userName}, '%')
             </if>
-            AND p.status = '0'
             AND d.status = '0'
         </where>
     </select>

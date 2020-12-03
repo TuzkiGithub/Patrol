@@ -28,7 +28,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class InspectionOrganizationMeetingsPO extends PIBaseEntity {
+public class InspectionOrganizationMeetingsPO extends PIBaseApprovalEntityPO {
     /**
      * 组织编号
      */
@@ -42,7 +42,7 @@ public class InspectionOrganizationMeetingsPO extends PIBaseEntity {
     /**
      * 被巡视单位ID
      */
-    private String unitsId;
+    private Long unitsId;
 
     /**
      * 会议名称
@@ -80,6 +80,12 @@ public class InspectionOrganizationMeetingsPO extends PIBaseEntity {
     private String meetingsContent;
 
     /**
+     * 事项类别
+     */
+    @NotBlank(message = "事项类别不能为空！")
+    private String mattersType;
+
+    /**
      * 参会人员LIST
      */
     @Valid
@@ -90,6 +96,5 @@ public class InspectionOrganizationMeetingsPO extends PIBaseEntity {
     /**
      * 文件信息
      */
-    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
 }

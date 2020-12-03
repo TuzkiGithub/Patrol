@@ -88,7 +88,7 @@ public class InspectionPlanController extends BaseController {
      *
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('piis:plan:query')")
+    @PreAuthorize("@ss.hasPermi('piis:plan:count')")
     @RequestMapping(value = "/statistics", method = RequestMethod.GET)
     public AjaxResult countCompany(InspectionPlanPO planPO) {
         return AjaxResult.success(inspectionPlanService.selectCountByCompany(planPO));
@@ -99,7 +99,7 @@ public class InspectionPlanController extends BaseController {
      *
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('piis:plan:query')")
+    @PreAuthorize("@ss.hasPermi('piis:plan:count')")
     @RequestMapping(value = "/member/count", method = RequestMethod.GET)
     public AjaxResult countPlanMember(PlanMemberCountVO planMemberCountVO) {
         return AjaxResult.success(inspectionPlanService.selectMemberCountByTime(planMemberCountVO));

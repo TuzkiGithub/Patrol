@@ -2,6 +2,7 @@ package tech.piis.modules.survey.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tech.piis.common.constant.BizConstants;
@@ -14,6 +15,7 @@ import tech.piis.framework.web.controller.BaseController;
 import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.framework.web.page.TableDataInfo;
 import tech.piis.modules.survey.domain.po.SurveyPaperPO;
+import tech.piis.modules.survey.domain.po.SurveyQuestionPO;
 import tech.piis.modules.survey.service.ISurveyPaperService;
 
 import javax.validation.Valid;
@@ -62,6 +64,14 @@ public class SurveyPaperController extends BaseController {
         }
         surveyPaper.setPageNum(surveyPaper.getPageNum() * surveyPaper.getPageSize());
         List<SurveyPaperPO> data = surveyPaperService.selectSurveyPaperList(surveyPaper);
+        if (!CollectionUtils.isEmpty(data)) {
+            data.forEach(paperPO -> {
+                List<SurveyQuestionPO> questionPOList = paperPO.getQuestionList();
+                if (!CollectionUtils.isEmpty(questionPOList)) {
+                    questionPOList.forEach(questionPO -> questionPO.setReferenceAnswer(null));
+                }
+            });
+        }
         return new TableDataInfo()
                 .setCode(ResultEnum.SUCCESS.getCode())
                 .setMsg(ResultEnum.SUCCESS.getMsg())
@@ -91,12 +101,14 @@ public class SurveyPaperController extends BaseController {
      * 新增试卷/问卷
      * PS:系统生成
      *
-     * @param paperType 试卷类型 1：测评、2：问卷
+     * @param surveyPaper
+     * 试卷类型 1：测评、2：问卷
      */
     @PreAuthorize("@ss.hasPermi('survey:paper:add')")
     @Log(title = "试卷/问卷", businessType = BusinessType.INSERT)
     @PostMapping("create")
-    public AjaxResult add(Integer paperType) {
+    public AjaxResult create(@RequestBody @Valid SurveyPaperPO surveyPaper) {
+        surveyPaperService.saveByCreate(surveyPaper);
         return AjaxResult.success();
     }
 

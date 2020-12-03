@@ -8,12 +8,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tech.piis.common.utils.ServletUtils;
 import tech.piis.common.utils.http.HttpClientUtils;
 import tech.piis.framework.security.LoginUser;
 import tech.piis.framework.security.service.SysPermissionService;
 import tech.piis.framework.security.service.TokenService;
 import tech.piis.framework.web.domain.AjaxResult;
-import tech.piis.modules.common.domain.UserAuthResponse;
 import tech.piis.modules.system.domain.SysUser;
 import tech.piis.modules.system.domain.vo.UserVO;
 import tech.piis.modules.system.mapper.SysUserDetailMapper;
@@ -95,6 +95,9 @@ public class IAMAuth {
     @Value("${iam.grantType}")
     private String grantType;
 
+    @Value("${piis.pc_app_url}")
+    private String piisPcAppUrl;
+
     /**
      * 连接符
      **/
@@ -166,7 +169,7 @@ public class IAMAuth {
     }
 
     /**
-     * 根据code获取用户基本信息
+     * 根据code获取用户基本信息，并重定向到前端页面
      *
      * @param code
      * @param state
@@ -197,7 +200,6 @@ public class IAMAuth {
         log.info("###IAM认证 userId = {}", userId);
         UserVO userVO = sysUserDetailMapper.selectUserAllByUserId(userId);
         log.info("###IAM认证 userVo = {}", userVO);
-
         LoginUser loginUser = new LoginUser();
         SysUser sysUser = new SysUser();
         sysUser.setUserId(userVO.getUserId());
@@ -211,10 +213,10 @@ public class IAMAuth {
         loginUser.setUser(sysUser);
         loginUser = new LoginUser(sysUser, permissionService.getMenuPermission(sysUser));
         String token = tokenService.createToken(loginUser);
-        UserAuthResponse userAuthResponse = new UserAuthResponse()
-                .setToken(token)
-                .setLoginUser(loginUser);
-        return AjaxResult.success(userAuthResponse);
+        String redirectUrl = piisPcAppUrl + "/dashboard?token=" + token + "&userId" + userId;
+        log.info("###IAM认证 redirectVueUrl = {}", redirectUrl);
+        ServletUtils.getResponse().sendRedirect(redirectUrl);
+        return AjaxResult.success(token);
     }
 
 

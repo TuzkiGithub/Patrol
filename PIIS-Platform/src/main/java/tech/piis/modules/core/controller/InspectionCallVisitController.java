@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.FileEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
@@ -19,6 +20,8 @@ import tech.piis.modules.core.service.IInspectionCallVisitService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.List;
+
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
 
 
 /**
@@ -81,9 +84,30 @@ InspectionCallVisitController extends BaseController {
         if (null == inspectionCallVisit) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        if (NO_APPROVAL == inspectionCallVisit.getIsApproval()) {
+            inspectionCallVisit.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionCallVisit.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
+        }
         convertFileDict(inspectionCallVisit);
         BizUtils.setCreatedOperation(InspectionCallVisitPO.class, inspectionCallVisit);
         return toAjax(inspectionCallVisitService.save(inspectionCallVisit));
+    }
+
+    /**
+     * 审批来电
+     *
+     * @param callVisitList
+     */
+    @PreAuthorize("@ss.hasPermi('piis:call/visit:approval')")
+    @Log(title = "来电", businessType = BusinessType.INSERT)
+    @PostMapping("approval")
+    public AjaxResult approval(@RequestBody List<InspectionCallVisitPO> callVisitList) {
+        if (CollectionUtils.isEmpty(callVisitList)) {
+            return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        inspectionCallVisitService.doApprovals(callVisitList);
+        return AjaxResult.success();
     }
 
     /**
@@ -95,9 +119,13 @@ InspectionCallVisitController extends BaseController {
     @Log(title = "来电", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionCallVisitPO inspectionCallVisit) throws BaseException {
-
         if (null == inspectionCallVisit) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionCallVisit.getIsApproval()) {
+            inspectionCallVisit.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionCallVisit.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         convertFileDict(inspectionCallVisit);
         BizUtils.setUpdatedOperation(InspectionCallVisitPO.class, inspectionCallVisit);
