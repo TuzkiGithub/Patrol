@@ -118,8 +118,8 @@
         <result property="deputyPost" column="deputyPost"/>
         <result property="connectorPost" column="connectorPost"/>
         <result property="memberPost" column="memberPost"/>
-        <result property="beginTime" column="beginTime"/>
-        <result property="endTime" column="endTime"/>
+        <result property="beginTime" column="BEGIN_TIME"/>
+        <result property="endTime" column="END_TIME"/>
     </resultMap>
 
     <select id="selectPlanList" resultMap="inspectionPlanResultMap">
