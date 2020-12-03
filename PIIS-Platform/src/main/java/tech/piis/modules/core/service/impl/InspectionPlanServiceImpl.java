@@ -21,7 +21,6 @@ import tech.piis.modules.core.domain.vo.*;
 import tech.piis.modules.core.mapper.*;
 import tech.piis.modules.core.service.IInspectionPlanService;
 import tech.piis.modules.core.service.IPiisDocumentService;
-import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
 import tech.piis.modules.workflow.service.IWfWorkflowBusinessService;
 import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.*;
 import static tech.piis.common.constant.PiisConstants.PIIS_TYPE;
-import static tech.piis.common.constant.PiisConstants.TODO_NEED;
 
 /**
  * 巡视计划 Service业务层处理
@@ -440,22 +438,25 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                         Long unitsId = units.getUnitsId();
                         if (!CollectionUtils.isEmpty(groupMembers)) {
                             for (InspectionGroupMemberPO groupMember : groupMembers) {
-                                for (InspectionGroupMemberPO aGroupMemberList : groupMemberList) {
-                                    //设置组员ID字段
-                                    if (Objects.equals(groupMember.getMemberId(), aGroupMemberList.getMemberId())) {
-                                        groupMemberIds.add(aGroupMemberList.getGroupMemberId());
-                                        break;
+                                for (InspectionGroupMemberPO aGroupMember : groupMemberList) {
+                                    //比较巡视组组员信息，设置被巡视单位中组员ID字段
+                                    if (Objects.equals(groupMember.getMemberId(), aGroupMember.getMemberId())) {
+                                        groupMember.setGroupMemberId(aGroupMember.getGroupMemberId());
                                     }
                                 }
+                                InspectionGroupMemberUnitsPO groupMemberUnits = new InspectionGroupMemberUnitsPO();
+                                groupMemberUnits.setUnitsId(unitsId);
+                                groupMemberUnits.setGroupMemberId(groupMember.getGroupMemberId());
+                                groupMemberUnitsList.add(groupMemberUnits);
                             }
                         }
 
-                        groupMemberIds.forEach(var -> {
-                            InspectionGroupMemberUnitsPO groupMemberUnits = new InspectionGroupMemberUnitsPO();
-                            groupMemberUnits.setUnitsId(unitsId);
-                            groupMemberUnits.setGroupMemberId(var);
-                            groupMemberUnitsList.add(groupMemberUnits);
-                        });
+//                        groupMemberIds.forEach(var -> {
+//                            InspectionGroupMemberUnitsPO groupMemberUnits = new InspectionGroupMemberUnitsPO();
+//                            groupMemberUnits.setUnitsId(unitsId);
+//                            groupMemberUnits.setGroupMemberId(var);
+//                            groupMemberUnitsList.add(groupMemberUnits);
+//                        });
 
                     });
                 }

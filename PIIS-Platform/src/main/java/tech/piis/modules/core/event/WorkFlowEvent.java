@@ -49,6 +49,11 @@ public class WorkFlowEvent extends ApplicationEvent {
      *
      */
     private Integer agreeFlag;
+
+    /**
+     * 扩展字段
+     */
+    private String remark;
     /**
      * Create a new ApplicationEvent.
      *
@@ -96,5 +101,13 @@ public class WorkFlowEvent extends ApplicationEvent {
 
     public void setAgreeFlag(Integer agreeFlag) {
         this.agreeFlag = agreeFlag;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

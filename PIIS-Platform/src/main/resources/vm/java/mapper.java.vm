@@ -13,9 +13,16 @@ import java.util.List;
  */
 public interface ${ClassName}Mapper extends BaseMapper<${ClassName}PO> {
     /**
-     * 统计巡视方案下被巡视单位${ClassName}次数
+     * 统计巡视方案下被巡视单位${functionName}次数
      * @param planId 巡视计划ID
      *
      */
     List<UnitsBizCountVO> select${ClassName}Count(String planId) throws BaseException;
+
+    /**
+    * 根据ID查询${functionName}以及文件信息
+    * @return
+    * @throws BaseException
+    */
+    ${ClassName}PO select${ClassName}WithFileById(${ClassName}PO ${className}) throws BaseException;
 }

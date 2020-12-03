@@ -19,6 +19,8 @@
         <result property="updatedBy" column="UPDATED_BY"/>
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
+
+        <collection property="documents" javaType="java.util.List" resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -48,6 +50,13 @@
         where u.plan_id = #{planId}
         group by u.UNITS_ID, ORGANIZATION_TYPE
         order by u.created_time, u.UNITS_ID desc
+    </select>
+
+    <select id="selectOrganizationMeetingsWithFile" parameterType="InspectionOrganizationMeetingsPO" resultMap="InspectionOrganizationMeetingsResult">
+        select ORGANIZATION_MEETINGS_ID, PLAN_ID, MEETINGS_NAME, MEETINGS_TIME, MEETINGS_PLACE, PARTICIPANTS_ID, PARTICIPANTS_NAME, ORGANIZATION_TYPE, MEETINGS_CONTENT, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_organization_meetings m
+ left join piis_document doc on concat('OrganizationMeetings', m.ORGANIZATION_MEETINGS_ID) = doc.OBJECT_ID
+ WHERE ORGANIZATION_MEETINGS_ID = ${organizationMeetingsId}
+ AND ORGANIZATION_TYPE = #{organizationType}
     </select>
 
 </mapper>

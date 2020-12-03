@@ -18,6 +18,8 @@ import tech.piis.framework.utils.BizUtils;
 import org.springframework.util.CollectionUtils;
 import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import tech.piis.modules.core.domain.vo.PlanBriefVO;
+import static tech.piis.common.constant.PiisConstants.*;
 
 
 import java.util.Arrays;
@@ -71,7 +73,13 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service, Applicatio
         QueryWrapper<${ClassName}PO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("units_id", ${className}.getUnitsId());
         queryWrapper.eq("plan_id", ${className}.getPlanId());
-        return ${className}Mapper.selectList(queryWrapper);
+        List<${ClassName}PO> ${className}List = ${className}Mapper.selectList(queryWrapper);
+        if(!CollectionUtils.isEmpty(${className}List)){
+                ${className}List.forEach(${className} -> {
+                    ${className}.setDocuments(documentService.getFileListByBizId("${ClassName}"));
+                });
+        }
+        return ${className}List;
     }
 
     /**
@@ -119,7 +127,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service, Applicatio
     /**
      * 新增代办
      *
-     * @param inspectionConsultInfo
+     * @param ${className}
      */
     private void handleTodo(${ClassName}PO ${className}) {
         String planId = ${className}.getPlanId();
@@ -131,10 +139,10 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service, Applicatio
         WfWorkFlowTodoPO wfWorkFlowTodoPO = new WfWorkFlowTodoPO()
                 .setLookStatus(NO_LOOK)
                 .setTodoName("[XX]-" + planPO.getPlanName() + "-" + planPO.getGroupName() + "-" + planPO.getOrgName())
-                .setBusinessId(String.valueOf(inspectionConsultInfo.getConsultInfoId()))
+                .setBusinessId("")
                 .setTodoStatus(TODO_NEED)
-                .setApproverId(inspectionConsultInfo.getApproverId())
-                .setApproverName(inspectionConsultInfo.getApproverName());
+                .setApproverId(${className}.getApproverId())
+                .setApproverName(${className}.getApproverName());
         BizUtils.setCreatedOperation(WfWorkFlowTodoPO.class, wfWorkFlowTodoPO);
         todoService.saveWorkflowTodo(wfWorkFlowTodoPO);
     }
@@ -177,12 +185,12 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service, Applicatio
                 ${ClassName}PO ${className} = new ${ClassName}PO();
                 if (NO_APPROVAL == continueApprovalFlag) {
                     if (AGREE == agreeFlag) {
-                        inspectionConsultInfoPO.setApprovalFlag(ApprovalEnum.PASSED.getCode());
+                        ${className}.setApprovalFlag(ApprovalEnum.PASSED.getCode());
                     } else {
-                        inspectionConsultInfoPO.setApprovalFlag(ApprovalEnum.REJECTED.getCode());
+                        ${className}.setApprovalFlag(ApprovalEnum.REJECTED.getCode());
                     }
                 } else {
-                    inspectionConsultInfoPO.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                    ${className}.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
                 }
                 BizUtils.setUpdatedOperation(${ClassName}PO .class, ${className});
                 ${className}Mapper.updateById(${className});

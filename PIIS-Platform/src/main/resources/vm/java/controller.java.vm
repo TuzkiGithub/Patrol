@@ -51,16 +51,6 @@ public class ${ClassName}Controller extends BaseController {
     }
 
     /**
-     * 查询${functionName}文件
-     * @param  ${className}Id 文件关联ID
-     */
-    @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
-    @GetMapping("/file")
-    public AjaxResult find${ClassName}File(@RequestParam("") String ${className}Id) throws BaseException {
-        return AjaxResult.success(documentService.getFileListByBizId("${ClassName}" + ${className}Id));
-    }
-
-    /**
      * 查询${functionName}总览列表
      *
      * @param planId 巡视计划ID
@@ -92,7 +82,7 @@ public class ${ClassName}Controller extends BaseController {
 
     /**
      * 审批${functionName}
-     * @param  ${className}
+     * @param  ${className}List
      */
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:approval')")
     @Log(title = "${functionName}", businessType = BusinessType.INSERT)

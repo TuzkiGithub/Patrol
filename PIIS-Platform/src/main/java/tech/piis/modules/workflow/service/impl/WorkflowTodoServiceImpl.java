@@ -72,6 +72,7 @@ public class WorkflowTodoServiceImpl implements IWfWorkflowTodoService {
         event.setBizId(wfWorkFlowTodoPO.getBusinessId());
         event.setContinueApprovalFlag(wfWorkFlowTodoPO.getContinueApprovalFlag());
         event.setAgreeFlag(wfWorkFlowTodoPO.getTodoStatus());
+        event.setRemark(wfWorkFlowTodoPO.getRemark());
         applicationContext.publishEvent(event);
         wfWorkFlowTodoPO.setBizObject(event.getData());
         return wfWorkFlowTodoPO;

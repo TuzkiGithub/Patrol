@@ -11,6 +11,7 @@
         <result property="approverName" column="APPROVER_NAME"/>
         <result property="businessId" column="BUSINESS_ID"/>
         <result property="todoStatus" column="TODO_STATUS"/>
+        <result property="remark" column="REMARK"/>
         <result property="createdBy" column="CREATED_BY"/>
         <result property="createdTime" column="CREATED_TIME"/>
         <result property="updatedBy" column="UPDATED_BY"/>
@@ -19,7 +20,7 @@
     </resultMap>
 
     <sql id="selectWfWorkflowTodoVo">
-        select WORK_FLOW_TODO_ID, TODO_NAME, APPROVER_ID, APPROVER_NAME, BUSINESS_ID, TODO_STATUS, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from wf_workflow_todo
+        select WORK_FLOW_TODO_ID, TODO_NAME, APPROVER_ID, APPROVER_NAME, BUSINESS_ID, TODO_STATUS, REMARK, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from wf_workflow_todo
     </sql>
 
     <select id="selectCount" parameterType="WfWorkflowTodoPO" resultType="TodoCountVO">

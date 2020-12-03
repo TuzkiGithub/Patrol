@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
 import tech.piis.framework.aspectj.lang.enums.BusinessType;
@@ -17,6 +18,8 @@ import tech.piis.modules.core.service.IInspectionOrganizationMeetingsService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.List;
+
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
 
 
 /**
@@ -62,7 +65,7 @@ public class InspectionOrganizationMeetingsController extends BaseController {
     /**
      * 查询组织会议总览列表
      *
-     * @param planId 巡视计划ID
+     * @param planId           巡视计划ID
      * @param organizationType 组织类型
      */
     @PreAuthorize("@ss.hasPermi('piis:meetings:query')")
@@ -83,9 +86,26 @@ public class InspectionOrganizationMeetingsController extends BaseController {
         if (null == inspectionOrganizationMeetings) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        if (NO_APPROVAL == inspectionOrganizationMeetings.getIsApproval()) {
+            inspectionOrganizationMeetings.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionOrganizationMeetings.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
+        }
         BizUtils.setCreatedOperation(InspectionOrganizationMeetingsPO.class, inspectionOrganizationMeetings);
         organizationMeetingsCovert2String(inspectionOrganizationMeetings);
         return toAjax(inspectionOrganizationMeetingsService.save(inspectionOrganizationMeetings));
+    }
+
+    /**
+     * 批量审批
+     *
+     * @param organizationMeetingsList
+     * @return
+     */
+    @PostMapping("approval")
+    public AjaxResult doApproval(@RequestBody List<InspectionOrganizationMeetingsPO> organizationMeetingsList) {
+        inspectionOrganizationMeetingsService.doApprovals(organizationMeetingsList);
+        return AjaxResult.success();
     }
 
     /**
@@ -99,6 +119,11 @@ public class InspectionOrganizationMeetingsController extends BaseController {
     public AjaxResult edit(@RequestBody InspectionOrganizationMeetingsPO inspectionOrganizationMeetings) throws BaseException {
         if (null == inspectionOrganizationMeetings) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionOrganizationMeetings.getIsApproval()) {
+            inspectionOrganizationMeetings.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionOrganizationMeetings.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         BizUtils.setUpdatedOperation(InspectionOrganizationMeetingsPO.class, inspectionOrganizationMeetings);
         organizationMeetingsCovert2String(inspectionOrganizationMeetings);

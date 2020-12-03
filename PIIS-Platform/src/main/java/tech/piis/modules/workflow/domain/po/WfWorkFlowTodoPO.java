@@ -87,6 +87,11 @@ public class WfWorkFlowTodoPO{
     private String suggestion;
 
     /**
+     * 扩展字段
+     */
+    private String remark;
+
+    /**
      * 创建人
      */
     private String createdBy;
