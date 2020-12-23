@@ -27,7 +27,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionClueTransferPO extends PIBaseEntity {
+public class InspectionClueTransferPO extends PIBaseApprovalEntityPO {
     /**
      * 线索移交编号
      */

@@ -28,10 +28,8 @@ import tech.piis.modules.core.service.IPiisDocumentService;
 import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
 import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.DELETE;
 import static tech.piis.common.constant.OperationConstants.INSERT;
@@ -87,7 +85,7 @@ public class InspectionCallVisitServiceImpl implements IInspectionCallVisitServi
      * @param planId 巡视计划ID
      */
     public List<UnitsBizCountVO> selectInspectionCallVisitCount(String planId) throws BaseException {
-        return inspectionCallVisitMapper.selectInspectionCallVisitCount(planId);
+        return inspectionCallVisitMapper.selectInspectionCallVisitCount(planId).stream().sorted(Comparator.comparing(UnitsBizCountVO::getUnitsId).reversed()).collect(Collectors.toList());
     }
 
     /**

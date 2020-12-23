@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tech.piis.modules.core.mapper.InspectionImportantReportMapper">
+
+
+    <resultMap id="InspectionImportantReportResult" type="InspectionImportantReportPO">
+        <result property="importantReportId" column="IMPORTANT_REPORT_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="reportName" column="REPORT_NAME"/>
+        <result property="reportTime" column="REPORT_TIME"/>
+        <result property="reporterId" column="REPORTER_ID"/>
+        <result property="reporterName" column="REPORTER_NAME"/>
+        <result property="reportContent" column="REPORT_CONTENT"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
+    </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
         <result property="unitsId" column="units_id"/>
@@ -12,13 +34,31 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createdTime" column="CREATED_TIME"/>
     </resultMap>
 
-    <select id="selectInspectionImportantReportCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
+    <sql id="selectInspectionImportantReportVo">
+        select IMPORTANT_REPORT_ID, PLAN_ID, UNITS_ID, REPORT_NAME, REPORT_TIME, REPORTER_ID, REPORTER_NAME, REPORT_CONTENT, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID, APPROVER_ID, APPROVER_NAME, APPROVAL_FLAG from inspection_important_report
+    </sql>
+
+    <select id="selectInspectionImportantReportCount" resultMap="unitsBizCountResultMap"
+            parameterType="java.lang.String">
         select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(r.UNITS_ID) as count
         from inspection_units u
         left join inspection_important_report r on u.UNITS_ID = r.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
     </select>
-    
+
+    <select id="selectImportantReport" parameterType="InspectionImportantReportPO" resultMap="InspectionImportantReportResult">
+      select r.IMPORTANT_REPORT_ID, r.PLAN_ID, r.UNITS_ID, r.REPORT_NAME, r.REPORT_TIME, r.REPORTER_ID, r.REPORTER_NAME, r.REPORT_CONTENT, r.CREATED_BY, r.CREATED_TIME, r.UPDATED_BY, r.UPDATED_TIME, r.ENT_ID, r.APPROVER_ID, r.APPROVER_NAME, r.APPROVAL_FLAG,
+       doc.PIIS_DOC_ID,
+       doc.OBJECT_ID,
+       doc.FILE_DICT_ID,
+       doc.FILE_NAME,
+       doc.FILE_SIZE,
+       doc.FILE_PATH
+      from inspection_important_report r
+      left join piis_document doc on concat('ImportantReport', r.IMPORTANT_REPORT_ID) = doc.OBJECT_ID
+      where r.IMPORTANT_REPORT_ID = #{importantReportId}
+    </select>
+
+
 </mapper>

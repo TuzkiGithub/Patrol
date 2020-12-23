@@ -1,14 +1,16 @@
 package tech.piis.modules.core.domain.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import tech.piis.modules.core.domain.vo.UserBriefVO;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * 临时支部成员 对象 inspection_temp_branch_member
@@ -24,34 +26,52 @@ import java.util.Date;
 @Accessors(chain = true)
 public class InspectionTempBranchMemberPO extends PIBaseEntity {
     /**
-     * 临时支部成员编号
+     * 临时支部成员ID
      */
     @TableId(value = "TEMP_BRANCH_MEMBER_ID", type = IdType.AUTO)
     private Long tempBranchMemberId;
 
+    /**
+     * 临时支部ID
+     */
     private String tempBranchId;
+
     /**
-     * 组员ID
+     * 临时支部名称
      */
-    private String memberId;
+    private String tempBranchName;
+
     /**
-     * 组员姓名
+     * 临时党支部书记编号
      */
-    private String memberName;
+    private String secretaryId;
     /**
-     * 所在公司ID
+     * 临时党支部书记姓名
      */
-    private String memberCompanyId;
+    private String secretaryName;
     /**
-     * 所在公司名称
+     * 临时党支部支委编号
      */
-    private String memberCompanyName;
+    private String branchPersonId;
     /**
-     * 担任职务
+     * 临时党支部支委姓名
      */
-    private String memberPost;
+    private String branchPersonName;
+
     /**
-     * 联系方式
+     * 临时党支部成员编号
      */
-    private String memberContact;
+    private String branchMemberIds;
+
+    /**
+     * 临时党支部成员名称
+     */
+    private String branchMemberNames;
+
+    @TableField(exist = false)
+    private List<UserBriefVO> memberList;
+
+    @TableField(exist = false)
+    private List<PiisDocumentPO> documents;
+
 }

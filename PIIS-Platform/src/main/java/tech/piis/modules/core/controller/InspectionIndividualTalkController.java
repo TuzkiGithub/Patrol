@@ -38,7 +38,7 @@ public class InspectionIndividualTalkController extends BaseController {
      *
      * @param inspectionIndividualTalk
      */
-    @PreAuthorize("@ss.hasPermi('piis:talk:list')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionIndividualTalkPO inspectionIndividualTalk) throws BaseException {
         startPage();
@@ -52,7 +52,7 @@ public class InspectionIndividualTalkController extends BaseController {
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:talk:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/count")
     public AjaxResult countInspectionIndividualTalkList(String planId) throws BaseException {
         return AjaxResult.success(inspectionIndividualTalkService.selectInspectionIndividualTalkCount(planId));
@@ -63,7 +63,7 @@ public class InspectionIndividualTalkController extends BaseController {
      *
      * @param inspectionIndividualTalk
      */
-    @PreAuthorize("@ss.hasPermi('piis:talk:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "个别谈话 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionIndividualTalkPO inspectionIndividualTalk) {
@@ -80,7 +80,7 @@ public class InspectionIndividualTalkController extends BaseController {
      *
      * @param inspectionIndividualTalk
      */
-    @PreAuthorize("@ss.hasPermi('piis:talk:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "个别谈话 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionIndividualTalkPO inspectionIndividualTalk) throws BaseException {
@@ -96,7 +96,7 @@ public class InspectionIndividualTalkController extends BaseController {
      * 删除个别谈话
      * individualTalkIds 个别谈话 ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:talk:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "个别谈话 ", businessType = BusinessType.DELETE)
     @DeleteMapping("/{individualTalkIds}")
     public AjaxResult remove(@PathVariable Long[] individualTalkIds) throws BaseException {

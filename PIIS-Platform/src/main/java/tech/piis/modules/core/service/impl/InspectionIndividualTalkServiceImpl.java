@@ -10,7 +10,9 @@ import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.INSERT;
 
@@ -41,7 +43,7 @@ public class InspectionIndividualTalkServiceImpl implements IInspectionIndividua
      */
     @Override
     public List<UnitsBizCountVO> selectInspectionIndividualTalkCount(String planId) throws BaseException {
-        return inspectionIndividualTalkMapper.selectInspectionIndividualTalkCount(planId);
+        return inspectionIndividualTalkMapper.selectInspectionIndividualTalkCount(planId).stream().sorted(Comparator.comparing(UnitsBizCountVO::getUnitsId).reversed()).collect(Collectors.toList());
     }
 
     /**

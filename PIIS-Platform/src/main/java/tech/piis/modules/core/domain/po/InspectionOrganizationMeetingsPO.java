@@ -96,5 +96,6 @@ public class InspectionOrganizationMeetingsPO extends PIBaseApprovalEntityPO {
     /**
      * 文件信息
      */
+    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
 }

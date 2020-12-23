@@ -19,4 +19,12 @@ public interface InspectionImportantReportMapper extends BaseMapper<InspectionIm
      *
      */
     List<UnitsBizCountVO> selectInspectionImportantReportCount(String planId) throws BaseException;
+
+    /**
+     * 查询重要情况专题报告
+     * @param inspectionImportantReportPO
+     * @return
+     * @throws BaseException
+     */
+    InspectionImportantReportPO selectImportantReport(InspectionImportantReportPO inspectionImportantReportPO) throws BaseException;
 }

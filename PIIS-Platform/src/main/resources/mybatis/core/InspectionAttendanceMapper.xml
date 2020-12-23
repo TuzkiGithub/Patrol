@@ -16,7 +16,7 @@
         left join inspection_attendance a on u.UNITS_ID = a.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
+        order by u.CREATED_TIME desc
     </select>
 
 </mapper>

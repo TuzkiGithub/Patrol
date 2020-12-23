@@ -1,26 +1,39 @@
 package tech.piis.modules.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import tech.piis.common.enums.ApprovalEnum;
+import tech.piis.common.enums.FileEnum;
+import tech.piis.common.enums.OperationEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
+import tech.piis.framework.utils.BizUtils;
+import tech.piis.modules.core.domain.dto.PlanBriefDTO;
 import tech.piis.modules.core.domain.po.InspectionClueTransferDetailPO;
 import tech.piis.modules.core.domain.po.InspectionClueTransferPO;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.domain.vo.PlanBriefVO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import tech.piis.modules.core.event.WorkFlowEvent;
 import tech.piis.modules.core.mapper.InspectionClueTransferDetailMapper;
 import tech.piis.modules.core.mapper.InspectionClueTransferMapper;
 import tech.piis.modules.core.service.IInspectionClueTransferService;
+import tech.piis.modules.core.service.IInspectionPlanService;
 import tech.piis.modules.core.service.IPiisDocumentService;
+import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
+import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.*;
+import static tech.piis.common.constant.PiisConstants.*;
 
 /**
  * 线索移交 Service业务层处理
@@ -30,7 +43,8 @@ import static tech.piis.common.constant.OperationConstants.*;
  */
 @Transactional
 @Service
-public class InspectionClueTransferServiceImpl implements IInspectionClueTransferService {
+@Slf4j
+public class InspectionClueTransferServiceImpl implements IInspectionClueTransferService, ApplicationListener<WorkFlowEvent> {
     @Autowired
     private InspectionClueTransferMapper inspectionClueTransferMapper;
 
@@ -40,6 +54,22 @@ public class InspectionClueTransferServiceImpl implements IInspectionClueTransfe
     @Autowired
     private IPiisDocumentService documentService;
 
+    @Autowired
+    private IInspectionPlanService planService;
+
+    @Autowired
+    private IWfWorkflowTodoService todoService;
+
+    /**
+     * 与前端接口定义文件类型
+     */
+    private static final Map<Long, Long> TO_TEMP_MAP = new HashMap<>();
+
+    static {
+        TO_TEMP_MAP.put(FileEnum.APPROVAL_FILE.getCode(), 1L);
+        TO_TEMP_MAP.put(FileEnum.HANDOVER_FILE.getCode(), 2L);
+    }
+
 
     /**
      * 统计巡视方案下被巡视单位InspectionClueTransfer次数
@@ -48,7 +78,7 @@ public class InspectionClueTransferServiceImpl implements IInspectionClueTransfe
      */
     @Override
     public List<UnitsBizCountVO> selectInspectionClueTransferCount(String planId) throws BaseException {
-        return inspectionClueTransferMapper.selectInspectionClueTransferCount(planId);
+        return inspectionClueTransferMapper.selectInspectionClueTransferCount(planId).stream().sorted(Comparator.comparing(UnitsBizCountVO::getUnitsId).reversed()).collect(Collectors.toList());
     }
 
     /**
@@ -193,5 +223,85 @@ public class InspectionClueTransferServiceImpl implements IInspectionClueTransfe
         queryWrapper.eq("PLAN_ID", inspectionClueTransfer.getPlanId());
         queryWrapper.eq("UNITS_ID", inspectionClueTransfer.getUnitsId());
         return inspectionClueTransferMapper.selectCount(queryWrapper);
+    }
+
+    /**
+     * 新增代办
+     *
+     * @param clueTransferPO
+     */
+    private void handleTodo(InspectionClueTransferPO clueTransferPO) {
+        String planId = clueTransferPO.getPlanId();
+        Long unitsId = clueTransferPO.getUnitsId();
+        PlanBriefDTO planBriefDTO = new PlanBriefDTO()
+                .setPlanId(planId)
+                .setUnitsId(unitsId);
+        PlanBriefVO planPO = planService.selectPiisBrief(planBriefDTO);
+        WfWorkFlowTodoPO wfWorkFlowTodoPO = new WfWorkFlowTodoPO()
+                .setLookStatus(NO_LOOK)
+                .setTodoName("[线索移交]-" + planPO.getPlanName() + "-" + planPO.getGroupName() + "-" + planPO.getOrgName())
+                .setBusinessId(String.valueOf(clueTransferPO.getClueTransferId()))
+                .setTodoStatus(TODO_NEED)
+                .setApproverId(clueTransferPO.getApproverId())
+                .setApproverName(clueTransferPO.getApproverName());
+        BizUtils.setCreatedOperation(WfWorkFlowTodoPO.class, wfWorkFlowTodoPO);
+        todoService.saveWorkflowTodo(wfWorkFlowTodoPO);
+    }
+
+    /**
+     * 审批线索移交
+     *
+     * @param clueTransferList
+     */
+    @Override
+    public void doApprovals(List<InspectionClueTransferPO> clueTransferList) {
+        if (!CollectionUtils.isEmpty(clueTransferList)) {
+            clueTransferList.forEach(clueTransferPO -> {
+                clueTransferPO.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                inspectionClueTransferMapper.updateById(clueTransferPO);
+                handleTodo(clueTransferPO);
+            });
+        }
+    }
+
+    /**
+     * Handle an application event.
+     *
+     * @param event the event to respond to
+     */
+    @Override
+    public void onApplicationEvent(WorkFlowEvent event) {
+        log.info("###ApplicationListener notify event [线索移交]###");
+        Object object = event.getSource();
+        if (object instanceof InspectionClueTransferServiceImpl) {
+            Integer eventType = event.getEventType();
+            InspectionClueTransferPO clueTransferPO = new InspectionClueTransferPO()
+                    .setClueTransferId(event.getBizId());
+            if (OperationEnum.SELECT.getCode() == eventType) {
+                InspectionClueTransferPO result = inspectionClueTransferMapper.selectInspectionClueTransferWithFile(clueTransferPO);
+                List<InspectionClueTransferDetailPO> clueTransferDetailList = result.getClueTransferDetailList();
+                if (!CollectionUtils.isEmpty(clueTransferDetailList)) {
+                    clueTransferDetailList.forEach(clueTransferDetail -> {
+                        List<PiisDocumentPO> documents = clueTransferDetail.getDocuments();
+                        BizUtils.convertFileDict(documents, TO_TEMP_MAP);
+                    });
+                }
+                event.setData(result);
+            } else if (OperationEnum.UPDATE.getCode() == eventType) {
+                Integer continueApprovalFlag = event.getContinueApprovalFlag();
+                Integer agreeFlag = event.getAgreeFlag();
+                if (NO_APPROVAL == continueApprovalFlag) {
+                    if (AGREE == agreeFlag) {
+                        clueTransferPO.setApprovalFlag(ApprovalEnum.PASSED.getCode());
+                    } else {
+                        clueTransferPO.setApprovalFlag(ApprovalEnum.REJECTED.getCode());
+                    }
+                } else {
+                    clueTransferPO.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                }
+                BizUtils.setUpdatedOperation(InspectionClueTransferPO.class, clueTransferPO);
+                inspectionClueTransferMapper.updateById(clueTransferPO);
+            }
+        }
     }
 }

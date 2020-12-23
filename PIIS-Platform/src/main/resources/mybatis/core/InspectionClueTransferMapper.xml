@@ -23,12 +23,15 @@
         <result property="feedbackCompanyName" column="FEEDBACK_COMPANY_NAME"/>
         <result property="feedbackTime" column="FEEDBACK_TIME"/>
         <result property="feedbackContent" column="FEEDBACK_CONTENT"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
         <result property="remark" column="REMARK"/>
-        <result property="createdBy" column="CREATED_BY"/>
-        <result property="createdTime" column="CREATED_TIME"/>
-        <result property="updatedBy" column="UPDATED_BY"/>
-        <result property="updatedTime" column="UPDATED_TIME"/>
-        <result property="entId" column="ENT_ID"/>
+        <result property="createdBy" column="CCREATED_BY"/>
+        <result property="createdTime" column="CCREATED_TIME"/>
+        <result property="updatedBy" column="UUPDATED_BY"/>
+        <result property="updatedTime" column="UUPDATED_TIME"/>
+        <result property="entId" column="EENT_ID"/>
 
         <collection property="clueTransferDetailList" javaType="java.util.List"
                     resultMap="inspectionClueTransferDetailResult"/>
@@ -44,17 +47,9 @@
         <result property="planTransferCompanyId" column="PLAN_TRANSFER_COMPANY_ID"/>
         <result property="planTransferCompanyName" column="PLAN_TRANSFER_COMPANY_NAME"/>
         <collection property="documents" javaType="java.util.List"
-                    resultMap="documentResultMap"/>
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
     </resultMap>
 
-    <resultMap id="documentResultMap" type="PiisDocumentPO">
-        <id property="piisDocId" column="PIIS_DOC_ID"/>
-        <result property="objectId" column="OBJECT_ID"/>
-        <result property="fileDictId" column="FILE_DICT_ID"/>
-        <result property="fileName" column="FILE_NAME"/>
-        <result property="fileSize" column="FILE_SIZE"/>
-        <result property="filePath" column="FILE_PATH"/>
-    </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
         <result property="unitsId" column="units_id"/>
@@ -63,10 +58,6 @@
         <result property="count" column="count"/>
         <result property="createdTime" column="CREATED_TIME"/>
     </resultMap>
-
-    <sql id="selectInspectionClueTransferVo">
-        select CLUE_TRANSFER_ID, PLAN_ID, UNITS_ID, CLUE_NAME, TRANSFER_COMPANY_ID, TRANSFER_COMPANY_NAME, TRANSFER_AGENT_ID, TRANSFER_AGENT_NAME, TRANSFER_TIME, RECEIVER_COMPANY_ID, RECEIVER_COMPANY_NAME, RECEIVER_AGENT_ID, RECEIVER_AGENT_NAME, RECEIVER_TIME, FEEDBACK_COMPANY_ID, FEEDBACK_COMPANY_NAME, FEEDBACK_TIME, FEEDBACK_CONTENT, REMARK, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_clue_transfer
-    </sql>
 
     <select id="selectInspectionClueTransferList" parameterType="InspectionClueTransferPO"
             resultMap="inspectionClueTransferResult">
@@ -90,11 +81,14 @@
               i.FEEDBACK_TIME,
               i.FEEDBACK_CONTENT,
               i.REMARK,
-              i.CREATED_BY,
-              i.CREATED_TIME,
-              i.UPDATED_BY,
-              i.UPDATED_TIME,
-              i.ENT_ID,
+              i.APPROVAL_FLAG,
+              i.APPROVER_NAME,
+              i.APPROVER_ID,
+              i.CREATED_BY as 'CCREATED_BY',
+              i.CREATED_TIME as 'CCREATED_TIME',
+              i.UPDATED_BY as 'UUPDATED_BY',
+              i.UPDATED_TIME as 'UUPDATED_TIME',
+              i.ENT_ID as 'EENT_ID',
               CLUE_TRANSFER_DETAIL_ID,
               REFLECTED_PERSON_NAME,
               REFLECTED_PERSON_ID,
@@ -134,7 +128,10 @@
                  CREATED_TIME,
                  UPDATED_BY,
                  UPDATED_TIME,
-                 ENT_ID
+                 ENT_ID,
+                 APPROVAL_FLAG,
+                 APPROVER_NAME,
+                 APPROVER_ID
                from inspection_clue_transfer
                where PLAN_ID =#{planId}
                      and UNITS_ID = #{unitsId}
@@ -152,8 +149,56 @@
         left join inspection_clue_transfer d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
     </select>
 
+    <select id="selectInspectionClueTransferWithFile" parameterType="InspectionClueTransferPO"
+            resultMap="inspectionClueTransferResult">
+      select
+          i.CLUE_TRANSFER_ID,
+          i.PLAN_ID,
+          i.UNITS_ID,
+          i.CLUE_NAME,
+          i.TRANSFER_COMPANY_ID,
+          i.TRANSFER_COMPANY_NAME,
+          i.TRANSFER_AGENT_ID,
+          i.TRANSFER_AGENT_NAME,
+          i.TRANSFER_TIME,
+          i.RECEIVER_COMPANY_ID,
+          i.RECEIVER_COMPANY_NAME,
+          i.RECEIVER_AGENT_ID,
+          i.RECEIVER_AGENT_NAME,
+          i.RECEIVER_TIME,
+          i.FEEDBACK_COMPANY_ID,
+          i.FEEDBACK_COMPANY_NAME,
+          i.FEEDBACK_TIME,
+          i.FEEDBACK_CONTENT,
+          i.REMARK,
+          i.CREATED_BY as 'CCREATED_BY',
+          i.CREATED_TIME as 'CCREATED_TIME',
+          i.UPDATED_BY as 'UUPDATED_BY',
+          i.UPDATED_TIME as 'UUPDATED_TIME',
+          i.ENT_ID as 'EENT_ID',
+          i.APPROVAL_FLAG,
+          i.APPROVER_NAME,
+          i.APPROVER_ID,
+          CLUE_TRANSFER_DETAIL_ID,
+          REFLECTED_PERSON_NAME,
+          REFLECTED_PERSON_ID,
+          REFLECTED_PERSON_POST,
+          CLUE_ORIGIN,
+          ACCEPT_TIME,
+          PLAN_TRANSFER_COMPANY_ID,
+          PLAN_TRANSFER_COMPANY_NAME,
+          doc.PIIS_DOC_ID,
+          doc.FILE_DICT_ID,
+          doc.OBJECT_ID,
+          doc.FILE_PATH,
+          doc.FILE_SIZE,
+          doc.FILE_NAME
+      from inspection_clue_transfer i
+      left join inspection_clue_transfer_detail d on i.CLUE_TRANSFER_ID = d.CLUE_TRANSFER_ID
+      left join piis_document doc on concat('ClueTransferDetail', d.CLUE_TRANSFER_DETAIL_ID) = doc.OBJECT_ID
+    where i.CLUE_TRANSFER_ID = #{clueTransferId}
+    </select>
 
 </mapper>

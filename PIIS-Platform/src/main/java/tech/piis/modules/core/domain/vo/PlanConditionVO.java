@@ -24,9 +24,19 @@ public class PlanConditionVO {
     private String piisType;
 
     /**
+     * 巡视方案ID
+     */
+    private String planId;
+
+    /**
      * 巡视方案名称
      */
     private String planName;
+
+    /**
+     * 巡视组ID
+     */
+    private String groupId;
 
     /**
      * 巡视组名称

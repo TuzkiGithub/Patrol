@@ -23,13 +23,13 @@ public class PIBaseEntity {
      * 巡视计划ID参数，数据过滤使用
      */
     @TableField(exist = false)
-    private Set<String> planIdSet;
+    private Set<String> planIdDataScope;
 
     /**
      * 巡视组ID参数，数据过滤使用
      */
     @TableField(exist = false)
-    private Set<String> groupIdSet;
+    private Set<String> groupIdDataScope;
 
     /**
      * 创建人

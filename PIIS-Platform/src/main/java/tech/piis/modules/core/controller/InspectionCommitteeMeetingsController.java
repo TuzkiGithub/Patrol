@@ -57,7 +57,7 @@ public class InspectionCommitteeMeetingsController extends BaseController {
     @PreAuthorize("@ss.hasPermi('core:committee/meetings:query')")
     @GetMapping("/file")
     public AjaxResult findInspectionCommitteeMeetingsFile(@RequestParam("committeeMeetingsId") String inspectionCommitteeMeetingsId) throws BaseException {
-        return AjaxResult.success(documentService.getFileListByBizId("InspectionCommitteeMeetings" + inspectionCommitteeMeetingsId));
+        return AjaxResult.success(documentService.getFileListByBizId("CommitteeMeetings" + inspectionCommitteeMeetingsId));
     }
 
     /**

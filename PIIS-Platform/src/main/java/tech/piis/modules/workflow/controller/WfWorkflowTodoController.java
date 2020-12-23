@@ -35,19 +35,18 @@ public class WfWorkflowTodoController extends BaseController {
     private IWfWorkflowTodoService wfWorkflowTodoService;
 
 
+
     /**
      * 查询代办列表
      *
      * @param wfWorkflowTodo
      */
-    @PreAuthorize("@ss.hasPermi('workflow:todo:list')")
     @GetMapping("/list")
     public AjaxResult list(WfWorkFlowTodoPO wfWorkflowTodo) throws BaseException {
         startPage();
         List<WfWorkFlowTodoPO> data = wfWorkflowTodoService.selectWfWorkflowTodoList(wfWorkflowTodo);
         AjaxResult ajaxResult = AjaxResult.success();
         TableDataInfo tableDataInfo = getDataTable(data);
-        ajaxResult.put("total", tableDataInfo.getTotal());
         ajaxResult.put("rows", tableDataInfo.getRows());
         ajaxResult.put("code", tableDataInfo.getCode());
         ajaxResult.put("msg", tableDataInfo.getMsg());
@@ -55,6 +54,8 @@ public class WfWorkflowTodoController extends BaseController {
         if (null != todoCountVO) {
             ajaxResult.put("undoCount", todoCountVO.getUndoCount());
             ajaxResult.put("doCount", todoCountVO.getDoCount());
+            ajaxResult.put("total", todoCountVO.getUndoCount() +todoCountVO.getDoCount());
+
         }
         return ajaxResult;
     }
@@ -64,7 +65,7 @@ public class WfWorkflowTodoController extends BaseController {
      *
      * @param workflowTodoId
      */
-    @PreAuthorize("@ss.hasPermi('workflow:todo:query')")
+    @PreAuthorize("@ss.hasPermi('workflow:todo:perms')")
     @GetMapping("/info")
     public AjaxResult todoDetail(Long workflowTodoId) {
         return AjaxResult.success(wfWorkflowTodoService.selectWfWorkflowTodoById(workflowTodoId));
@@ -75,7 +76,7 @@ public class WfWorkflowTodoController extends BaseController {
      *
      * @param wfWorkflowTodo
      */
-    @PreAuthorize("@ss.hasPermi('core:todo:edit')")
+    @PreAuthorize("@ss.hasPermi('workflow:todo:perms')")
     @Log(title = "代办", businessType = BusinessType.UPDATE)
     @PostMapping("/status")
     public AjaxResult edit(@RequestBody WfWorkFlowTodoPO wfWorkflowTodo) throws BaseException {
@@ -93,6 +94,7 @@ public class WfWorkflowTodoController extends BaseController {
      * @param wfWorkflowTodo
      * @return
      */
+    @PreAuthorize("@ss.hasPermi('workflow:todo:perms')")
     @PostMapping("approval")
     public AjaxResult doApproval(@RequestBody @Valid WfWorkFlowTodoPO wfWorkflowTodo) throws BaseException {
         wfWorkflowTodoService.doApproval(wfWorkflowTodo);

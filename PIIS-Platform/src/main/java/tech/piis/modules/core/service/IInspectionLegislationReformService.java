@@ -57,4 +57,10 @@ public interface IInspectionLegislationReformService {
      * @return
      */
     int count();
+
+    /**
+     * 审批立行立改
+     * @param inspectionLegislationReformList
+     */
+    void approvals(List<InspectionLegislationReformPO> inspectionLegislationReformList);
 }

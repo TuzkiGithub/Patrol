@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import tech.piis.modules.core.domain.vo.UserBriefVO;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionImportantReportPO extends PIBaseEntity {
+public class InspectionImportantReportPO extends PIBaseApprovalEntityPO {
     /**
      * 重要情况专题报告编号
      */
@@ -55,17 +56,19 @@ public class InspectionImportantReportPO extends PIBaseEntity {
     /**
      * 呈送人ID
      */
-    @NotEmpty(message = "呈送人ID不能为空！")
     private String reporterId;
     /**
      * 呈送人姓名
      */
-    @NotEmpty(message = "呈送人姓名不能为空！")
     private String reporterName;
     /**
      * 报告内容
      */
     private String reportContent;
+
+    @NotEmpty(message = "呈送人不能为空！")
+    @TableField(exist = false)
+    private List<UserBriefVO> forwardSendList;
 
     @TableField(exist = false)
     private List<PiisDocumentPO> documents;

@@ -2,9 +2,11 @@ package tech.piis.modules.core.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
@@ -18,6 +20,8 @@ import tech.piis.modules.core.service.IInspectionSinkingUnderstandingService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.List;
+
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
 
 
 /**
@@ -40,12 +44,10 @@ public class InspectionSinkingUnderstandingController extends BaseController {
      *
      * @param inspectionSinkingUnderstanding
      */
-    @PreAuthorize("@ss.hasPermi('piis:sinking/understanding:list')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding) throws BaseException {
-        Long unitsId = null;
         if (null != inspectionSinkingUnderstanding) {
-            unitsId = Long.parseLong(inspectionSinkingUnderstanding.getUnitsId());
             if (null == inspectionSinkingUnderstanding.getPageNum() || null == inspectionSinkingUnderstanding.getPageNum()) {
                 inspectionSinkingUnderstanding.setPageNum(GenConstants.DEFAULT_PAGE_NUM);
                 inspectionSinkingUnderstanding.setPageSize(GenConstants.DEFAULT_PAGE_SIZE);
@@ -65,7 +67,7 @@ public class InspectionSinkingUnderstandingController extends BaseController {
      *
      * @param sinkingUnderstandingId 文件关联ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:sinking/understanding:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/file")
     public AjaxResult findInspectionSinkingUnderstandingFile(String sinkingUnderstandingId) throws BaseException {
         return AjaxResult.success(documentService.getFileListByBizId("SinkingUnderstanding" + sinkingUnderstandingId));
@@ -76,7 +78,7 @@ public class InspectionSinkingUnderstandingController extends BaseController {
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:sinking/understanding:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/count")
     public AjaxResult countInspectionSinkingUnderstandingList(String planId) throws BaseException {
         return AjaxResult.success(inspectionSinkingUnderstandingService.selectInspectionSinkingUnderstandingCount(planId));
@@ -87,15 +89,36 @@ public class InspectionSinkingUnderstandingController extends BaseController {
      *
      * @param inspectionSinkingUnderstanding
      */
-    @PreAuthorize("@ss.hasPermi('piis:sinking/understanding:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "下沉了解", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding) {
         if (null == inspectionSinkingUnderstanding) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        if (NO_APPROVAL == inspectionSinkingUnderstanding.getIsApproval()) {
+            inspectionSinkingUnderstanding.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionSinkingUnderstanding.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
+        }
         BizUtils.setCreatedOperation(InspectionSinkingUnderstandingPO.class, inspectionSinkingUnderstanding);
         return toAjax(inspectionSinkingUnderstandingService.save(inspectionSinkingUnderstanding));
+    }
+
+    /**
+     * 审批下沉了解
+     *
+     * @param sinkingUnderstandingList
+     */
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
+    @Log(title = "下沉了解", businessType = BusinessType.APPROVAL)
+    @PostMapping("approval")
+    public AjaxResult approval(@RequestBody List<InspectionSinkingUnderstandingPO> sinkingUnderstandingList) {
+        if (CollectionUtils.isEmpty(sinkingUnderstandingList)) {
+            return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        inspectionSinkingUnderstandingService.doApprovals(sinkingUnderstandingList);
+        return AjaxResult.success();
     }
 
     /**
@@ -103,12 +126,17 @@ public class InspectionSinkingUnderstandingController extends BaseController {
      *
      * @param inspectionSinkingUnderstanding
      */
-    @PreAuthorize("@ss.hasPermi('piis:sinking/understanding:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "下沉了解", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding) throws BaseException {
         if (null == inspectionSinkingUnderstanding) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionSinkingUnderstanding.getIsApproval()) {
+            inspectionSinkingUnderstanding.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionSinkingUnderstanding.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         BizUtils.setUpdatedOperation(InspectionSinkingUnderstandingPO.class, inspectionSinkingUnderstanding);
         return toAjax(inspectionSinkingUnderstandingService.update(inspectionSinkingUnderstanding));
@@ -118,29 +146,11 @@ public class InspectionSinkingUnderstandingController extends BaseController {
      * 删除下沉了解
      * sinkngUnderstandingIds 下沉了解ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:sinking/understanding:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "下沉了解", businessType = BusinessType.DELETE)
     @DeleteMapping("/{sinkngUnderstandingIds}")
     public AjaxResult remove(@PathVariable String[] sinkngUnderstandingIds) throws BaseException {
         return toAjax(inspectionSinkingUnderstandingService.deleteByInspectionSinkingUnderstandingIds(sinkngUnderstandingIds));
     }
 
-    /**
-     * 参数类型转换
-     *
-     * @param inspectionSinkingUnderstanding
-     */
-    private void specialReportCovert2String(InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding) {
-
-    }
-
-
-    /**
-     * 参数类型转换
-     *
-     * @param inspectionSinkingUnderstandingList
-     */
-    private void specialReportCovert2List(List<InspectionSinkingUnderstandingPO> inspectionSinkingUnderstandingList) {
-
-    }
 }

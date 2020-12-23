@@ -43,7 +43,7 @@ public class InspectionPlanController extends BaseController {
     /**
      * 查询巡视计划列表
      */
-    @PreAuthorize("@ss.hasPermi('piis:plan:list')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionPlanPO inspectionPlanPO) {
         List<InspectionPlanPO> list = null;
@@ -111,11 +111,12 @@ public class InspectionPlanController extends BaseController {
      * @param planId
      * @return
      * @throws Exception
+     *
      */
-    @PreAuthorize("@ss.hasPermi('piis:plan:query')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @GetMapping("file")
     public AjaxResult getPlanFile(String planId) throws BaseException {
-        return AjaxResult.success(documentService.getFileListByBizId(planId));
+        return AjaxResult.success(documentService.getFileListByBizId("Plan" + planId));
     }
 
     /**

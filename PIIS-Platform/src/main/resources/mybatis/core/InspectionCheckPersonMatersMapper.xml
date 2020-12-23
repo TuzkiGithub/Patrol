@@ -12,6 +12,9 @@
         <result property="checkerName" column="CHECKER_NAME"/>
         <result property="checkName" column="CHECK_NAME"/>
         <result property="checkTime" column="CHECK_TIME"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
         <result property="createdBy" column="CREATED_BY"/>
         <result property="createdTime" column="CREATED_TIME"/>
         <result property="updatedBy" column="UPDATED_BY"/>
@@ -49,6 +52,9 @@
         cpm.CHECKER_NAME,
         cpm.CHECK_NAME,
         cpm.CHECK_TIME,
+        cpm.APPROVER_ID,
+        cpm.APPROVER_NAME,
+        cpm.APPROVAL_FLAG,
         cpm.CREATED_BY,
         cpm.CREATED_TIME,
         cpm.UPDATED_BY,
@@ -69,6 +75,9 @@
         CHECKER_NAME,
         CHECK_NAME,
         CHECK_TIME,
+        APPROVER_ID,
+        APPROVER_NAME,
+        APPROVAL_FLAG,
         CREATED_BY,
         CREATED_TIME,
         UPDATED_BY,
@@ -91,13 +100,42 @@
     </select>
 
 
-    <select id="selectInspectionCheckPersonMattersCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
+    <select id="selectInspectionCheckPersonMattersCount" resultMap="unitsBizCountResultMap"
+            parameterType="java.lang.String">
         select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(cpm.UNITS_ID) as count
         from inspection_units u
         left join inspection_check_person_matters cpm on u.UNITS_ID = cpm.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
+    </select>
+
+    <select id="selectCheckPersonMatters" parameterType="InspectionCheckPersonMattersPO"
+            resultMap="inspectionCheckPersonMattersResult">
+        select
+        cpm.CHECK_PERSON_MATTERS_ID,
+        cpm.PLAN_ID,
+        cpm.UNITS_ID,
+        cpm.CHECKER_ID,
+        cpm.CHECKER_NAME,
+        cpm.CHECK_NAME,
+        cpm.CHECK_TIME,
+        cpm.APPROVER_ID,
+        cpm.APPROVER_NAME,
+        cpm.APPROVAL_FLAG,
+        cpm.CREATED_BY,
+        cpm.CREATED_TIME,
+        cpm.UPDATED_BY,
+        cpm.UPDATED_TIME,
+        cpm.ENT_ID,
+        d.PIIS_DOC_ID,
+        d.FILE_DICT_ID,
+        d.FILE_NAME,
+        d.FILE_PATH,
+        d.FILE_SIZE
+        from
+        inspection_check_person_matters cpm
+        left join piis_document d on concat('CheckPersonMatters', cpm.CHECK_PERSON_MATTERS_ID) = d.OBJECT_ID
+        where CHECK_PERSON_MATTERS_ID = #{checkPersonMattersId}
     </select>
 
 </mapper>

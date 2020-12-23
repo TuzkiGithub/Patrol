@@ -1,6 +1,7 @@
 package tech.piis.modules.core.domain.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -37,5 +38,6 @@ public class InspectionAnnouncementInfoPO extends PIBaseApprovalEntityPO {
      */
     private Long unitsId;
 
+    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
 }

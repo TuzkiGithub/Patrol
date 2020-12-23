@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * ClassName : ClearFile
  * Package : tech.piis.ex_service.job
- * Description :
+ * Description :定时清理无关联的文件
  *
  * @author : chenhui@xvco.com
  */
@@ -28,18 +28,18 @@ public class ClearFile {
     @Autowired
     private PiisDocumentMapper documentMapper;
 
-    public void clearFile() throws Exception {
+    public void clearFile() {
         QueryWrapper<PiisDocumentPO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("object_id", "");
+        queryWrapper.eq("OBJECT_ID", null);
         List<PiisDocumentPO> piisDocumentPOS = documentMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(piisDocumentPOS)) {
-            List<Long> ids = new ArrayList<>();
-            piisDocumentPOS.forEach(piisDocumentPO -> {
-                ids.add(piisDocumentPO.getPiisDocId());
-                String filePath = piisDocumentPO.getFilePath();
+            List<Long> docIdList = new ArrayList<>();
+            piisDocumentPOS.forEach(documentPO -> {
+                docIdList.add(documentPO.getPiisDocId());
+                String filePath = documentPO.getFilePath();
                 FileUploadUtils.deleteServerFile(filePath);
             });
-            documentMapper.deleteBatchIds(ids);
+            documentMapper.deleteBatchIds(docIdList);
         }
     }
 

@@ -24,7 +24,7 @@ import java.util.List;
 @Data
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionSinkingUnderstandingPO extends PIBaseEntity {
+public class InspectionSinkingUnderstandingPO extends PIBaseApprovalEntityPO {
     /**
      * 下沉了解编号
      */
@@ -37,7 +37,7 @@ public class InspectionSinkingUnderstandingPO extends PIBaseEntity {
     /**
      * 被巡视单位ID
      */
-    private String unitsId;
+    private Long unitsId;
     /**
      * 了解单位
      */

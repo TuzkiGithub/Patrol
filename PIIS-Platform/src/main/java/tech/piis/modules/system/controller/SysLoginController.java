@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tech.piis.common.constant.Constants;
+import tech.piis.common.enums.RoleEnum;
 import tech.piis.common.utils.ServletUtils;
 import tech.piis.framework.security.LoginBody;
 import tech.piis.framework.security.LoginUser;
@@ -16,6 +17,7 @@ import tech.piis.framework.security.service.SysPermissionService;
 import tech.piis.framework.security.service.TokenService;
 import tech.piis.framework.web.domain.AjaxResult;
 import tech.piis.modules.system.domain.SysMenu;
+import tech.piis.modules.system.domain.SysRole;
 import tech.piis.modules.system.domain.SysUser;
 import tech.piis.modules.system.domain.vo.RouterVo;
 import tech.piis.modules.system.domain.vo.RouterWithButtonVO;
@@ -116,13 +118,36 @@ public class SysLoginController {
     public AjaxResult getRouters() {
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
         // 用户信息
+        if (null == loginUser) {
+            return AjaxResult.error("缓存中获取用户信息失败！");
+        }
         SysUser user = loginUser.getUser();
+        if (null == user) {
+            return AjaxResult.error("获取用户详细信息失败！");
+        }
+        List<SysRole> roleList = user.getRoles();
+        RouterWithButtonVO routerWithButtonVO = new RouterWithButtonVO();
+
+        if (!CollectionUtils.isEmpty(roleList)) {
+            for (SysRole sysRole : roleList) {
+                Long roleId = sysRole.getRoleId();
+                if (RoleEnum.ADMIN.getRoleId().equals(roleId) || RoleEnum.getInspectionRoleList().contains(roleId)) {
+                    routerWithButtonVO.setPatrolType(3);
+                    break;
+                }
+                if (RoleEnum.getPatrolRoleList().contains(roleId) || RoleEnum.getPatrolGroupRoleList().contains(roleId)) {
+                    routerWithButtonVO.setPatrolType(2);
+                }
+                if (RoleEnum.getInspectionGroupRoleList().contains(roleId)) {
+                    routerWithButtonVO.setPatrolType(1);
+                }
+            }
+        }
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(user.getUserId());
         SysMenu sysMenu = new SysMenu();
         sysMenu.setMenuType("F");
         List<RouterVo> router = menuService.buildMenus(menus);
         List<SysMenu> menuList = menuService.selectMenuList(sysMenu, user.getUserId());
-        RouterWithButtonVO routerWithButtonVO = new RouterWithButtonVO();
         List<String> buttonList;
         if (!CollectionUtils.isEmpty(menuList)) {
             buttonList = new ArrayList<>(menuList.size());

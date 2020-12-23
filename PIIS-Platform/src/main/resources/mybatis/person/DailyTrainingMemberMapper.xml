@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tech.piis.modules.person.mapper.DailyTrainingMemberMapper">
+
+    <!--sql语句-->
+    <resultMap id="dailyTrainingMemberResultMap" type="tech.piis.modules.person.domain.po.DailyTrainingMemberPO">
+        <id property="id" column="ID"/>
+        <result property="memberId" column="member_id"/>
+        <result property="dailyId" column="daily_id"/>
+        <result property="groupName" column="group_name"/>
+        <result property="memberName" column="member_name"/>
+        <result property="memberUnit" column="member_unit"/>
+        <result property="memberPost" column="member_post"/>
+        <result property="innerPost" column="inner_post"/>
+        <result property="sex" column="sex"/>
+        <result property="nation" column="nation"/>
+        <result property="nactive" column="nactive"/>
+        <result property="birthday" column="birthday"/>
+        <result property="phoneNo" column="phone_no"/>
+    </resultMap>
+
+    <insert id="insertBatch" parameterType="tech.piis.modules.person.domain.po.DailyTrainingMemberPO">
+        insert into
+        person_daily_training_member(member_id,daily_id,group_name,member_name,member_unit,member_post,inner_post,sex,nation,nactive,birthday,phone_no) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.memberId},
+            #{item.dailyId},#{item.groupName},#{item.memberName},#{item.memberUnit},#{item.memberPost},#{item.innerPost},#{item.sex},#{item.nation},#{item.nactive},#{item.birthday},#{item.phoneNo})
+        </foreach>
+    </insert>
+</mapper>

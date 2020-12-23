@@ -44,7 +44,7 @@ public class InspectionIssuanceNoticeController extends BaseController
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:notice:query')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @GetMapping("/info")
     public AjaxResult findInspectionIssuanceNotice(String planId) throws BaseException {
         InspectionIssuanceNoticePO inspectionIssuanceNoticePO = new InspectionIssuanceNoticePO()
@@ -54,7 +54,7 @@ public class InspectionIssuanceNoticeController extends BaseController
         if (!CollectionUtils.isEmpty(inspectionIssuanceNoticeList)) {
             PatrolBriefVO patrolBriefVO = new PatrolBriefVO()
                     .setObjectId(inspectionIssuanceNoticeList.get(0).getIssuanceNoticeId())
-                    .setDocuments(documentService.getFileListByBizId("InspectionIssuanceNotice" + inspectionIssuanceNoticeList.get(0).getIssuanceNoticeId()));
+                    .setDocuments(documentService.getFileListByBizId("IssuanceNotice" + inspectionIssuanceNoticeList.get(0).getIssuanceNoticeId()));
             List<PatrolBriefVO> patrolBriefVOList = new ArrayList<>();
             patrolBriefVOList.add(patrolBriefVO);
             return AjaxResult.success(patrolBriefVOList);
@@ -66,7 +66,7 @@ public class InspectionIssuanceNoticeController extends BaseController
      * 新增印发通知 
      * @param  inspectionIssuanceNotice
      */
-    @PreAuthorize("@ss.hasPermi('piis:notice:add')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "印发通知 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionIssuanceNoticePO inspectionIssuanceNotice) {
@@ -81,7 +81,7 @@ public class InspectionIssuanceNoticeController extends BaseController
      * 修改印发通知 
      * @param  inspectionIssuanceNotice
      */
-    @PreAuthorize("@ss.hasPermi('piis:notice:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "印发通知 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionIssuanceNoticePO inspectionIssuanceNotice) throws BaseException{

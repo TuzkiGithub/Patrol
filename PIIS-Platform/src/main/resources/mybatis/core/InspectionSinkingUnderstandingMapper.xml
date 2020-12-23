@@ -12,6 +12,9 @@
         <result property="researchCompanyId" column="RESEARCH_COMPANY_ID"/>
         <result property="sinkingTime" column="SINKING_TIME"/>
         <result property="target" column="TARGET"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
         <result property="createdBy" column="CREATED_BY"/>
         <result property="createdTime" column="CREATED_TIME"/>
         <result property="updatedBy" column="UPDATED_BY"/>
@@ -19,6 +22,8 @@
         <result property="entId" column="ENT_ID"/>
         <collection property="sinkingUnderstandingDetailList" javaType="java.util.List"
                     resultMap="InspectionSinkingUnderstandingDetailResultMap"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
     </resultMap>
 
     <resultMap id="InspectionSinkingUnderstandingDetailResultMap" type="InspectionSinkingUnderstandingDetailPO">
@@ -39,7 +44,7 @@
     </resultMap>
 
     <sql id="selectInspectionSinkingUnderstandingVo">
-        select SINKING_UNDERSTANDING_ID, PLAN_ID, RESEARCH_COMPANY, RESEARCH_COMPANY_ID, SINKING_TIME, TARGET, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_sinking_understanding
+        select SINKING_UNDERSTANDING_ID, PLAN_ID, RESEARCH_COMPANY, RESEARCH_COMPANY_ID, SINKING_TIME, TARGET, APPROVER_ID,APPROVER_NAME,APPROVAL_FLAG,CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_sinking_understanding
     </sql>
 
     <select id="selectInspectionSinkingUnderstandingList" parameterType="InspectionSinkingUnderstandingPO"
@@ -49,13 +54,16 @@
           u.PLAN_ID,
           u.RESEARCH_COMPANY,
           u.RESEARCH_COMPANY_ID,
-          u. SINKING_TIME,
-          u.  TARGET,
+          u.SINKING_TIME,
+          u.TARGET,
+          u.APPROVER_ID,
+          u.APPROVER_NAME,
+          u.APPROVAL_FLAG,
           u.CREATED_BY,
           u.CREATED_TIME,
-          u. UPDATED_BY,
+          u.UPDATED_BY,
           u.UPDATED_TIME,
-          u. ENT_ID,
+          u.ENT_ID,
           SINKING_UNDERSTANDING_DETAIL_ID,
           UNDERSTANDING_NAME,
           COMPANY_ID,
@@ -70,6 +78,9 @@
          RESEARCH_COMPANY_ID,
          SINKING_TIME,
          TARGET,
+         APPROVER_ID,
+         APPROVER_NAME,
+         APPROVAL_FLAG,
          CREATED_BY,
          CREATED_TIME,
          UPDATED_BY,
@@ -91,7 +102,41 @@
         left join inspection_sinking_understanding d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
+    </select>
+
+    <select id="selectSinkingUnderstandingWithFile" parameterType="InspectionSinkingUnderstandingPO"
+            resultMap="InspectionSinkingUnderstandingResult">
+      select
+          s.SINKING_UNDERSTANDING_ID,
+          PLAN_ID,
+          RESEARCH_COMPANY,
+          RESEARCH_COMPANY_ID,
+          SINKING_TIME,
+          TARGET,
+          APPROVER_ID,
+          APPROVER_NAME,
+          APPROVAL_FLAG,
+          s.CREATED_BY,
+          s.CREATED_TIME,
+          s.UPDATED_BY,
+          s.UPDATED_TIME,
+          s.ENT_ID,
+          SINKING_UNDERSTANDING_DETAIL_ID,
+          UNDERSTANDING_NAME,
+          COMPANY_ID,
+          COMPANY_NAME,
+          POST_NAME,
+          UNDERSTANDING_CONTENT,
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH
+        from inspection_sinking_understanding s
+        left join inspection_sinking_understanding_detail d on d.SINKING_UNDERSTANDING_ID = s.SINKING_UNDERSTANDING_ID
+        left join piis_document doc on concat('SinkingUnderstanding', s.SINKING_UNDERSTANDING_ID) = doc.OBJECT_ID
+        where s.SINKING_UNDERSTANDING_ID = #{sinkingUnderstandingId}
     </select>
 
 

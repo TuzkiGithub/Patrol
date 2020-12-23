@@ -19,4 +19,13 @@ public interface InspectionLegislationReformMapper extends BaseMapper<Inspection
      *
      */
     List<UnitsBizCountVO> selectInspectionLegislationReformCount(String planId) throws BaseException;
+
+
+    /**
+     * 查询立行立改
+     * @param inspectionLegislationReformPO
+     * @return
+     * @throws BaseException
+     */
+    InspectionLegislationReformPO selectLegislationReform(InspectionLegislationReformPO inspectionLegislationReformPO) throws BaseException;
 }

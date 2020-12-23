@@ -30,7 +30,9 @@ import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
 import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.*;
 import static tech.piis.common.constant.PiisConstants.*;
@@ -67,7 +69,7 @@ public class InspectionInvestigationVisitServiceImpl implements IInspectionInves
      * @param planId 巡视计划ID
      */
     public List<UnitsBizCountVO> selectInspectionInvestigationVisitCount(String planId) throws BaseException {
-        return inspectionInvestigationVisitMapper.selectInspectionInvestigationVisitCount(planId);
+        return inspectionInvestigationVisitMapper.selectInspectionInvestigationVisitCount(planId).stream().sorted(Comparator.comparing(UnitsBizCountVO::getUnitsId).reversed()).collect(Collectors.toList());
     }
 
     /**

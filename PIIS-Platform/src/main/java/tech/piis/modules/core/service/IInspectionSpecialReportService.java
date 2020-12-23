@@ -1,6 +1,7 @@
 package tech.piis.modules.core.service;
 
 
+import tech.piis.common.exception.BaseException;
 import tech.piis.modules.core.domain.po.InspectionSpecialReportPO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 
@@ -26,8 +27,14 @@ public interface IInspectionSpecialReportService {
 
     int deleteBySpecialReportIds(Long[] specialReportIds);
 
-    int update(InspectionSpecialReportPO inspectionSpecialReport) throws Exception;
+    int update(InspectionSpecialReportPO inspectionSpecialReport) throws BaseException;
 
-    int save(InspectionSpecialReportPO inspectionSpecialReport) throws Exception;
+    int save(InspectionSpecialReportPO inspectionSpecialReport) throws BaseException;
 
+    /**
+     * 审批专题报告
+     * @param inspectionSpecialReportPOList
+     * @return
+     */
+    void doApprovals(List<InspectionSpecialReportPO> inspectionSpecialReportPOList);
 }

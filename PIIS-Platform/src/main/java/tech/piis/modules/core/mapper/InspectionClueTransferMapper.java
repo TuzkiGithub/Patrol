@@ -27,4 +27,12 @@ public interface InspectionClueTransferMapper extends BaseMapper<InspectionClueT
      * @throws BaseException
      */
     List<InspectionClueTransferPO> selectInspectionClueTransferList(InspectionClueTransferPO inspectionClueTransferPO) throws BaseException;
+
+    /**
+     * 查询线索移交以及文件
+     * @param inspectionClueTransferPO
+     * @return
+     * @throws BaseException
+     */
+    InspectionClueTransferPO selectInspectionClueTransferWithFile(InspectionClueTransferPO inspectionClueTransferPO) throws BaseException;
 }

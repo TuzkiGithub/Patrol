@@ -14,7 +14,9 @@ import tech.piis.modules.core.service.IInspectionCommitteeMeetingsService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.INSERT;
 
@@ -41,7 +43,7 @@ public class InspectionCommitteeMeetingsServiceImpl implements IInspectionCommit
      */
     @Override
     public List<UnitsBizCountVO> selectInspectionCommitteeMeetingsCount(String planId) throws BaseException {
-        return inspectionCommitteeMeetingsMapper.selectInspectionCommitteeMeetingsCount(planId);
+        return inspectionCommitteeMeetingsMapper.selectInspectionCommitteeMeetingsCount(planId).stream().sorted(Comparator.comparing(UnitsBizCountVO::getUnitsId).reversed()).collect(Collectors.toList());
     }
 
     /**
@@ -73,7 +75,7 @@ public class InspectionCommitteeMeetingsServiceImpl implements IInspectionCommit
         List<PiisDocumentPO> documents = inspectionCommitteeMeetings.getDocuments();
         documents.forEach(document -> document.setOperationType(INSERT));
         Object bizId = inspectionCommitteeMeetings.getCommitteeMeetingsId();
-        documentService.updateDocumentBatch(documents, "InspectionCommitteeMeetings" + bizId, FileEnum.COMMITTEE_OTHER_FILE.getCode());
+        documentService.updateDocumentBatch(documents, "CommitteeMeetings" + bizId, FileEnum.COMMITTEE_OTHER_FILE.getCode());
         return result;
     }
 
@@ -87,7 +89,7 @@ public class InspectionCommitteeMeetingsServiceImpl implements IInspectionCommit
     @Override
     public int update(InspectionCommitteeMeetingsPO inspectionCommitteeMeetings) throws BaseException {
         Object bizId = inspectionCommitteeMeetings.getCommitteeMeetingsId();
-        documentService.updateDocumentBatch(inspectionCommitteeMeetings.getDocuments(), "InspectionCommitteeMeetings" + bizId, FileEnum.COMMITTEE_OTHER_FILE.getCode());
+        documentService.updateDocumentBatch(inspectionCommitteeMeetings.getDocuments(), "CommitteeMeetings" + bizId, FileEnum.COMMITTEE_OTHER_FILE.getCode());
         return inspectionCommitteeMeetingsMapper.updateById(inspectionCommitteeMeetings);
     }
 

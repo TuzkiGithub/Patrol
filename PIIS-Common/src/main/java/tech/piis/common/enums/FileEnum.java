@@ -46,7 +46,7 @@ public enum FileEnum {
     PIIS_SITE_ARRANGEMENT_FILE("巡视现场安排文件", 63L),
     PIIS_WORK_RULE_FILE("巡视组工作制度文件", 64L),
     PIIS_NEGATIVE_TALK_FILE("巡视谈话负面清单文件", 65L),
-    PIIS_TEMP_BRANCH_FILE("巡视组临时党支部文件", 66L),
+    PIIS_TEMP_BRANCH_FILE("巡视组临时党支部成立文件", 66L),
     OPERATION_OTHER_FILE("工作人员手册其他文件", 67L),
     NOTICE_CONTENT_FILE("通报内容文件", 68L),
     INVITATION_OTHER_FILE("邀请函文件", 69L),
@@ -57,7 +57,20 @@ public enum FileEnum {
     SPOT_OTHER_FILE("进驻材料其他文件", 74L),
     GROUP_FILE("巡视组任命文件", 75L),
     AGENDA_FILE("会议议程文件", 76L),
-    SECRETARY_SPEECH_FILE("被巡视党组织党委书记表态讲话文件", 77L);
+    SECRETARY_SPEECH_FILE("被巡视党组织党委书记表态讲话文件", 77L),
+    ANNOUNCEMENT_INFO_FILE("公告信息文件", 78L),
+    FORUM_OTHER_FILE("座谈会相关附件", 79L),
+    PRESENT_OTHER_FILE("列席会议相关附件", 80L),
+    REPORT_OTHER_FILE_ONE("报请审批报请党委审批巡视方案的签报批示页", 81L),
+    REPORT_OTHER_FILE_TWO("报请审批报请党委审批的巡视方案", 82L),
+    TEMP_OTHER_FILE_ONE("临时党支部审批巡视方案的签报批示页", 83L),
+    TEMP_OTHER_FILE_TWO("临时党支部报请党委审批的巡视方案", 84L),
+    MEETINGS_RESEARCH_FILE("会议研究文件", 85L),
+    PATROL_REPORT_FILE("巡视报告文件", 86L),
+    FEEDBACK_PLAN_FILE("反馈方案文件", 87L),
+    FEEDBACK_MEETINGS_FILE("反馈会文件", 88L),
+    RECTIFICATION_FILE_ONE("含被巡视巡察党组织在整改通报文件", 89L),
+    RECTIFICATION_FILE_TWO("单位内部公开整改情况文件", 90L);
 
     private String name;
 

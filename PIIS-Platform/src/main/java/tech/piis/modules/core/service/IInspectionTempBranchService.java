@@ -13,12 +13,12 @@ import java.util.List;
 public interface IInspectionTempBranchService {
 
     /**
-     * 查询临时支部 列表
+     * 查询临时支部
      * @param inspectionTempBranch
      * @return
      * @throws BaseException
      */
-    List<InspectionTempBranchPO> selectInspectionTempBranchList(InspectionTempBranchPO inspectionTempBranch) throws BaseException;
+    InspectionTempBranchPO selectInspectionTempBranchList(InspectionTempBranchPO inspectionTempBranch) throws BaseException;
 
     /**
     * 新增临时支部 

@@ -57,4 +57,10 @@ public interface IInspectionImportantReportService {
      * @return
      */
     int count();
+
+    /**
+     * 审批重要情况专题报告
+     * @param inspectionImportantReportList
+     */
+    void doApprovals(List<InspectionImportantReportPO> inspectionImportantReportList);
 }

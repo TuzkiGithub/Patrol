@@ -21,9 +21,14 @@
         <result property="clueCount" column="clueCount"/>
         <result property="consultCount" column="consultCount"/>
         <result property="visitCount" column="visitCount"/>
+        <result property="speakScriptCount" column="speakScriptCount"/>
+        <result property="patrolReportCount" column="patrolReportCount"/>
+        <result property="specialReportCount" column="specialReportCount"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
     </resultMap>
 
-   <select id="selectFilingByPlanId" parameterType="java.lang.String" resultMap="inspectionFilingResultMap">
+    <select id="selectFilingByPlanId" parameterType="java.lang.String" resultMap="inspectionFilingResultMap">
         select
           p.PLAN_NAME,
           g.GROUP_ID,
@@ -31,27 +36,43 @@
           g.LEADER_NAME,
           u.UNITS_ID,
           u.ORG_NAME,
-          ifnull(count(distinct (cm.COMMITTEE_MEETINGS_ID)), 0)                        as committeeMeetingsCount,
-          ifnull(count(distinct (ir.IMPORTANT_REPORT_ID)), 0)                          as importReportCount,
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_PATH,
+          doc.FILE_SIZE,
+          doc.FILE_NAME,
+--           ifnull(count(distinct (cm.COMMITTEE_MEETINGS_ID)), 0)                        as committeeMeetingsCount,
+--           ifnull(count(distinct (ir.IMPORTANT_REPORT_ID)), 0)                          as importReportCount,
+--           ifnull(count(distinct (ci.CONSULT_INFO_ID)), 0)                              as consultCount,
+--           ifnull(count(distinct (v.VISIT_ID)) + count(distinct (cv.CALL_VISIT_ID)), 0) as
+--                                                                                           visitCount
           ifnull(count(distinct (it.INDIVIDUAL_TALK_ID)), 0)                           as talkCount,
           ifnull(count(distinct (pd.PROBLEM_DRAFT_ID)), 0)                             as problemDraftCount,
           ifnull(count(distinct (pm.CHECK_PERSON_MATTERS_ID)), 0)                      as checkPersonalCount,
           ifnull(count(distinct (ct.CLUE_TRANSFER_ID)), 0)                             as clueCount,
-          ifnull(count(distinct (ci.CONSULT_INFO_ID)), 0)                              as consultCount,
-          ifnull(count(distinct (v.VISIT_ID)) + count(distinct (cv.CALL_VISIT_ID)), 0) as
-                                                                                          visitCount
-        from inspection_plan p
+          ifnull(count(distinct (pr.PATROL_REPORT_ID)), 0)                             as patrolReportCount,
+          ifnull(count(distinct (sr.SPECIAL_REPORT_ID)), 0)                            as specialReportCount,
+          ifnull((select count(1)
+      from inspection_spot_material sm
+                 left join piis_document doc on concat('SpotMaterial', sm.SPOT_MATERIAL_ID) = doc.OBJECT_ID
+               where PLAN_ID = #{planId}
+               group by SPOT_MATERIAL_ID), 0) as speakScriptCount
+          from inspection_plan p
           LEFT JOIN inspection_group g ON p.PLAN_ID = g.PLAN_ID
           LEFT JOIN inspection_units u ON u.GROUP_ID = g.GROUP_ID
-          left join inspection_committee_meetings cm on cm.UNITS_ID = u.UNITS_ID
-          left join inspection_important_report ir on ir.UNITS_ID = u.UNITS_ID
+--           left join inspection_committee_meetings cm on cm.UNITS_ID = u.UNITS_ID
+--           left join inspection_important_report ir on ir.UNITS_ID = u.UNITS_ID
+--           left join inspection_consult_info ci on ci.UNITS_ID = u.UNITS_ID
+--           left join inspection_visit v on v.UNITS_ID = u.UNITS_ID
+--           left join inspection_call_visit cv on cv.UNITS_ID = u.UNITS_ID
           left join inspection_individual_talk it on it.UNITS_ID = u.UNITS_ID
           left join inspection_problem_draft pd on pd.UNITS_ID = u.UNITS_ID
           left join inspection_check_person_matters pm on pm.UNITS_ID = u.UNITS_ID
           left join inspection_clue_transfer ct on ct.UNITS_ID = u.UNITS_ID
-          left join inspection_consult_info ci on ci.UNITS_ID = u.UNITS_ID
-          left join inspection_visit v on v.UNITS_ID = u.UNITS_ID
-          left join inspection_call_visit cv on cv.UNITS_ID = u.UNITS_ID
+          left join inspection_patrol_report pr on pr.UNITS_ID = u.UNITS_ID
+          left join inspection_special_report sr on sr.UNITS_ID = u.UNITS_ID
+          left join piis_document doc on concat('Plan', p.PLAN_ID) = doc.OBJECT_ID
         where p.plan_id = #{planId}
         group by
           p.PLAN_NAME,

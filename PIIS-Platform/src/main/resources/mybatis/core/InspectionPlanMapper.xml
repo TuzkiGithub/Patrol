@@ -113,6 +113,8 @@
     <resultMap id="piisConditionResultMap" type="PlanConditionVO">
         <result property="piisType" column="piisType"/>
         <result property="planName" column="planName"/>
+        <result property="planId" column="planId"/>
+        <result property="groupId" column="groupId"/>
         <result property="groupName" column="groupName"/>
         <result property="leaderPost" column="leaderPost"/>
         <result property="deputyPost" column="deputyPost"/>
@@ -154,20 +156,7 @@
         u.INSPECTION_TIME,
         u.ORG_ID,
         u.ORG_NAME,
-        u.CREATED_TIME,
-        mb.MOBILIZE_ID,
-        mb.MEET_NAME,
-        mb.MEET_PLACE,
-        mb.MEET_TIME,
-        mb.MEET_DESC,
-        mba.MOBILIZE_ATTENDEE_ID,
-        mba.ATTENDEE_ID,
-        mba.ATTENDEE_NAME,
-        mba.ATTENDEE_POST,
-        mba.ATTENDEE_COMPANY,
-        mba.ATTENDEE_COMPANY_ID,
-        mba.ATTENDEE_PERSON_TYPE,
-        mba.ATTENDEE_TIME
+        u.CREATED_TIME
         from (
         select
         PLAN_ID,
@@ -183,24 +172,38 @@
         from
         inspection_plan
         <where>
-            <if test="planName!=null and planName!=''">
-                AND plan_name like concat('%', #{planName}, '%')
+            <if test="plan.planName!=null and plan.planName!=''">
+                AND plan_name like concat('%', #{plan.planName}, '%')
             </if>
 
-            <if test="planCompanyId!=null and planCompanyId!=''">
-                AND PLAN_COMPANY_ID = #{planCompanyId}
+            <if test="plan.planCompanyId!=null and plan.planCompanyId!=''">
+                AND PLAN_COMPANY_ID = #{plan.planCompanyId}
             </if>
 
-            <if test="planType != null">
-                AND PLAN_TYPE = #{planType}
+            <if test="plan.planType != null">
+                AND PLAN_TYPE = #{plan.planType}
             </if>
         </where>
+        order by CREATED_TIME desc
         ) p
         left join inspection_group g on p.PLAN_ID = g.PLAN_ID
         left join inspection_group_member m on m.GROUP_ID = g.GROUP_ID
         left join inspection_units u on u.GROUP_ID = g.GROUP_ID
-        left join inspection_mobilize mb on mb.PLAN_ID = p.PLAN_ID
-        left join inspection_mobilize_attendee mba on mba.MOBILIZE_ID = mb.MOBILIZE_ID
+        <where>
+            <if test="plan.planIdDataScope!=null">
+                and p.PLAN_ID in
+                <foreach item="item" index="index" collection="plan.planIdDataScope" separator="," open="(" close = ")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="plan.groupIdDataScope!=null">
+                and g.GROUP_ID in
+                <foreach item="item" index="index" collection="plan.groupIdDataScope" separator="," open="(" close = ")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by u.UNITS_ID desc
     </select>
 
     <select id="selectPlanCompanyTotal" resultMap="selectPlanCompanyTotalResultMap">
@@ -243,6 +246,7 @@
       select
           p.PLAN_ID as planId,
           PLAN_NAME as planName,
+          g.GROUP_ID as groupId,
           GROUP_NAME as groupName,
           case p.PLAN_TYPE
           when 0
@@ -267,6 +271,7 @@
       select
           p.PLAN_ID,
           PLAN_NAME,
+          g.GROUP_ID as groupId,
           GROUP_NAME,
           case p.PLAN_TYPE
           when 0
@@ -300,7 +305,8 @@
     group by PLAN_COMPANY_ID
     </select>
 
-    <select id="selectPiisBrief" parameterType="tech.piis.modules.core.domain.dto.PlanBriefDTO" resultType="PlanBriefVO">
+    <select id="selectPiisBrief" parameterType="tech.piis.modules.core.domain.dto.PlanBriefDTO"
+            resultType="PlanBriefVO">
       select
       p.PLAN_ID as planId,
       p.PLAN_NAME as planName,

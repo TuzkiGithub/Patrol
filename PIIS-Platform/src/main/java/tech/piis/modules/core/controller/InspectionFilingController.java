@@ -22,7 +22,7 @@ public class InspectionFilingController {
     @Autowired
     private InspectionFilingMapper inspectionFilingMapper;
 
-    @PreAuthorize("@ss.hasPermi('piis:filing:query')")
+    @PreAuthorize("@ss.hasPermi('piis:filing:perms')")
     @RequestMapping("count")
     public AjaxResult selectFiling(String planId) {
         return AjaxResult.success(inspectionFilingMapper.selectFilingByPlanId(planId));

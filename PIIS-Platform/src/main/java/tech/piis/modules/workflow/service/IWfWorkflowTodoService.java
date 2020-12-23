@@ -63,7 +63,7 @@ public interface IWfWorkflowTodoService {
     int doApproval(WfWorkFlowTodoPO wfWorkflowTodo) throws BaseException;
 
     /**
-     * 查询数量
+     * 查询代办已办数量
      *
      * @return
      */

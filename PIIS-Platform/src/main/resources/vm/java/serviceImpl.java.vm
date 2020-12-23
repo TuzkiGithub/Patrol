@@ -1,6 +1,7 @@
 package ${packageName}.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,7 @@ import  ${packageName}.service.I${ClassName}Service;
  * @date ${datetime}
  */
 @Transactional
+@Slf4j
 @Service
 public class ${ClassName}ServiceImpl implements I${ClassName}Service, ApplicationListener<WorkFlowEvent>  {
     @Autowired
@@ -71,12 +73,12 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service, Applicatio
     @Override
     public List<${ClassName}PO> select${ClassName}List(${ClassName}PO ${className}) throws BaseException {
         QueryWrapper<${ClassName}PO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("units_id", ${className}.getUnitsId());
-        queryWrapper.eq("plan_id", ${className}.getPlanId());
+        queryWrapper.eq("UNITS_ID", ${className}.getUnitsId());
+        queryWrapper.eq("PLAN_ID", ${className}.getPlanId());
         List<${ClassName}PO> ${className}List = ${className}Mapper.selectList(queryWrapper);
         if(!CollectionUtils.isEmpty(${className}List)){
-                ${className}List.forEach(${className} -> {
-                    ${className}.setDocuments(documentService.getFileListByBizId("${ClassName}"));
+                ${className}List.forEach(var -> {
+                    var.setDocuments(documentService.getFileListByBizId("${ClassName}"));
                 });
         }
         return ${className}List;
@@ -171,18 +173,14 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service, Applicatio
     @Override
     public void onApplicationEvent(WorkFlowEvent event) {
         Object object = event.getSource();
-        System.out.println(object.getClass());
         if (object instanceof ${ClassName}ServiceImpl) {
             Integer eventType = event.getEventType();
+            ${ClassName}PO ${className} = new ${ClassName}PO();
             if(OperationEnum.SELECT.getCode() == eventType){
-                QueryWrapper<${ClassName}PO> queryWrapper = new QueryWrapper<>();
-                queryWrapper.eq("","");
-                ${ClassName}PO ${className} = ${className}Mapper.selectOne(queryWrapper);
-                event.setData(${className});
+                event.setData(null);
             }else if(OperationEnum.UPDATE.getCode() == eventType){
                 Integer continueApprovalFlag = event.getContinueApprovalFlag();
                 Integer agreeFlag = event.getAgreeFlag();
-                ${ClassName}PO ${className} = new ${ClassName}PO();
                 if (NO_APPROVAL == continueApprovalFlag) {
                     if (AGREE == agreeFlag) {
                         ${className}.setApprovalFlag(ApprovalEnum.PASSED.getCode());

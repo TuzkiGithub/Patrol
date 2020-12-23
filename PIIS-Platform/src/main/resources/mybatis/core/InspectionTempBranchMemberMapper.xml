@@ -1,125 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tech.piis.modules.core.mapper.InspectionTempBranchMemberMapper">
-    
-    <resultMap type="InspectionTempBranchMemberPO" id="InspectionTempBranchMemberResult">
-        <result property="tempBranchMemberId"    column="TEMP_BRANCH_MEMBER_ID"    />
-        <result property="memberId"    column="MEMBER_ID"    />
-        <result property="memberName"    column="MEMBER_NAME"    />
-        <result property="memberCompanyId"    column="MEMBER_COMPANY_ID"    />
-        <result property="memberCompanyName"    column="MEMBER_COMPANY_NAME"    />
-        <result property="memberPost"    column="MEMBER_POST"    />
-        <result property="memberContact"    column="MEMBER_CONTACT"    />
-        <result property="createdBy"    column="CREATED_BY"    />
-        <result property="createdTime"    column="CREATED_TIME"    />
-        <result property="updatedBy"    column="UPDATED_BY"    />
-        <result property="updatedTime"    column="UPDATED_TIME"    />
-        <result property="entId"    column="ENT_ID"    />
-    </resultMap>
 
-    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
-        <result property="unitsId" column="units_id"/>
-        <result property="orgId" column="org_id"/>
-        <result property="orgName" column="org_name"/>
-        <result property="count" column="count"/>
-        <result property="createdTime" column="CREATED_TIME"/>
+    <resultMap type="InspectionTempBranchMemberPO" id="InspectionTempBranchMemberResult">
+        <result property="tempBranchMemberId" column="TEMP_BRANCH_MEMBER_ID"/>
+        <result property="tempBranchName" column="TEMP_BRANCH_NAME"/>
+        <result property="secretaryId" column="SECRETARY_ID"/>
+        <result property="secretaryName" column="SECRETARY_NAME"/>
+        <result property="branchPersonId" column="BRANCH_PERSON_ID"/>
+        <result property="branchPersonName" column="BRANCH_PERSON_NAME"/>
+        <result property="branchMemberIds" column="BRANCH_MEMBER_IDS"/>
+        <result property="branchMemberNames" column="BRANCH_MEMBER_NAMES"/>
+        <collection property="documents" javaType="java.util.List" resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
     </resultMap>
 
     <sql id="selectInspectionTempBranchMemberVo">
-        select TEMP_BRANCH_MEMBER_ID, MEMBER_ID, MEMBER_NAME, MEMBER_COMPANY_ID, MEMBER_COMPANY_NAME, MEMBER_POST, MEMBER_CONTACT, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_temp_branch_member
+        select TEMP_BRANCH_MEMBER_ID,SECRETARY_ID, SECRETARY_NAME, BRANCH_PERSON_ID, BRANCH_PERSON_NAME, BRANCH_MEMBER_IDS, BRANCH_MEMBER_NAMES,CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_temp_branch_member
     </sql>
 
-    <select id="selectInspectionTempBranchMemberCount}" parameterType="java.lang.String"
-            resultMap="unitsBizCountResultMap">
-        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
-        from inspection_units u
-        left join inspection_temp_branch_member d on u.UNITS_ID = d.UNITS_ID
-        where u.plan_id = #{planId}
-        group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
-    </select>
-
-    <select id="selectInspectionTempBranchMemberList" parameterType="InspectionTempBranchMemberPO" resultMap="InspectionTempBranchMemberResult">
-        <include refid="selectInspectionTempBranchMemberVo"/>
-        <where>  
-            <if test="memberId != null  and memberId != ''"> and MEMBER_ID = #{memberId}</if>
-            <if test="memberName != null  and memberName != ''"> and MEMBER_NAME like concat('%', #{memberName}, '%')</if>
-            <if test="memberCompanyId != null  and memberCompanyId != ''"> and MEMBER_COMPANY_ID = #{memberCompanyId}</if>
-            <if test="memberCompanyName != null  and memberCompanyName != ''"> and MEMBER_COMPANY_NAME like concat('%', #{memberCompanyName}, '%')</if>
-            <if test="memberPost != null  and memberPost != ''"> and MEMBER_POST = #{memberPost}</if>
-            <if test="memberContact != null  and memberContact != ''"> and MEMBER_CONTACT = #{memberContact}</if>
-            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
-            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
-            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
-            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
-        </where>
-    </select>
-    
-    <select id="selectInspectionTempBranchMemberById" parameterType="Long" resultMap="InspectionTempBranchMemberResult">
-        <include refid="selectInspectionTempBranchMemberVo"/>
-        where TEMP_BRANCH_MEMBER_ID = #{tempBranchMemberId}
-    </select>
-        
-    <insert id="insertInspectionTempBranchMember" parameterType="InspectionTempBranchMemberPO" useGeneratedKeys="true" keyProperty="tempBranchMemberId">
-        insert into inspection_temp_branch_member
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="memberId != null  and memberId != ''">MEMBER_ID,</if>
-            <if test="memberName != null  and memberName != ''">MEMBER_NAME,</if>
-            <if test="memberCompanyId != null  and memberCompanyId != ''">MEMBER_COMPANY_ID,</if>
-            <if test="memberCompanyName != null  and memberCompanyName != ''">MEMBER_COMPANY_NAME,</if>
-            <if test="memberPost != null  and memberPost != ''">MEMBER_POST,</if>
-            <if test="memberContact != null  and memberContact != ''">MEMBER_CONTACT,</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
-            <if test="createdTime != null ">CREATED_TIME,</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
-            <if test="updatedTime != null ">UPDATED_TIME,</if>
-            <if test="entId != null  and entId != ''">ENT_ID,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="memberId != null  and memberId != ''">#{memberId},</if>
-            <if test="memberName != null  and memberName != ''">#{memberName},</if>
-            <if test="memberCompanyId != null  and memberCompanyId != ''">#{memberCompanyId},</if>
-            <if test="memberCompanyName != null  and memberCompanyName != ''">#{memberCompanyName},</if>
-            <if test="memberPost != null  and memberPost != ''">#{memberPost},</if>
-            <if test="memberContact != null  and memberContact != ''">#{memberContact},</if>
-            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
-            <if test="createdTime != null ">#{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
-            <if test="updatedTime != null ">#{updatedTime},</if>
-            <if test="entId != null  and entId != ''">#{entId},</if>
-         </trim>
+    <insert id="insertBatch" parameterType="InspectionTempBranchMemberPO" useGeneratedKeys="true" keyProperty="tempBranchMemberId">
+        insert into inspection_temp_branch_member(TEMP_BRANCH_ID,TEMP_BRANCH_NAME,SECRETARY_ID, SECRETARY_NAME, BRANCH_PERSON_ID,
+        BRANCH_PERSON_NAME,
+        BRANCH_MEMBER_IDS, BRANCH_MEMBER_NAMES) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (
+            #{item.tempBranchId},
+            #{item.tempBranchName},
+            #{item.secretaryId},
+            #{item.secretaryName},
+            #{item.branchPersonId},
+            #{item.branchPersonName},
+            #{item.branchMemberIds},
+            #{item.branchMemberNames}
+            )
+        </foreach>
     </insert>
 
-    <update id="updateInspectionTempBranchMember" parameterType="InspectionTempBranchMemberPO">
-        update inspection_temp_branch_member
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="memberId != null  and memberId != ''">MEMBER_ID = #{memberId},</if>
-            <if test="memberName != null  and memberName != ''">MEMBER_NAME = #{memberName},</if>
-            <if test="memberCompanyId != null  and memberCompanyId != ''">MEMBER_COMPANY_ID = #{memberCompanyId},</if>
-            <if test="memberCompanyName != null  and memberCompanyName != ''">MEMBER_COMPANY_NAME = #{memberCompanyName},</if>
-            <if test="memberPost != null  and memberPost != ''">MEMBER_POST = #{memberPost},</if>
-            <if test="memberContact != null  and memberContact != ''">MEMBER_CONTACT = #{memberContact},</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
-            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
-            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
-            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
-        </trim>
-        where TEMP_BRANCH_MEMBER_ID = #{tempBranchMemberId}
-    </update>
-
-    <delete id="deleteInspectionTempBranchMemberById" parameterType="Long">
-        delete from inspection_temp_branch_member where TEMP_BRANCH_MEMBER_ID = #{tempBranchMemberId}
-    </delete>
-
-    <delete id="deleteInspectionTempBranchMemberByIds" parameterType="String">
-        delete from inspection_temp_branch_member where TEMP_BRANCH_MEMBER_ID in 
-        <foreach item="tempBranchMemberId" collection="array" open="(" separator="," close=")">
-            #{tempBranchMemberId}
-        </foreach>
-    </delete>
-    
 </mapper>

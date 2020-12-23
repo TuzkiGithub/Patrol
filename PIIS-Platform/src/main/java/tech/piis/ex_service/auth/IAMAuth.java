@@ -213,7 +213,7 @@ public class IAMAuth {
         loginUser.setUser(sysUser);
         loginUser = new LoginUser(sysUser, permissionService.getMenuPermission(sysUser));
         String token = tokenService.createToken(loginUser);
-        String redirectUrl = piisPcAppUrl + "/dashboard?token=" + token + "&userId" + userId;
+        String redirectUrl = piisPcAppUrl + "/dashboard?token=" + token + "&userId=" + userId;
         log.info("###IAM认证 redirectVueUrl = {}", redirectUrl);
         ServletUtils.getResponse().sendRedirect(redirectUrl);
         return AjaxResult.success(token);

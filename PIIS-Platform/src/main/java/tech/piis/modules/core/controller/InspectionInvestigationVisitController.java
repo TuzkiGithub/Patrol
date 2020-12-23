@@ -44,7 +44,7 @@ public class InspectionInvestigationVisitController extends BaseController {
      *
      * @param inspectionInvestigationVisit
      */
-    @PreAuthorize("@ss.hasPermi('piis:investigation/visit:list')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionInvestigationVisitPO inspectionInvestigationVisit) throws BaseException {
         if (null != inspectionInvestigationVisit) {
@@ -67,7 +67,7 @@ public class InspectionInvestigationVisitController extends BaseController {
      *
      * @param investigationVisitId 文件关联ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:investigation/visit:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/file")
     public AjaxResult findInspectionInvestigationVisitFile(String investigationVisitId) throws BaseException {
         return AjaxResult.success(documentService.getFileListByBizId("InvestigationVisit" + investigationVisitId));
@@ -78,7 +78,7 @@ public class InspectionInvestigationVisitController extends BaseController {
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:investigation/visit:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/count")
     public AjaxResult countInspectionInvestigationVisitList(String planId) throws BaseException {
         return AjaxResult.success(inspectionInvestigationVisitService.selectInspectionInvestigationVisitCount(planId));
@@ -89,7 +89,7 @@ public class InspectionInvestigationVisitController extends BaseController {
      *
      * @param inspectionInvestigationVisit
      */
-    @PreAuthorize("@ss.hasPermi('piis:investigation/visit:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "调研走访", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InspectionInvestigationVisitPO inspectionInvestigationVisit) {
@@ -110,7 +110,7 @@ public class InspectionInvestigationVisitController extends BaseController {
      *
      * @param inspectionInvestigationVisitList
      */
-    @PreAuthorize("@ss.hasPermi('piis:investigation/visit:approval')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "调研走访", businessType = BusinessType.INSERT)
     @PostMapping("approval")
     public AjaxResult approval(@RequestBody List<InspectionInvestigationVisitPO> inspectionInvestigationVisitList) {
@@ -126,7 +126,7 @@ public class InspectionInvestigationVisitController extends BaseController {
      *
      * @param inspectionInvestigationVisit
      */
-    @PreAuthorize("@ss.hasPermi('piis:investigation/visit:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "调研走访", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionInvestigationVisitPO inspectionInvestigationVisit) throws BaseException {
@@ -146,7 +146,7 @@ public class InspectionInvestigationVisitController extends BaseController {
      * 删除调研走访
      * investigationVisitIds 调研走访ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:investigation/visit:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "调研走访", businessType = BusinessType.DELETE)
     @DeleteMapping("/{investigationVisitIds}")
     public AjaxResult remove(@PathVariable String[] investigationVisitIds) throws BaseException {

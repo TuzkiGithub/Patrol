@@ -42,7 +42,7 @@ public class InspectionOrganizationMeetingsController extends BaseController {
      *
      * @param inspectionOrganizationMeetings
      */
-    @PreAuthorize("@ss.hasPermi('piis:meetings:list')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionOrganizationMeetingsPO inspectionOrganizationMeetings) throws BaseException {
         startPage();
@@ -56,7 +56,7 @@ public class InspectionOrganizationMeetingsController extends BaseController {
      *
      * @param organizationMeetingsId 文件关联ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:meetings:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/file")
     public AjaxResult findInspectionOrganizationMeetingsFile(String organizationMeetingsId) throws BaseException {
         return AjaxResult.success(documentService.getFileListByBizId("OrganizationMeetings" + organizationMeetingsId));
@@ -68,7 +68,7 @@ public class InspectionOrganizationMeetingsController extends BaseController {
      * @param planId           巡视计划ID
      * @param organizationType 组织类型
      */
-    @PreAuthorize("@ss.hasPermi('piis:meetings:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/count")
     public AjaxResult countInspectionOrganizationMeetingsList(@RequestParam("planId") String planId, @RequestParam("organizationType") Integer organizationType) throws BaseException {
         return AjaxResult.success(inspectionOrganizationMeetingsService.selectInspectionOrganizationMeetingsCount(planId, organizationType));
@@ -79,7 +79,7 @@ public class InspectionOrganizationMeetingsController extends BaseController {
      *
      * @param inspectionOrganizationMeetings
      */
-    @PreAuthorize("@ss.hasPermi('piis:meetings:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "组织会议", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InspectionOrganizationMeetingsPO inspectionOrganizationMeetings) {
@@ -103,6 +103,7 @@ public class InspectionOrganizationMeetingsController extends BaseController {
      * @return
      */
     @PostMapping("approval")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     public AjaxResult doApproval(@RequestBody List<InspectionOrganizationMeetingsPO> organizationMeetingsList) {
         inspectionOrganizationMeetingsService.doApprovals(organizationMeetingsList);
         return AjaxResult.success();
@@ -113,7 +114,7 @@ public class InspectionOrganizationMeetingsController extends BaseController {
      *
      * @param inspectionOrganizationMeetings
      */
-    @PreAuthorize("@ss.hasPermi('piis:meetings:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "组织会议", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionOrganizationMeetingsPO inspectionOrganizationMeetings) throws BaseException {
@@ -134,7 +135,7 @@ public class InspectionOrganizationMeetingsController extends BaseController {
      * 删除组织会议
      * organizationMeetingsIds 组织会议ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:meetings:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "组织会议", businessType = BusinessType.DELETE)
     @DeleteMapping("/{organizationMeetingsIds}")
     public AjaxResult remove(@PathVariable Long[] organizationMeetingsIds) throws BaseException {

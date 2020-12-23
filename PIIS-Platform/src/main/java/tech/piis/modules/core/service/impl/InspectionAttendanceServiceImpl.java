@@ -19,7 +19,9 @@ import tech.piis.modules.core.service.IInspectionAttendanceService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.DELETE;
 import static tech.piis.common.constant.OperationConstants.INSERT;
@@ -51,7 +53,7 @@ public class InspectionAttendanceServiceImpl implements IInspectionAttendanceSer
      * @param planId 巡视计划ID
      */
     public List<UnitsBizCountVO> selectInspectionAttendanceCount(String planId) throws BaseException {
-        return inspectionAttendanceMapper.selectInspectionAttendanceCount(planId);
+        return inspectionAttendanceMapper.selectInspectionAttendanceCount(planId).stream().sorted(Comparator.comparing(UnitsBizCountVO::getUnitsId).reversed()).collect(Collectors.toList());
     }
 
     /**

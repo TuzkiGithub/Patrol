@@ -1,22 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tech.piis.modules.core.mapper.InspectionTempBranchMapper">
-    
+
     <resultMap type="InspectionTempBranchPO" id="InspectionTempBranchResult">
-        <result property="tempBranchId"    column="TEMP_BRANCH_ID"    />
-        <result property="planId"    column="PLAN_ID"    />
-        <result property="secretaryId"    column="SECRETARY_ID"    />
-        <result property="secretaryName"    column="SECRETARY_NAME"    />
-        <result property="branchPersonId"    column="BRANCH_PERSON_ID"    />
-        <result property="branchPersonName"    column="BRANCH_PERSON_NAME"    />
-        <result property="approvalFlag"    column="APPROVAL_FLAG"    />
-        <result property="createdBy"    column="CREATED_BY"    />
-        <result property="createdTime"    column="CREATED_TIME"    />
-        <result property="updatedBy"    column="UPDATED_BY"    />
-        <result property="updatedTime"    column="UPDATED_TIME"    />
-        <result property="entId"    column="ENT_ID"    />
+        <result property="tempBranchId" column="TEMP_BRANCH_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="title" column="TITLE"/>
+        <result property="forwardSendIds" column="FORWARD_SEND_IDS"/>
+        <result property="forwardSendNames" column="FORWARD_SEND_NAMES"/>
+        <result property="agentId" column="AGENT_ID"/>
+        <result property="agentName" column="AGENT_NAME"/>
+        <result property="quickSlow" column="QUICK_SLOW"/>
+        <result property="classification" column="CLASSIFICATION"/>
+        <result property="phone" column="PHONE"/>
+        <result property="time" column="TIME"/>
+        <result property="signDeptIds" column="SIGN_DEPT_IDS"/>
+        <result property="signDeptNames" column="SIGN_DEPT_NAMES"/>
+        <result property="createdBy" column="t.CREATED_BY"/>
+        <result property="createdTime" column="t.CREATED_TIME"/>
+        <result property="updatedBy" column="t.UPDATED_BY"/>
+        <result property="updatedTime" column="t.UPDATED_TIME"/>
+        <result property="entId" column="t.ENT_ID"/>
+        <collection property="tempBranchMemberList" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.InspectionTempBranchMemberMapper.InspectionTempBranchMemberResult"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -27,99 +35,55 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createdTime" column="CREATED_TIME"/>
     </resultMap>
 
-    <sql id="selectInspectionTempBranchVo">
-        select TEMP_BRANCH_ID, PLAN_ID, SECRETARY_ID, SECRETARY_NAME, BRANCH_PERSON_ID, BRANCH_PERSON_NAME, APPROVAL_FLAG, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_temp_branch
-    </sql>
-
-    <select id="selectInspectionTempBranchCount}" parameterType="java.lang.String"
+    <select id="selectInspectionTempBranchCount" parameterType="java.lang.String"
             resultMap="unitsBizCountResultMap">
         select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
         from inspection_units u
         left join inspection_temp_branch d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
+        order by u.CREATED_TIME desc
     </select>
 
-    <select id="selectInspectionTempBranchList" parameterType="InspectionTempBranchPO" resultMap="InspectionTempBranchResult">
-        <include refid="selectInspectionTempBranchVo"/>
-        <where>  
-            <if test="planId != null  and planId != ''"> and PLAN_ID = #{planId}</if>
-            <if test="secretaryId != null  and secretaryId != ''"> and SECRETARY_ID = #{secretaryId}</if>
-            <if test="secretaryName != null  and secretaryName != ''"> and SECRETARY_NAME like concat('%', #{secretaryName}, '%')</if>
-            <if test="branchPersonId != null  and branchPersonId != ''"> and BRANCH_PERSON_ID = #{branchPersonId}</if>
-            <if test="branchPersonName != null  and branchPersonName != ''"> and BRANCH_PERSON_NAME like concat('%', #{branchPersonName}, '%')</if>
-            <if test="approvalFlag != null "> and APPROVAL_FLAG = #{approvalFlag}</if>
-            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
-            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
-            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
-            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
-        </where>
+    <select id="selectInspectionTempBranch" parameterType="InspectionTempBranchPO"
+            resultMap="InspectionTempBranchResult">
+        select
+          b.TEMP_BRANCH_ID,
+          PLAN_ID,
+          TITLE,
+          FORWARD_SEND_IDS,
+          FORWARD_SEND_NAMES,
+          AGENT_ID,
+          AGENT_NAME,
+          QUICK_SLOW,
+          CLASSIFICATION,
+          PHONE,
+          SIGN_DEPT_IDS,
+          SIGN_DEPT_NAMES,
+          TIME,
+          m.TEMP_BRANCH_MEMBER_ID,
+          m.TEMP_BRANCH_NAME,
+          m.SECRETARY_ID,
+          m.SECRETARY_NAME,
+          m.BRANCH_PERSON_ID,
+          m.BRANCH_PERSON_NAME,
+          m.BRANCH_MEMBER_IDS,
+          m.BRANCH_MEMBER_NAMES,
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH,
+          b.CREATED_BY as 't.CREATED_BY',
+          b.CREATED_TIME as 't.CREATED_TIME',
+          b.UPDATED_BY as 't.UPDATED_BY',
+          b.UPDATED_TIME as 't.UPDATED_TIME',
+          b.ENT_ID as 't.ENT_ID'
+        from inspection_temp_branch b
+          left join inspection_temp_branch_member m on b.TEMP_BRANCH_ID = m.TEMP_BRANCH_ID
+          left join piis_document doc on concat('TempBranchMember', m.TEMP_BRANCH_MEMBER_ID) = doc.OBJECT_ID
+        where PLAN_ID = #{planId}
     </select>
-    
-    <select id="selectInspectionTempBranchById" parameterType="Long" resultMap="InspectionTempBranchResult">
-        <include refid="selectInspectionTempBranchVo"/>
-        where TEMP_BRANCH_ID = #{tempBranchId}
-    </select>
-        
-    <insert id="insertInspectionTempBranch" parameterType="InspectionTempBranchPO" useGeneratedKeys="true" keyProperty="tempBranchId">
-        insert into inspection_temp_branch
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="planId != null  and planId != ''">PLAN_ID,</if>
-            <if test="secretaryId != null  and secretaryId != ''">SECRETARY_ID,</if>
-            <if test="secretaryName != null  and secretaryName != ''">SECRETARY_NAME,</if>
-            <if test="branchPersonId != null  and branchPersonId != ''">BRANCH_PERSON_ID,</if>
-            <if test="branchPersonName != null  and branchPersonName != ''">BRANCH_PERSON_NAME,</if>
-            <if test="approvalFlag != null ">APPROVAL_FLAG,</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
-            <if test="createdTime != null ">CREATED_TIME,</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
-            <if test="updatedTime != null ">UPDATED_TIME,</if>
-            <if test="entId != null  and entId != ''">ENT_ID,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="planId != null  and planId != ''">#{planId},</if>
-            <if test="secretaryId != null  and secretaryId != ''">#{secretaryId},</if>
-            <if test="secretaryName != null  and secretaryName != ''">#{secretaryName},</if>
-            <if test="branchPersonId != null  and branchPersonId != ''">#{branchPersonId},</if>
-            <if test="branchPersonName != null  and branchPersonName != ''">#{branchPersonName},</if>
-            <if test="approvalFlag != null ">#{approvalFlag},</if>
-            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
-            <if test="createdTime != null ">#{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
-            <if test="updatedTime != null ">#{updatedTime},</if>
-            <if test="entId != null  and entId != ''">#{entId},</if>
-         </trim>
-    </insert>
 
-    <update id="updateInspectionTempBranch" parameterType="InspectionTempBranchPO">
-        update inspection_temp_branch
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="planId != null  and planId != ''">PLAN_ID = #{planId},</if>
-            <if test="secretaryId != null  and secretaryId != ''">SECRETARY_ID = #{secretaryId},</if>
-            <if test="secretaryName != null  and secretaryName != ''">SECRETARY_NAME = #{secretaryName},</if>
-            <if test="branchPersonId != null  and branchPersonId != ''">BRANCH_PERSON_ID = #{branchPersonId},</if>
-            <if test="branchPersonName != null  and branchPersonName != ''">BRANCH_PERSON_NAME = #{branchPersonName},</if>
-            <if test="approvalFlag != null ">APPROVAL_FLAG = #{approvalFlag},</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
-            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
-            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
-            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
-        </trim>
-        where TEMP_BRANCH_ID = #{tempBranchId}
-    </update>
-
-    <delete id="deleteInspectionTempBranchById" parameterType="Long">
-        delete from inspection_temp_branch where TEMP_BRANCH_ID = #{tempBranchId}
-    </delete>
-
-    <delete id="deleteInspectionTempBranchByIds" parameterType="String">
-        delete from inspection_temp_branch where TEMP_BRANCH_ID in 
-        <foreach item="tempBranchId" collection="array" open="(" separator="," close=")">
-            #{tempBranchId}
-        </foreach>
-    </delete>
-    
 </mapper>

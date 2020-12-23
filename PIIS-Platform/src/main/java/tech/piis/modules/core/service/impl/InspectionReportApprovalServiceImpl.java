@@ -62,7 +62,7 @@ public class InspectionReportApprovalServiceImpl implements IInspectionReportApp
         List<PiisDocumentPO> documents = inspectionReportApproval.getDocuments();
         documents.forEach(document -> document.setOperationType(INSERT));
         Object bizId = inspectionReportApproval.getReportApprovalId();
-        documentService.updateDocumentBatch(documents, "InspectionReportApproval" + bizId, FileEnum.REPORT_APPROVAL_FILE.getCode());
+        documentService.updateDocumentBatch(documents, "ReportApproval" + bizId);
         return result;
     }
 
@@ -75,7 +75,7 @@ public class InspectionReportApprovalServiceImpl implements IInspectionReportApp
      */
     @Override
     public int update(InspectionReportApprovalPO inspectionReportApproval) throws BaseException {
-        String objectId = "InspectionReportApproval" + inspectionReportApproval.getReportApprovalId();
+        String objectId = "ReportApproval" + inspectionReportApproval.getReportApprovalId();
         List<PiisDocumentPO> documents = inspectionReportApproval.getDocuments();
         documentService.updateDocumentBatch(documents, String.valueOf(objectId));
         return inspectionReportApprovalMapper.updateById(inspectionReportApproval);
@@ -84,7 +84,7 @@ public class InspectionReportApprovalServiceImpl implements IInspectionReportApp
     /**
      * 根据ID批量删除报请审批
      *
-     * @param reportApprovalIds 报请审批 编号
+     * @param reportApprovalIds 报请审批编号
      * @return
      */
     @Override

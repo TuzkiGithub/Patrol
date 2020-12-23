@@ -57,4 +57,10 @@ public interface IInspectionFeedbackService {
      * @return
      */
     int count(InspectionFeedbackPO inspectionFeedback);
+
+    /**
+     * 审批反馈意见
+     * @param inspectionFeedbackList
+     */
+    void doApprovals(List<InspectionFeedbackPO> inspectionFeedbackList);
 }

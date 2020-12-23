@@ -2,7 +2,11 @@ package tech.piis.modules.core.service;
 
 import tech.piis.common.exception.BaseException;
 import tech.piis.modules.core.domain.po.InspectionAnnouncementInfoPO;
+
+import java.io.FileNotFoundException;
 import java.util.List;
+
+import tech.piis.modules.core.domain.vo.AnnouncementInfoCountVO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 
 /**
@@ -18,7 +22,7 @@ public interface IInspectionAnnouncementInfoService {
      * @param planId 巡视计划ID
      *
      */
-    List<UnitsBizCountVO> selectInspectionAnnouncementInfoCount(String planId) throws BaseException;
+    List<AnnouncementInfoCountVO> selectInspectionAnnouncementInfoCount(String planId) throws BaseException;
 
     /**
      * 查询公告信息 列表

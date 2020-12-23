@@ -11,4 +11,12 @@ import java.util.List;
  * @date 2020-11-23
  */
 public interface InspectionTempBranchMapper extends BaseMapper<InspectionTempBranchPO> {
+
+    /**
+     * 查询临时党支部
+     * @param inspectionTempBranchPO
+     * @return
+     * @throws BaseException
+     */
+    InspectionTempBranchPO selectInspectionTempBranch(InspectionTempBranchPO inspectionTempBranchPO) throws BaseException;
 }

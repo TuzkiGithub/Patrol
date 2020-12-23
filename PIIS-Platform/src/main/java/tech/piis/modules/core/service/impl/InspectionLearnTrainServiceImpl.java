@@ -59,7 +59,7 @@ public class InspectionLearnTrainServiceImpl implements IInspectionLearnTrainSer
         List<PiisDocumentPO> documents = inspectionLearnTrain.getDocuments();
         documents.forEach(document -> document.setOperationType(INSERT));
         Object bizId = inspectionLearnTrain.getLearnTrainId();
-        documentService.updateDocumentBatch(documents, "InspectionLearnTrain" + bizId);
+        documentService.updateDocumentBatch(documents, "LearnTrain" + bizId);
         return result;
     }
 
@@ -73,7 +73,7 @@ public class InspectionLearnTrainServiceImpl implements IInspectionLearnTrainSer
     @Override
     public int update(InspectionLearnTrainPO inspectionLearnTrain) throws BaseException {
         Object bizId = inspectionLearnTrain.getLearnTrainId();
-        documentService.updateDocumentBatch(inspectionLearnTrain.getDocuments(), "InspectionLearnTrain" + bizId);
+        documentService.updateDocumentBatch(inspectionLearnTrain.getDocuments(), "LearnTrain" + bizId);
         return inspectionLearnTrainMapper.updateById(inspectionLearnTrain);
     }
 

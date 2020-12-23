@@ -36,7 +36,6 @@
         left join inspection_committee_meetings d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
     </select>
 
 </mapper>

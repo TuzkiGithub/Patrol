@@ -39,13 +39,13 @@ public class SpringBeanUtils implements ApplicationContextAware {
                 clazz = InspectionMobilizationServiceImpl.class;
                 break;
             case "公告信息":
-//                clazz = InspectionMobilizationServiceImpl.class;
+                clazz = InspectionAnnouncementInfoServiceImpl.class;
                 break;
             case "问卷测评":
 //                clazz = InspectionMobilizationServiceImpl.class;
                 break;
             case "听取汇报":
-//                clazz = InspectionMobilizationServiceImpl.class;
+                clazz = InspectionSpecialReportServiceImpl.class;
                 break;
             case "个别谈话":
 //                clazz = InspectionMobilizationServiceImpl.class;
@@ -54,10 +54,10 @@ public class SpringBeanUtils implements ApplicationContextAware {
                 clazz = InspectionConsultInfoServiceImpl.class;
                 break;
             case "列席会议":
-//                clazz = InspectionMobilizationServiceImpl.class;
+                clazz = InspectionPresentMeetingServiceImpl.class;
                 break;
             case "座谈会":
-//                clazz = InspectionMobilizationServiceImpl.class;
+                clazz = InspectionForumServiceImpl.class;
                 break;
             case "信访管理-来电":
                 clazz = InspectionCallVisitServiceImpl.class;
@@ -71,13 +71,13 @@ public class SpringBeanUtils implements ApplicationContextAware {
             case "组务会":
                 clazz = InspectionOrganizationMeetingsServiceImpl.class;
                 break;
-            case "临时支部会":
+            case "临时党支部会":
                 clazz = InspectionOrganizationMeetingsServiceImpl.class;
                 break;
             case "下沉了解":
                 clazz = InspectionSinkingUnderstandingServiceImpl.class;
                 break;
-            case "抽查个人报告":
+            case "抽查个人事项报告":
                 clazz = InspectionCheckPersonMattersServiceImpl.class;
                 break;
             case "重要情况报告":
@@ -89,8 +89,33 @@ public class SpringBeanUtils implements ApplicationContextAware {
             case "作风纪律后评估":
 //                clazz = InspectionMobilizationServiceImpl.class;
                 break;
+            case "问题底稿":
+                clazz = InspectionProblemDraftServiceImpl.class;
+                break;
+            case "会议研究":
+                clazz = InspectionMeetingsResearchServiceImpl.class;
+                break;
+            case "巡视报告":
+                clazz = InspectionPatrolReportServiceImpl.class;
+                break;
+            case "反馈意见":
+                clazz = InspectionClueTransferServiceImpl.class;
+                break;
+            case "反馈方案":
+//                clazz = InspectionProblemDraftServiceImpl.class;
+                break;
+            case "反馈会":
+                clazz = InspectionFeedbackMeetingsServiceImpl.class;
+                break;
+            case "线索移交":
+                clazz = InspectionClueTransferServiceImpl.class;
+                break;
+            case "整改公开情况":
+                clazz = InspectionRectificationServiceImpl.class;
+                break;
 
         }
+        assert clazz != null;
         return applicationContext.getBean(clazz);
     }
 

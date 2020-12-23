@@ -51,7 +51,7 @@ public class InspectionSpotMaterialController extends BaseController {
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:material:query')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @GetMapping("/info")
     public AjaxResult findInspectionSpotMaterialFile(String planId) throws BaseException {
         InspectionSpotMaterialPO spotMaterialPO = new InspectionSpotMaterialPO()
@@ -60,7 +60,7 @@ public class InspectionSpotMaterialController extends BaseController {
 
         AjaxResult ajaxResult = AjaxResult.success();
         if (!CollectionUtils.isEmpty(spotMaterialList)) {
-            List<PiisDocumentPO> documents = documentService.getFileListByBizId("InspectionSpotMaterial" + spotMaterialList.get(0).getSpotMaterialId());
+            List<PiisDocumentPO> documents = documentService.getFileListByBizId("SpotMaterial" + spotMaterialList.get(0).getSpotMaterialId());
             convertTempDict(documents);
             PatrolBriefVO patrolBriefVO = new PatrolBriefVO()
                     .setObjectId(spotMaterialList.get(0).getSpotMaterialId())
@@ -77,7 +77,7 @@ public class InspectionSpotMaterialController extends BaseController {
      *
      * @param inspectionSpotMaterial
      */
-    @PreAuthorize("@ss.hasPermi('piis:material:add')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "驻场材料 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionSpotMaterialPO inspectionSpotMaterial) {
@@ -94,7 +94,7 @@ public class InspectionSpotMaterialController extends BaseController {
      *
      * @param inspectionSpotMaterial
      */
-    @PreAuthorize("@ss.hasPermi('piis:material:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "驻场材料 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionSpotMaterialPO inspectionSpotMaterial) throws BaseException {

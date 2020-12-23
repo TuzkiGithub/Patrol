@@ -2,6 +2,7 @@ package tech.piis.modules.core.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import tech.piis.common.exception.BaseException;
 import tech.piis.modules.core.domain.po.InspectionSpecialReportPO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
 
@@ -22,5 +23,21 @@ public interface InspectionSpecialReportMapper extends BaseMapper<InspectionSpec
      * @return
      */
     List<UnitsBizCountVO> selectSpecialReportCount(String planId);
+
+    /**
+     * 查询专题报告以及文件
+     *
+     * @return
+     * @throws BaseException
+     */
+    List<InspectionSpecialReportPO> selectSpecialReportListWithFile(InspectionSpecialReportPO specialReportPO) throws BaseException;
+
+    /**
+     * 查询专题报告以及文件
+     *
+     * @return
+     * @throws BaseException
+     */
+    InspectionSpecialReportPO selectSpecialReportWithFile(InspectionSpecialReportPO specialReportPO) throws BaseException;
 
 }

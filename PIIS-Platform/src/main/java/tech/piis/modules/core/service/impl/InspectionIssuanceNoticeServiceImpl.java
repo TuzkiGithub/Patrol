@@ -61,7 +61,7 @@ public class InspectionIssuanceNoticeServiceImpl implements IInspectionIssuanceN
         List<PiisDocumentPO> documents = inspectionIssuanceNotice.getDocuments();
         documents.forEach(document -> document.setOperationType(INSERT));
         Object bizId = inspectionIssuanceNotice.getIssuanceNoticeId();
-        documentService.updateDocumentBatch(documents, "InspectionIssuanceNotice" + bizId, FileEnum.PRINT_TOPIC_FILE.getCode());
+        documentService.updateDocumentBatch(documents, "IssuanceNotice" + bizId, FileEnum.PRINT_TOPIC_FILE.getCode());
         return result;
     }
 
@@ -74,7 +74,7 @@ public class InspectionIssuanceNoticeServiceImpl implements IInspectionIssuanceN
      */
     @Override
     public int update(InspectionIssuanceNoticePO inspectionIssuanceNotice) throws BaseException {
-        String objectId = "InspectionIssuanceNotice" + inspectionIssuanceNotice.getIssuanceNoticeId();
+        String objectId = "IssuanceNotice" + inspectionIssuanceNotice.getIssuanceNoticeId();
         List<PiisDocumentPO> documents = inspectionIssuanceNotice.getDocuments();
         documentService.updateDocumentBatch(documents, String.valueOf(objectId));
         return inspectionIssuanceNoticeMapper.updateById(inspectionIssuanceNotice);

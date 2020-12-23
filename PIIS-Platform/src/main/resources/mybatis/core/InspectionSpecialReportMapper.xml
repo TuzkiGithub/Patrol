@@ -7,21 +7,19 @@
     <resultMap type="InspectionSpecialReportPO" id="InspectionSpecialReportResult">
         <result property="specialReportId" column="SPECIAL_REPORT_ID"/>
         <result property="planId" column="PLAN_ID"/>
-        <result property="reportName" column="REPORT_NAME"/>
-        <result property="reportTime" column="REPORT_TIME"/>
-        <result property="venue" column="VENUE"/>
-        <result property="reporterName" column="REPORTER_NAME"/>
-        <result property="reporterId" column="REPORTER_ID"/>
-        <result property="inspectionGroupPersonName" column="INSPECTION_GROUP_PERSON_NAME"/>
-        <result property="inspectionGroupPersonId" column="INSPECTION_GROUP_PERSON_ID"/>
-        <result property="reportPersonName" column="REPORT_PERSON_NAME"/>
-        <result property="reportPersonId" column="REPORT_PERSON_ID"/>
-        <result property="meetingDesc" column="MEETING_DESC"/>
-        <result property="createdBy" column="CREATED_BY"/>
-        <result property="createdTime" column="CREATED_TIME"/>
-        <result property="updatedBy" column="UPDATED_BY"/>
-        <result property="updatedTime" column="UPDATED_TIME"/>
-        <result property="entId" column="ENT_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="reportType" column="REPORT_TYPE"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
+        <result property="createdBy" column="o_CREATED_BY"/>
+        <result property="createdTime" column="o_CREATED_TIME"/>
+        <result property="updatedBy" column="o_UPDATED_BY"/>
+        <result property="updatedTime" column="o_UPDATED_TIME"/>
+        <result property="entId" column="o_ENT_ID"/>
+
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -33,39 +31,47 @@
     </resultMap>
 
     <sql id="selectInspectionSpecialReportVo">
-        select SPECIAL_REPORT_ID, PLAN_ID, REPORT_NAME, REPORT_TIME, VENUE, REPORTER_NAME, REPORTER_ID, INSPECTION_GROUP_PERSON_NAME, INSPECTION_GROUP_PERSON_ID, REPORT_PERSON_NAME, REPORT_PERSON_ID, MEETING_DESC, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_special_report
+        select SPECIAL_REPORT_ID, PLAN_ID, REPORT_TYPE,APPROVAL_FLAG, APPROVER_ID,APPROVER_NAME,CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_special_report
     </sql>
 
-    <select id="selectInspectionSpecialReportList" parameterType="InspectionSpecialReportPO"
+    <select id="selectSpecialReportListWithFile" parameterType="InspectionSpecialReportPO"
             resultMap="InspectionSpecialReportResult">
-        <include refid="selectInspectionSpecialReportVo"/>
-        <where>
-            <if test="planId != null  and planId != ''">and PLAN_ID = #{planId}</if>
-            <if test="reportName != null  and reportName != ''">and REPORT_NAME like concat('%', #{reportName}, '%')
-            </if>
-            <if test="reportTime != null ">and REPORT_TIME = #{reportTime}</if>
-            <if test="venue != null  and venue != ''">and VENUE = #{venue}</if>
-            <if test="reporterName != null  and reporterName != ''">and REPORTER_NAME like concat('%', #{reporterName},
-                '%')
-            </if>
-            <if test="reporterId != null  and reporterId != ''">and REPORTER_ID = #{reporterId}</if>
-            <if test="inspectionGroupPersonName != null  and inspectionGroupPersonName != ''">and
-                INSPECTION_GROUP_PERSON_NAME like concat('%', #{inspectionGroupPersonName}, '%')
-            </if>
-            <if test="inspectionGroupPersonId != null  and inspectionGroupPersonId != ''">and INSPECTION_GROUP_PERSON_ID
-                = #{inspectionGroupPersonId}
-            </if>
-            <if test="reportPersonName != null  and reportPersonName != ''">and REPORT_PERSON_NAME like concat('%',
-                #{reportPersonName}, '%')
-            </if>
-            <if test="reportPersonId != null  and reportPersonId != ''">and REPORT_PERSON_ID = #{reportPersonId}</if>
-            <if test="meetingDesc != null  and meetingDesc != ''">and MEETING_DESC = #{meetingDesc}</if>
-            <if test="createdBy != null  and createdBy != ''">and CREATED_BY = #{createdBy}</if>
-            <if test="createdTime != null ">and CREATED_TIME = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''">and UPDATED_BY = #{updatedBy}</if>
-            <if test="updatedTime != null ">and UPDATED_TIME = #{updatedTime}</if>
-            <if test="entId != null  and entId != ''">and ENT_ID = #{entId}</if>
-        </where>
+        select SPECIAL_REPORT_ID, PLAN_ID, REPORT_TYPE,
+        s.CREATED_BY as 'o_CREATED_BY',
+        s.CREATED_TIME as 'o_CREATED_TIME',
+        s.UPDATED_BY as 'o_UPDATED_BY',
+        s.UPDATED_TIME as 'o_UPDATED_TIME',
+        s.ENT_ID as 'o_ENT_ID',
+        APPROVER_ID,APPROVER_NAME,APPROVAL_FLAG,
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH from inspection_special_report s
+      left join piis_document doc on concat('SpecialReport', s.SPECIAL_REPORT_ID) = doc.OBJECT_ID
+      where PLAN_ID = #{planId}
+      and UNITS_ID = #{unitsId}
+      order by s.CREATED_TIME desc
+    </select>
+
+    <select id="selectSpecialReportWithFile" parameterType="InspectionSpecialReportPO"
+            resultMap="InspectionSpecialReportResult">
+      select SPECIAL_REPORT_ID, PLAN_ID, REPORT_TYPE,
+        s.CREATED_BY as 'o_CREATED_BY',
+        s.CREATED_TIME as 'o_CREATED_TIME',
+        s.UPDATED_BY as 'o_UPDATED_BY',
+        s.UPDATED_TIME as 'o_UPDATED_TIME',
+        s.ENT_ID as 'o_ENT_ID',
+      APPROVER_ID,APPROVER_NAME,APPROVAL_FLAG,
+          doc.PIIS_DOC_ID
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH from inspection_special_report s
+      left join piis_document doc on concat('SpecialReport', s.SPECIAL_REPORT_ID) = doc.OBJECT_ID
+      where s.SPECIAL_REPORT_ID = #{specialReportId}
     </select>
 
     <select id="selectSpecialReportCount" resultMap="unitsBizCountResultMap" parameterType="java.lang.String">
@@ -74,7 +80,6 @@
         left join inspection_special_report r on u.UNITS_ID = r.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
     </select>
 
 </mapper>

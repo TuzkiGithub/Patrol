@@ -57,4 +57,10 @@ public interface IInspectionProblemDraftService {
      * @return
      */
     int count();
+
+    /**
+     * 审批问题底稿
+     * @param inspectionProblemDraftPOList
+     */
+    void doApprovals(List<InspectionProblemDraftPO> inspectionProblemDraftPOList);
 }

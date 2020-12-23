@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.FileEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
@@ -19,6 +20,8 @@ import tech.piis.modules.core.service.IInspectionProblemDraftService;
 import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.List;
+
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
 
 
 /**
@@ -48,7 +51,7 @@ public class InspectionProblemDraftController extends BaseController {
      *
      * @param inspectionProblemDraft
      */
-    @PreAuthorize("@ss.hasPermi('piis:draft:list')")
+    @PreAuthorize("@ss.hasPermi('piis:patrolReport:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionProblemDraftPO inspectionProblemDraft) throws BaseException {
         startPage();
@@ -61,10 +64,10 @@ public class InspectionProblemDraftController extends BaseController {
      *
      * @param inspectionProblemDraftId 文件关联ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:draft:query')")
+    @PreAuthorize("@ss.hasPermi('piis:patrolReport:perms')")
     @GetMapping("/file")
     public AjaxResult findInspectionProblemDraftFile(@RequestParam("problemDraftId") String inspectionProblemDraftId) throws BaseException {
-        List<PiisDocumentPO> documents = documentService.getFileListByBizId("InspectionProblemDraft" + inspectionProblemDraftId);
+        List<PiisDocumentPO> documents = documentService.getFileListByBizId("ProblemDraft" + inspectionProblemDraftId);
         convertTempDict(documents);
         return AjaxResult.success(documents);
     }
@@ -74,7 +77,7 @@ public class InspectionProblemDraftController extends BaseController {
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:draft:query')")
+    @PreAuthorize("@ss.hasPermi('piis:patrolReport:perms')")
     @GetMapping("/count")
     public AjaxResult countInspectionProblemDraftList(String planId) throws BaseException {
         return AjaxResult.success(inspectionProblemDraftService.selectInspectionProblemDraftCount(planId));
@@ -85,12 +88,17 @@ public class InspectionProblemDraftController extends BaseController {
      *
      * @param inspectionProblemDraft
      */
-    @PreAuthorize("@ss.hasPermi('piis:draft:add')")
+    @PreAuthorize("@ss.hasPermi('piis:patrolReport:perms')")
     @Log(title = "问题底稿 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InspectionProblemDraftPO inspectionProblemDraft) {
         if (null == inspectionProblemDraft) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionProblemDraft.getIsApproval()) {
+            inspectionProblemDraft.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionProblemDraft.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         convertFileDict(inspectionProblemDraft);
         BizUtils.setCreatedOperation(InspectionProblemDraftPO.class, inspectionProblemDraft);
@@ -98,16 +106,36 @@ public class InspectionProblemDraftController extends BaseController {
     }
 
     /**
+     * 审批问题底稿
+     *
+     * @param inspectionProblemDraftPOList
+     */
+    @PreAuthorize("@ss.hasPermi('piis:patrolReport:perms')")
+    @Log(title = "问题底稿", businessType = BusinessType.APPROVAL)
+    @PostMapping("approval")
+    public AjaxResult approval(@RequestBody List<InspectionProblemDraftPO> inspectionProblemDraftPOList) {
+        if (CollectionUtils.isEmpty(inspectionProblemDraftPOList)) {
+            return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        inspectionProblemDraftService.doApprovals(inspectionProblemDraftPOList);
+        return AjaxResult.success();
+    }
+    /**
      * 修改问题底稿
      *
      * @param inspectionProblemDraft
      */
-    @PreAuthorize("@ss.hasPermi('piis:draft:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:patrolReport:perms')")
     @Log(title = "问题底稿 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionProblemDraftPO inspectionProblemDraft) throws BaseException {
         if (null == inspectionProblemDraft) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionProblemDraft.getIsApproval()) {
+            inspectionProblemDraft.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionProblemDraft.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         convertFileDict(inspectionProblemDraft);
         BizUtils.setUpdatedOperation(InspectionProblemDraftPO.class, inspectionProblemDraft);
@@ -118,7 +146,7 @@ public class InspectionProblemDraftController extends BaseController {
      * 删除问题底稿
      * problemDraftIds 问题底稿 ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:draft:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:patrolReport:perms')")
     @Log(title = "问题底稿 ", businessType = BusinessType.DELETE)
     @DeleteMapping("/{problemDraftIds}")
     public AjaxResult remove(@PathVariable Long[] problemDraftIds) throws BaseException {

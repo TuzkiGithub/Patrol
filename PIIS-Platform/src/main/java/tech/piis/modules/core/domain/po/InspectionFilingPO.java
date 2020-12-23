@@ -58,11 +58,13 @@ public class InspectionFilingPO extends PIBaseEntity {
     /**
      * 党委汇报材料数
      */
+    @Deprecated
     private Integer committeeMeetingsCount;
 
     /**
      * 重要问题专题报告数
      */
+    @Deprecated
     private Integer importReportCount;
 
     /**
@@ -88,13 +90,53 @@ public class InspectionFilingPO extends PIBaseEntity {
     /**
      * 调阅文件数
      */
+    @Deprecated
     private Integer consultCount;
 
     /**
      *
      * 信访件数
      */
+    @Deprecated
     private Integer visitCount;
+
+    /**
+     * 巡视报告数
+     */
+    private Integer patrolReportCount;
+
+    /**
+     * 演讲稿数
+     */
+    private Integer speakScriptCount;
+
+    /**
+     * 汇报材料数
+     */
+    private Integer reportMaterialsCount;
+
+    /**
+     * 整改报告数
+     * todo unknown
+     */
+    private Integer rectificationCount;
+
+    /**
+     * 被巡视党组织移交材料数
+     * todo unknown
+     */
+    private Integer transferMaterialsCount;
+
+    /**
+     * 专题报告数
+     * todo unknown
+     */
+    private Integer specialReportCount;
+
+    /**
+     * 巡视方案文件
+     */
+    private List<PiisDocumentPO> documents;
 
 
 }

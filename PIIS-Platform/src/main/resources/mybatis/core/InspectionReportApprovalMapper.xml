@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tech.piis.modules.core.mapper.InspectionReportApprovalMapper">
-    
+
     <resultMap type="InspectionReportApprovalPO" id="InspectionReportApprovalResult">
-        <result property="reportApprovalId"    column="REPORT_APPROVAL_ID"    />
-        <result property="planId"    column="PLAN_ID"    />
-        <result property="createdBy"    column="CREATED_BY"    />
-        <result property="createdTime"    column="CREATED_TIME"    />
-        <result property="updatedBy"    column="UPDATED_BY"    />
-        <result property="updatedTime"    column="UPDATED_TIME"    />
-        <result property="entId"    column="ENT_ID"    />
+        <result property="reportApprovalId" column="REPORT_APPROVAL_ID"/>
+        <result property="title" column="TITLE"/>
+        <result property="forwardSend" column="FORWARD_SEND"/>
+        <result property="agentId" column="AGENT_ID"/>
+        <result property="agentName" column="AGENT_NAME"/>
+        <result property="quickSlow" column="QUICK_SLOW"/>
+        <result property="classification" column="CLASSIFICATION"/>
+        <result property="phone" column="PHONE"/>
+        <result property="time" column="TIME"/>
+        <result property="signDeptIds" column="SIGN_DEPT_IDS"/>
+        <result property="signDeptNames" column="SIGN_DEPT_NAMES"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -36,65 +46,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         order by u.created_time, u.UNITS_ID desc
     </select>
 
-    <select id="selectInspectionReportApprovalList" parameterType="InspectionReportApprovalPO" resultMap="InspectionReportApprovalResult">
-        <include refid="selectInspectionReportApprovalVo"/>
-        <where>  
-            <if test="planId != null  and planId != ''"> and PLAN_ID = #{planId}</if>
-            <if test="createdBy != null  and createdBy != ''"> and CREATED_BY = #{createdBy}</if>
-            <if test="createdTime != null "> and CREATED_TIME = #{createdTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and UPDATED_BY = #{updatedBy}</if>
-            <if test="updatedTime != null "> and UPDATED_TIME = #{updatedTime}</if>
-            <if test="entId != null  and entId != ''"> and ENT_ID = #{entId}</if>
-        </where>
-    </select>
-    
-    <select id="selectInspectionReportApprovalById" parameterType="Long" resultMap="InspectionReportApprovalResult">
-        <include refid="selectInspectionReportApprovalVo"/>
-        where REPORT_APPROVAL_ID = #{reportApprovalId}
-    </select>
-        
-    <insert id="insertInspectionReportApproval" parameterType="InspectionReportApprovalPO" useGeneratedKeys="true" keyProperty="reportApprovalId">
-        insert into inspection_report_approval
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="planId != null  and planId != ''">PLAN_ID,</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY,</if>
-            <if test="createdTime != null ">CREATED_TIME,</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY,</if>
-            <if test="updatedTime != null ">UPDATED_TIME,</if>
-            <if test="entId != null  and entId != ''">ENT_ID,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="planId != null  and planId != ''">#{planId},</if>
-            <if test="createdBy != null  and createdBy != ''">#{createdBy},</if>
-            <if test="createdTime != null ">#{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">#{updatedBy},</if>
-            <if test="updatedTime != null ">#{updatedTime},</if>
-            <if test="entId != null  and entId != ''">#{entId},</if>
-         </trim>
-    </insert>
-
-    <update id="updateInspectionReportApproval" parameterType="InspectionReportApprovalPO">
-        update inspection_report_approval
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="planId != null  and planId != ''">PLAN_ID = #{planId},</if>
-            <if test="createdBy != null  and createdBy != ''">CREATED_BY = #{createdBy},</if>
-            <if test="createdTime != null ">CREATED_TIME = #{createdTime},</if>
-            <if test="updatedBy != null  and updatedBy != ''">UPDATED_BY = #{updatedBy},</if>
-            <if test="updatedTime != null ">UPDATED_TIME = #{updatedTime},</if>
-            <if test="entId != null  and entId != ''">ENT_ID = #{entId},</if>
-        </trim>
-        where REPORT_APPROVAL_ID = #{reportApprovalId}
-    </update>
-
-    <delete id="deleteInspectionReportApprovalById" parameterType="Long">
-        delete from inspection_report_approval where REPORT_APPROVAL_ID = #{reportApprovalId}
-    </delete>
-
-    <delete id="deleteInspectionReportApprovalByIds" parameterType="String">
-        delete from inspection_report_approval where REPORT_APPROVAL_ID in 
-        <foreach item="reportApprovalId" collection="array" open="(" separator="," close=")">
-            #{reportApprovalId}
-        </foreach>
-    </delete>
-    
 </mapper>

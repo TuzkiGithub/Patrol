@@ -11,10 +11,11 @@ import tech.piis.framework.aspectj.lang.enums.BusinessType;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.web.controller.BaseController;
 import tech.piis.framework.web.domain.AjaxResult;
-import tech.piis.framework.web.page.TableDataInfo;
+import tech.piis.modules.core.domain.po.InspectionTempBranchMemberPO;
 import tech.piis.modules.core.domain.po.InspectionTempBranchPO;
+import tech.piis.modules.core.domain.vo.UnitsBriefVO;
+import tech.piis.modules.core.domain.vo.UserBriefVO;
 import tech.piis.modules.core.service.IInspectionTempBranchService;
-import tech.piis.modules.core.service.IPiisDocumentService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -32,20 +33,17 @@ public class InspectionTempBranchController extends BaseController {
     @Autowired
     private IInspectionTempBranchService inspectionTempBranchService;
 
-
-
     /**
-     * 查询临时支部 列表
+     * 查询临时支部
      *
      * @param inspectionTempBranch
      */
-    @PreAuthorize("@ss.hasPermi('piis:branch:list')")
-    @GetMapping("/list")
-    public TableDataInfo list(InspectionTempBranchPO inspectionTempBranch) throws BaseException {
-        startPage();
-        List<InspectionTempBranchPO> data = inspectionTempBranchService.selectInspectionTempBranchList(inspectionTempBranch);
-        inspectionTempBranchCovert2List(data);
-        return getDataTable(data);
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
+    @GetMapping("/info")
+    public AjaxResult select(InspectionTempBranchPO inspectionTempBranch) throws BaseException {
+        InspectionTempBranchPO result = inspectionTempBranchService.selectInspectionTempBranchList(inspectionTempBranch);
+        inspectionTempBranchCovert2List(result);
+        return AjaxResult.success(result);
     }
 
     /**
@@ -53,7 +51,7 @@ public class InspectionTempBranchController extends BaseController {
      *
      * @param inspectionTempBranch
      */
-    @PreAuthorize("@ss.hasPermi('piis:branch:add')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "临时支部 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionTempBranchPO inspectionTempBranch) {
@@ -70,7 +68,7 @@ public class InspectionTempBranchController extends BaseController {
      *
      * @param inspectionTempBranch
      */
-    @PreAuthorize("@ss.hasPermi('piis:branch:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "临时支部 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionTempBranchPO inspectionTempBranch) throws BaseException {
@@ -86,7 +84,7 @@ public class InspectionTempBranchController extends BaseController {
      * 删除临时支部
      * tempBranchIds 临时支部 ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:branch:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "临时支部 ", businessType = BusinessType.DELETE)
     @DeleteMapping("/{tempBranchIds}")
     public AjaxResult remove(@PathVariable Long[] tempBranchIds) throws BaseException {
@@ -100,8 +98,20 @@ public class InspectionTempBranchController extends BaseController {
      */
     private void inspectionTempBranchCovert2String(InspectionTempBranchPO inspectionTempBranch) {
         if (null != inspectionTempBranch) {
-            inspectionTempBranch.setBranchMemberIds(paramsCovert2String(inspectionTempBranch.getMemberList()).get(0));
-            inspectionTempBranch.setBranchMemberNames(paramsCovert2String(inspectionTempBranch.getMemberList()).get(1));
+            List<InspectionTempBranchMemberPO> tempBranchMemberList = inspectionTempBranch.getTempBranchMemberList();
+            if (!CollectionUtils.isEmpty(tempBranchMemberList)) {
+                tempBranchMemberList.forEach(tempBranchMember -> {
+                    tempBranchMember.setBranchMemberIds(paramsCovert2String(tempBranchMember.getMemberList()).get(0));
+                    tempBranchMember.setBranchMemberNames(paramsCovert2String(tempBranchMember.getMemberList()).get(1));
+                    tempBranchMember.setMemberList(paramsCovert2List(tempBranchMember.getBranchMemberIds(), tempBranchMember.getBranchMemberNames()));
+                });
+            }
+            List<UserBriefVO> forwardSendList = inspectionTempBranch.getForwardSendList();
+            List<UnitsBriefVO> orgList = inspectionTempBranch.getSignOrgList();
+            inspectionTempBranch.setForwardSendIds(BizUtils.paramsCovert2String(forwardSendList).get(0));
+            inspectionTempBranch.setForwardSendNames(BizUtils.paramsCovert2String(forwardSendList).get(1));
+            inspectionTempBranch.setSignDeptIds(BizUtils.paramsCovert2OrgString(orgList).get(0));
+            inspectionTempBranch.setSignDeptNames(BizUtils.paramsCovert2OrgString(orgList).get(1));
         }
     }
 
@@ -109,11 +119,17 @@ public class InspectionTempBranchController extends BaseController {
     /**
      * 参数类型转换
      *
-     * @param inspectionTempBranchList
+     * @param inspectionTempBranch
      */
-    private void inspectionTempBranchCovert2List(List<InspectionTempBranchPO> inspectionTempBranchList) {
-        if (!CollectionUtils.isEmpty(inspectionTempBranchList)) {
-            inspectionTempBranchList.forEach(inspectionTempBranchPO -> inspectionTempBranchPO.setMemberList(paramsCovert2List(inspectionTempBranchPO.getBranchMemberIds(), inspectionTempBranchPO.getBranchMemberNames())));
+    private void inspectionTempBranchCovert2List(InspectionTempBranchPO inspectionTempBranch) {
+        if (null != inspectionTempBranch) {
+            List<InspectionTempBranchMemberPO> tempBranchMemberList = inspectionTempBranch.getTempBranchMemberList();
+            if (!CollectionUtils.isEmpty(tempBranchMemberList)) {
+                tempBranchMemberList.forEach(tempBranchMember -> tempBranchMember.setMemberList(paramsCovert2List(tempBranchMember.getBranchMemberIds(), tempBranchMember.getBranchMemberNames())));
+            }
+            inspectionTempBranch.setForwardSendList(BizUtils.paramsCovert2List(inspectionTempBranch.getForwardSendIds(), inspectionTempBranch.getForwardSendNames()));
+            inspectionTempBranch.setSignOrgList(BizUtils.paramsCovert2OrgList(inspectionTempBranch.getSignDeptIds(), inspectionTempBranch.getSignDeptNames()));
         }
     }
+
 }

@@ -38,6 +38,11 @@ public enum BusinessType
     EXPORT,
 
     /**
+     * 审批
+     */
+    APPROVAL,
+
+    /**
      * 导入
      */
     IMPORT,

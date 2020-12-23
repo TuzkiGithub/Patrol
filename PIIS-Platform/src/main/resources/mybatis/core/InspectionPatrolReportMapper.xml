@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionPatrolReportMapper">
+
+    <resultMap id="InspectionPatrolReportResult" type="InspectionPatrolReportPO">
+        <result property="patrolReportId" column="PATROL_REPORT_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="reportName" column="REPORT_NAME"/>
+        <result property="reportTime" column="REPORT_TIME"/>
+        <result property="reportContent" column="REPORT_CONTENT"/>
+        <result property="forwardSendIds" column="FORWARD_SEND_IDS"/>
+        <result property="forwardSendNames" column="FORWARD_SEND_NAMES"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="createdBy" column="r.CREATED_BY"/>
+        <result property="createdTime" column="r.CREATED_TIME"/>
+        <result property="updatedBy" column="r.UPDATED_BY"/>
+        <result property="updatedTime" column="r.UPDATED_TIME"/>
+        <result property="entId" column="r.ENT_ID"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+    </resultMap>
+
+    <sql id="selectInspectionPatrolReportVo">
+        select PATROL_REPORT_ID, PLAN_ID, UNITS_ID, REPORT_NAME, REPORT_TIME, REPORT_CONTENT, FORWARD_SEND_IDS, FORWARD_SEND_NAMES, APPROVAL_FLAG, APPROVER_ID, APPROVER_NAME, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_patrol_report
+    </sql>
+
+    <select id="selectInspectionPatrolReportCount" parameterType="java.lang.String"
+            resultMap="unitsBizCountResultMap">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
+        from inspection_units u
+        left join inspection_patrol_report d on u.UNITS_ID = d.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
+    </select>
+
+    <select id="selectInspectionPatrolReportWithFileById" parameterType="InspectionPatrolReportPO"
+            resultMap="InspectionPatrolReportResult">
+        select
+          PATROL_REPORT_ID,
+          PLAN_ID,
+          UNITS_ID,
+          REPORT_NAME,
+          REPORT_TIME,
+          REPORT_CONTENT,
+          FORWARD_SEND_IDS,
+          FORWARD_SEND_NAMES,
+          APPROVAL_FLAG,
+          APPROVER_ID,
+          APPROVER_NAME,
+          r.CREATED_BY   as 'r.CREATED_BY',
+          r.CREATED_TIME as 'r.CREATED_TIME',
+          r.UPDATED_BY   as 'r.UPDATED_BY',
+          r.UPDATED_TIME as 'r.UPDATED_TIME',
+          r.ENT_ID       as 'r.ENT_ID',
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH
+        from inspection_patrol_report r
+        left join piis_document doc on concat('PatrolReport', r.PATROL_REPORT_ID) = doc.OBJECT_ID
+        where r.PATROL_REPORT_ID = #{patrolReportId}
+    </select>
+</mapper>

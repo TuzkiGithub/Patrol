@@ -13,6 +13,7 @@ import tech.piis.common.exception.BaseException;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.IdUtils;
 import tech.piis.common.utils.StringUtils;
+import tech.piis.framework.annotation.DataPermission;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.file.FileUploadUtils;
 import tech.piis.modules.core.domain.dto.PlanBriefDTO;
@@ -21,8 +22,6 @@ import tech.piis.modules.core.domain.vo.*;
 import tech.piis.modules.core.mapper.*;
 import tech.piis.modules.core.service.IInspectionPlanService;
 import tech.piis.modules.core.service.IPiisDocumentService;
-import tech.piis.modules.workflow.service.IWfWorkflowBusinessService;
-import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,12 +58,6 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     private InspectionTalkOutlineMapper talkOutlineMapper;
 
     @Autowired
-    private IWfWorkflowBusinessService wfWorkflowBusinessService;
-
-    @Autowired
-    private IWfWorkflowTodoService wfWorkflowTodoService;
-
-    @Autowired
     private PiisDocumentMapper documentMapper;
 
     @Autowired
@@ -76,6 +69,7 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
     @Value("${piis.serverAddr}")
     private String serverAddr;
 
+    private static final String BIZ_NAME = "Plan";
 
     /**
      * 查询巡视计划列表
@@ -84,6 +78,7 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
      * @return
      */
     @Override
+    @DataPermission
     public List<InspectionPlanPO> selectPlanList(InspectionPlanPO inspectionPlanPO) {
         List<InspectionPlanPO> planList = planMapper.selectPlanList(inspectionPlanPO);
         //查询被巡视单位-巡视组组员关系
@@ -97,6 +92,7 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                         List<PiisDocumentPO> documents = documentService.selectDocumentByCondition(queryWrapper);
                         group.setDocuments(documents);
                         List<InspectionUnitsPO> unitsList = group.getInspectionUnitsList();
+                        group.setInspectionUnitsList(unitsList);
                         if (!CollectionUtils.isEmpty(unitsList)) {
                             unitsList.forEach(units -> {
                                 InspectionUnitsPO unitsPO = unitsMapper.selectUnitsMember(units.getUnitsId());
@@ -283,7 +279,7 @@ public class InspectionPlanServiceImpl implements IInspectionPlanService {
                         case INSERT: {
                             //将业务字段赋予文件表
                             document.setFileDictId(FileEnum.WORK_PREPARED_OTHER_FILE.getCode())
-                                    .setObjectId(planId);
+                                    .setObjectId(BIZ_NAME + planId);
                             documentMapper.updateById(document);
                             break;
                         }

@@ -18,7 +18,20 @@ import java.util.List;
 @ToString(callSuper = true)
 @Accessors(chain = true)
 public class RouterWithButtonVO {
+    /**
+     * 菜单
+     */
     private List<RouterVo> router;
 
+    /**
+     * 按钮
+     */
     private String[] button;
+
+    /**
+     * 1：巡视
+     * 2：巡察
+     * 3：ALL
+     */
+    private Integer patrolType;
 }

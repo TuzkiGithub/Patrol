@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
@@ -20,6 +21,8 @@ import tech.piis.modules.core.service.IInspectionFeedbackService;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
 
 
 /**
@@ -39,7 +42,7 @@ public class InspectionFeedbackController extends BaseController {
      *
      * @param inspectionFeedback
      */
-    @PreAuthorize("@ss.hasPermi('piis:feedback:list')")
+    @PreAuthorize("@ss.hasPermi('piis:feedback:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionFeedbackPO inspectionFeedback) throws BaseException {
         if (null == inspectionFeedback) {
@@ -61,7 +64,7 @@ public class InspectionFeedbackController extends BaseController {
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:feedback:query')")
+    @PreAuthorize("@ss.hasPermi('piis:feedback:perms')")
     @GetMapping("/count")
     public AjaxResult countInspectionFeedbackList(String planId) throws BaseException {
         return AjaxResult.success(inspectionFeedbackService.selectInspectionFeedbackCount(planId));
@@ -72,12 +75,17 @@ public class InspectionFeedbackController extends BaseController {
      *
      * @param inspectionFeedback
      */
-    @PreAuthorize("@ss.hasPermi('piis:feedback:add')")
+    @PreAuthorize("@ss.hasPermi('piis:feedback:perms')")
     @Log(title = "反馈意见 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionFeedbackPO inspectionFeedback) {
         if (null == inspectionFeedback) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionFeedback.getIsApproval()) {
+            inspectionFeedback.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionFeedback.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         inspectionFeedbackCovert2String(inspectionFeedback);
         BizUtils.setCreatedOperation(InspectionFeedbackPO.class, inspectionFeedback);
@@ -85,16 +93,38 @@ public class InspectionFeedbackController extends BaseController {
     }
 
     /**
+     * 审批反馈意见
+     *
+     * @param inspectionFeedbackList
+     */
+    @PreAuthorize("@ss.hasPermi('piis:feedback:perms')")
+    @Log(title = "反馈意见 ", businessType = BusinessType.APPROVAL)
+    @PostMapping("approval")
+    public AjaxResult approval(@RequestBody @Valid List<InspectionFeedbackPO> inspectionFeedbackList) {
+        if (CollectionUtils.isEmpty(inspectionFeedbackList)) {
+            return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        inspectionFeedbackService.doApprovals(inspectionFeedbackList);
+        return AjaxResult.success();
+    }
+
+
+    /**
      * 修改反馈意见
      *
      * @param inspectionFeedback
      */
-    @PreAuthorize("@ss.hasPermi('piis:feedback:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:feedback:perms')")
     @Log(title = "反馈意见 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionFeedbackPO inspectionFeedback) throws BaseException {
         if (null == inspectionFeedback) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionFeedback.getIsApproval()) {
+            inspectionFeedback.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionFeedback.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         inspectionFeedbackCovert2String(inspectionFeedback);
         BizUtils.setUpdatedOperation(InspectionFeedbackPO.class, inspectionFeedback);
@@ -105,7 +135,7 @@ public class InspectionFeedbackController extends BaseController {
      * 删除反馈意见
      * feedbackIds 反馈意见 ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:feedback:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:feedback:perms')")
     @Log(title = "反馈意见 ", businessType = BusinessType.DELETE)
     @DeleteMapping("/{feedbackIds}")
     public AjaxResult remove(@PathVariable String[] feedbackIds) throws BaseException {

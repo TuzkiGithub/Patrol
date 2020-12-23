@@ -59,7 +59,7 @@ public class InspectionSpotMaterialServiceImpl implements IInspectionSpotMateria
         List<PiisDocumentPO> documents = inspectionSpotMaterial.getDocuments();
         documents.forEach(document -> document.setOperationType(INSERT));
         Object bizId = inspectionSpotMaterial.getSpotMaterialId();
-        documentService.updateDocumentBatch(documents, "InspectionSpotMaterial" + bizId);
+        documentService.updateDocumentBatch(documents, "SpotMaterial" + bizId);
         return result;
     }
 
@@ -72,7 +72,7 @@ public class InspectionSpotMaterialServiceImpl implements IInspectionSpotMateria
      */
     @Override
     public int update(InspectionSpotMaterialPO inspectionSpotMaterial) throws BaseException {
-        String objectId = "InspectionSpotMaterial" + inspectionSpotMaterial.getSpotMaterialId();
+        String objectId = "SpotMaterial" + inspectionSpotMaterial.getSpotMaterialId();
         List<PiisDocumentPO> documents = inspectionSpotMaterial.getDocuments();
         documentService.updateDocumentBatch(documents, objectId);
         return inspectionSpotMaterialMapper.updateById(inspectionSpotMaterial);

@@ -57,4 +57,10 @@ public interface IInspectionSinkingUnderstandingService {
      * @return
      */
     int count(InspectionSinkingUnderstandingPO inspectionSinkingUnderstanding);
+
+    /**
+     * 批量审批
+     * @param sinkingUnderstandingList
+     */
+    void doApprovals(List<InspectionSinkingUnderstandingPO> sinkingUnderstandingList);
 }

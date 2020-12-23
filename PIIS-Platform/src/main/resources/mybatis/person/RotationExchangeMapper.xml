@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tech.piis.modules.person.mapper.RotationExchangeMapper">
+    <!--轮岗交流-->
+    <resultMap id="rotationExchangeResultMap" type="tech.piis.modules.person.domain.po.RotationExchangePO">
+        <id property="rotationId" column="ROTATION_ID"/>
+        <result property="orgId" column="ORG_ID"/>
+        <result property="rotationYear" column="ROTATION_YEAR"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="memberName" column="MEMBER_NAME"/>
+        <result property="memberUnit" column="MEMBER_UNIT"/>
+        <result property="memberPost" column="MEMBER_POST"/>
+        <result property="beginDate" column="BEGIN_DATE"/>
+        <result property="endDate" column="END_DATE"/>
+        <result property="beforeUnit" column="BEFORE_UNIT"/>
+        <result property="afterUnit" column="AFTER_UNIT"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+        <result property="updatedBy" column="UPDATED_BY"/>
+        <result property="updatedTime" column="UPDATED_TIME"/>
+        <result property="entId" column="ENT_ID"/>
+    </resultMap>
+    <!--轮岗交流总览-->
+        <select id="selectRecommendListByOrgId" resultMap="rotationExchangeResultMap">
+        select
+        ROTATION_ID,
+        d.dept_name as MEMBER_UNIT,
+        count(FIRSTBRANCH_ID) as amount
+        from  person_rotation_exchange r
+        JOIN sys_dept d on r.FIRSTBRANCH_ID = d.dept_id
+        group by FIRSTBRANCH_ID order by d.dept_id asc
+    </select>
+</mapper>

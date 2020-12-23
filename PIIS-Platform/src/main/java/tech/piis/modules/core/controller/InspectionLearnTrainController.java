@@ -56,7 +56,7 @@ public class InspectionLearnTrainController extends BaseController {
      *
      * @param inspectionLearnTrain
      */
-    @PreAuthorize("@ss.hasPermi('piis:train:list')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionLearnTrainPO inspectionLearnTrain) throws BaseException {
         startPage();
@@ -69,10 +69,10 @@ public class InspectionLearnTrainController extends BaseController {
      *
      * @param inspectionLearnTrainId 文件关联ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:train:query')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @GetMapping("/file")
     public AjaxResult findInspectionLearnTrainFile(@RequestParam("learnTrainId") String inspectionLearnTrainId) throws BaseException {
-        List<PiisDocumentPO> documents = documentService.getFileListByBizId("InspectionLearnTrain" + inspectionLearnTrainId);
+        List<PiisDocumentPO> documents = documentService.getFileListByBizId("LearnTrain" + inspectionLearnTrainId);
         convertTempDict(documents);
         return AjaxResult.success(documents);
     }
@@ -82,7 +82,7 @@ public class InspectionLearnTrainController extends BaseController {
      *
      * @param inspectionLearnTrain
      */
-    @PreAuthorize("@ss.hasPermi('piis:train:add')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "学习培训 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionLearnTrainPO inspectionLearnTrain) {
@@ -99,7 +99,7 @@ public class InspectionLearnTrainController extends BaseController {
      *
      * @param inspectionLearnTrain
      */
-    @PreAuthorize("@ss.hasPermi('piis:train:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "学习培训 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionLearnTrainPO inspectionLearnTrain) throws BaseException {
@@ -115,7 +115,7 @@ public class InspectionLearnTrainController extends BaseController {
      * 删除学习培训
      * learnTrainIds 学习培训 ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:train:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "学习培训 ", businessType = BusinessType.DELETE)
     @DeleteMapping("/{learnTrainIds}")
     public AjaxResult remove(@PathVariable Long[] learnTrainIds) throws BaseException {

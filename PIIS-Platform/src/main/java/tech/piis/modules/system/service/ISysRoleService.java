@@ -1,5 +1,6 @@
 package tech.piis.modules.system.service;
 
+import tech.piis.common.exception.BaseException;
 import tech.piis.modules.system.domain.SysRole;
 
 import java.util.List;
@@ -129,4 +130,6 @@ public interface ISysRoleService
      * @return 结果
      */
     public int deleteRoleByIds(Long[] roleIds);
+
+    void test() throws BaseException;
 }

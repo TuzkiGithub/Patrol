@@ -6,6 +6,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.enums.FileEnum;
 import tech.piis.common.exception.BaseException;
@@ -22,6 +23,8 @@ import tech.piis.modules.core.service.IInspectionClueTransferService;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
 
 
 /**
@@ -49,7 +52,7 @@ public class InspectionClueTransferController extends BaseController {
      *
      * @param inspectionClueTransfer
      */
-    @PreAuthorize("@ss.hasPermi('piis:clue/transfer:list')")
+    @PreAuthorize("@ss.hasPermi('piis:clueTransfer:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionClueTransferPO inspectionClueTransfer) throws BaseException {
         if (null != inspectionClueTransfer) {
@@ -80,7 +83,7 @@ public class InspectionClueTransferController extends BaseController {
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:clue/transfer:query')")
+    @PreAuthorize("@ss.hasPermi('piis:clueTransfer:perms')")
     @GetMapping("/count")
     public AjaxResult countInspectionClueTransferList(String planId) throws BaseException {
         return AjaxResult.success(inspectionClueTransferService.selectInspectionClueTransferCount(planId));
@@ -91,12 +94,17 @@ public class InspectionClueTransferController extends BaseController {
      *
      * @param inspectionClueTransfer
      */
-    @PreAuthorize("@ss.hasPermi('piis:clue/transfer:add')")
+    @PreAuthorize("@ss.hasPermi('piis:clueTransfer:perms')")
     @Log(title = "线索移交 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionClueTransferPO inspectionClueTransfer) {
         if (null == inspectionClueTransfer) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionClueTransfer.getIsApproval()) {
+            inspectionClueTransfer.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionClueTransfer.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         convertFileDict(inspectionClueTransfer);
         BizUtils.setCreatedOperation(InspectionClueTransferPO.class, inspectionClueTransfer);
@@ -104,16 +112,37 @@ public class InspectionClueTransferController extends BaseController {
     }
 
     /**
+     * 审批线索移交
+     *
+     * @param clueTransferList
+     */
+    @PreAuthorize("@ss.hasPermi('piis:clueTransfer:perms')")
+    @Log(title = "线索移交", businessType = BusinessType.APPROVAL)
+    @PostMapping("approval")
+    public AjaxResult approval(@RequestBody List<InspectionClueTransferPO> clueTransferList) {
+        if (CollectionUtils.isEmpty(clueTransferList)) {
+            return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        inspectionClueTransferService.doApprovals(clueTransferList);
+        return AjaxResult.success();
+    }
+
+    /**
      * 修改线索移交
      *
      * @param inspectionClueTransfer
      */
-    @PreAuthorize("@ss.hasPermi('piis:clue/transfer:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:clueTransfer:perms')")
     @Log(title = "线索移交 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionClueTransferPO inspectionClueTransfer) throws BaseException {
         if (null == inspectionClueTransfer) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionClueTransfer.getIsApproval()) {
+            inspectionClueTransfer.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionClueTransfer.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         convertFileDict(inspectionClueTransfer);
         BizUtils.setUpdatedOperation(InspectionClueTransferPO.class, inspectionClueTransfer);
@@ -124,7 +153,7 @@ public class InspectionClueTransferController extends BaseController {
      * 删除线索移交
      * clueTransferIds 线索移交 ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:clue/transfer:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:clueTransfer:perms')")
     @Log(title = "线索移交 ", businessType = BusinessType.DELETE)
     @DeleteMapping("/{clueTransferIds}")
     public AjaxResult remove(@PathVariable String[] clueTransferIds) throws BaseException {

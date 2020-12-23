@@ -110,14 +110,13 @@ public class SysUserController extends BaseController {
 
     @GetMapping("/importTemplate")
     public AjaxResult importTemplate() {
-        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+        ExcelUtil<SysUser> util = new ExcelUtil<>(SysUser.class);
         return util.importTemplateExcel("用户数据");
     }
 
     /**
      * 根据用户编号获取详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping(value = {"/", "/{userId}"})
     public AjaxResult getInfo(@PathVariable(value = "userId") String userId) throws BaseException {
         AjaxResult ajax = AjaxResult.success();

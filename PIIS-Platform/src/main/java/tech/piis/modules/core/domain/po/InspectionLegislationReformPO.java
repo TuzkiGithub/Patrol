@@ -26,7 +26,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionLegislationReformPO extends PIBaseEntity {
+public class InspectionLegislationReformPO extends PIBaseApprovalEntityPO {
     /**
      * 立行立改编号
      */

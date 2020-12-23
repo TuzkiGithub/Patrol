@@ -29,4 +29,12 @@ public interface InspectionSinkingUnderstandingMapper extends BaseMapper<Inspect
      * @throws BaseException
      */
     List<InspectionSinkingUnderstandingPO> selectInspectionSinkingUnderstandingList(InspectionSinkingUnderstandingPO sinkingUnderstanding) throws BaseException;
+
+    /**
+     * 查询下沉了解以及文件
+     * @param sinkingUnderstanding
+     * @return
+     * @throws BaseException
+     */
+    InspectionSinkingUnderstandingPO selectSinkingUnderstandingWithFile(InspectionSinkingUnderstandingPO sinkingUnderstanding) throws BaseException;
 }

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tech.piis.modules.core.mapper.InspectionFeedbackMeetingsMapper">
+
+    <resultMap id="InspectionFeedbackMeetingsResult" type="InspectionFeedbackMeetingsPO">
+        <result property="feedbackMeetingsId" column="FEEDBACK_MEETINGS_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="meetingsName" column="MEETINGS_NAME"/>
+        <result property="meetingsTime" column="MEETINGS_TIME"/>
+        <result property="venue" column="VENUE"/>
+        <result property="participantsId" column="PARTICIPANTS_ID"/>
+        <result property="participantsName" column="PARTICIPANTS_NAME"/>
+        <result property="meetingsContent" column="MEETINGS_CONTENT"/>
+        <result property="createdBy" column="f.CREATED_BY"/>
+        <result property="createdTime" column="f.CREATED_TIME"/>
+        <result property="updatedBy" column="f.UPDATED_BY"/>
+        <result property="updatedTime" column="f.UPDATED_TIME"/>
+        <result property="entId" column="f.ENT_ID"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
+    </resultMap>
+
+    <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
+        <result property="unitsId" column="units_id"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="count" column="count"/>
+        <result property="createdTime" column="CREATED_TIME"/>
+    </resultMap>
+
+    <sql id="selectInspectionFeedbackMeetingsVo">
+        select FEEDBACK_MEETINGS_ID, PLAN_ID, UNITS_ID, MEETINGS_NAME, MEETINGS_TIME, VENUE, PARTICIPANTS_ID, PARTICIPANTS_NAME, MEETINGS_CONTENT, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID, APPROVER_ID, APPROVER_NAME, APPROVAL_FLAG from inspection_feedback_meetings
+    </sql>
+
+    <select id="selectInspectionFeedbackMeetingsCount" parameterType="java.lang.String"
+            resultMap="unitsBizCountResultMap">
+        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
+        from inspection_units u
+        left join inspection_feedback_meetings d on u.UNITS_ID = d.UNITS_ID
+        where u.plan_id = #{planId}
+        group by u.UNITS_ID
+    </select>
+
+    <select id="selectInspectionFeedbackMeetingsWithFileById" parameterType="InspectionFeedbackMeetingsPO"
+            resultMap="InspectionFeedbackMeetingsResult">
+        select
+          FEEDBACK_MEETINGS_ID,
+          PLAN_ID,
+          UNITS_ID,
+          MEETINGS_NAME,
+          MEETINGS_TIME,
+          VENUE,
+          PARTICIPANTS_ID,
+          PARTICIPANTS_NAME,
+          MEETINGS_CONTENT,
+          f.CREATED_BY   as 'f.CREATED_BY ',
+          f.CREATED_TIME as 'f.CREATED_TIME',
+          f.UPDATED_BY   as 'f.UPDATED_BY',
+          f.UPDATED_TIME as 'f.UPDATED_TIME',
+          f.ENT_ID       as 'f.ENT_ID',
+          APPROVER_ID,
+          APPROVER_NAME,
+          APPROVAL_FLAG,
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH
+        from inspection_feedback_meetings f
+        left join piis_document doc on concat('FeedbackMeetings', f.FEEDBACK_MEETINGS_ID) = doc.OBJECT_ID
+        where f.FEEDBACK_MEETINGS_ID = #{feedbackMeetingsId}
+    </select>
+
+
+</mapper>

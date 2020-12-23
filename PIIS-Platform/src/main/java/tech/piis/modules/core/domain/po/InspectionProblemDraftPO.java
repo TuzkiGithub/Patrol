@@ -23,7 +23,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Accessors(chain = true)
-public class InspectionProblemDraftPO extends PIBaseEntity {
+public class InspectionProblemDraftPO extends PIBaseApprovalEntityPO {
     /**
      * 问题底稿编号
      */

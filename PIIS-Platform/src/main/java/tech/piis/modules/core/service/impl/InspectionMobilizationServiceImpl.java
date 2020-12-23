@@ -85,9 +85,9 @@ public class InspectionMobilizationServiceImpl implements IInspectionMobilizatio
         List<InspectionMobilizationPO> mobilizationList = inspectionMobilizationMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(mobilizationList)) {
             mobilizationList.forEach(mobilization -> {
-                List<PiisDocumentPO> documents = documentService.getFileListByBizId("InspectionMobilization" + mobilization.getMobilizationId());
-                mobilization.setRangeList(BizUtils.paramsCovert2List(mobilization.getRangeId(),mobilization.getRangeName()));
-                BizUtils.convertFileDict(inspectionMobilization.getDocuments(), TO_TEMP_MAP);
+                List<PiisDocumentPO> documents = documentService.getFileListByBizId("Mobilization" + mobilization.getMobilizationId());
+                mobilization.setRangeList(BizUtils.paramsCovert2List(mobilization.getRangeId(), mobilization.getRangeName()));
+                BizUtils.convertFileDict(documents, TO_TEMP_MAP);
                 mobilization.setDocuments(documents);
             });
         }
@@ -103,6 +103,8 @@ public class InspectionMobilizationServiceImpl implements IInspectionMobilizatio
      */
     @Override
     public int save(InspectionMobilizationPO inspectionMobilization) throws BaseException {
+        inspectionMobilization.setRangeId(BizUtils.paramsCovert2String(inspectionMobilization.getRangeList()).get(0));
+        inspectionMobilization.setRangeName(BizUtils.paramsCovert2String(inspectionMobilization.getRangeList()).get(1));
         BizUtils.convertFileDict(inspectionMobilization.getDocuments(), TO_DICT_MAP);
         int result = inspectionMobilizationMapper.insert(inspectionMobilization);
         List<PiisDocumentPO> documents = inspectionMobilization.getDocuments();
@@ -112,7 +114,7 @@ public class InspectionMobilizationServiceImpl implements IInspectionMobilizatio
             }
         }
         Object bizId = inspectionMobilization.getMobilizationId();
-        documentService.updateDocumentBatch(documents, "InspectionMobilization" + bizId);
+        documentService.updateDocumentBatch(documents, "Mobilization" + bizId);
         handleTodo(inspectionMobilization);
         return result;
     }
@@ -127,9 +129,11 @@ public class InspectionMobilizationServiceImpl implements IInspectionMobilizatio
     @Override
     public int update(InspectionMobilizationPO inspectionMobilization) throws BaseException {
         BizUtils.convertFileDict(inspectionMobilization.getDocuments(), TO_DICT_MAP);
+        inspectionMobilization.setRangeId(BizUtils.paramsCovert2String(inspectionMobilization.getRangeList()).get(0));
+        inspectionMobilization.setRangeName(BizUtils.paramsCovert2String(inspectionMobilization.getRangeList()).get(1));
         handleTodo(inspectionMobilization);
         Object bizId = inspectionMobilization.getMobilizationId();
-        documentService.updateDocumentBatch(inspectionMobilization.getDocuments(), "InspectionMobilization" + bizId);
+        documentService.updateDocumentBatch(inspectionMobilization.getDocuments(), "Mobilization" + bizId);
         return inspectionMobilizationMapper.updateById(inspectionMobilization);
     }
 
@@ -198,7 +202,7 @@ public class InspectionMobilizationServiceImpl implements IInspectionMobilizatio
                 QueryWrapper<InspectionMobilizationPO> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq("MOBILIZATION_ID", event.getBizId());
                 InspectionMobilizationPO mobilization = inspectionMobilizationMapper.selectOne(queryWrapper);
-                List<PiisDocumentPO> documents = documentService.getFileListByBizId("InspectionMobilization" + event.getBizId());
+                List<PiisDocumentPO> documents = documentService.getFileListByBizId("Mobilization" + event.getBizId());
                 //设置文件类型
                 BizUtils.convertFileDict(documents, TO_TEMP_MAP);
                 mobilization.setDocuments(documents);

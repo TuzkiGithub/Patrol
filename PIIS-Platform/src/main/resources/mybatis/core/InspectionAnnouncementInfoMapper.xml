@@ -11,13 +11,20 @@
         <result property="approverId" column="APPROVER_ID"/>
         <result property="approverName" column="APPROVER_NAME"/>
         <result property="approvalFlag" column="APPROVAL_FLAG"/>
-        <result property="createdBy" column="CREATED_BY"/>
-        <result property="createdTime" column="CREATED_TIME"/>
-        <result property="updatedBy" column="UPDATED_BY"/>
-        <result property="updatedTime" column="UPDATED_TIME"/>
-        <result property="entId" column="ENT_ID"/>
-        <collection property="documents" ofType="PiisDocumentPO" column="announcementInfoId"
-                    select="selectDocumentForAnnouncementInfo"/>
+        <result property="createdBy" column="c.CREATED_BY"/>
+        <result property="createdTime" column="c.CREATED_TIME"/>
+        <result property="updatedBy" column="c.UPDATED_BY"/>
+        <result property="updatedTime" column="c.UPDATED_TIME"/>
+        <result property="entId" column="c.ENT_ID"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
+    </resultMap>
+
+    <resultMap type="AnnouncementInfoCountVO" id="announcementInfoCountResult">
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="orgName" column="ORG_NAME"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -33,33 +40,40 @@
     </sql>
 
     <select id="selectInspectionAnnouncementInfoCount" parameterType="java.lang.String"
-            resultMap="unitsBizCountResultMap">
-        select u.UNITS_ID,u.ORG_ID,u.ORG_NAME,u.created_time,count(d.UNITS_ID) as count
+            resultMap="announcementInfoCountResult">
+         select
+          u.ORG_NAME,
+          u.UNITS_ID,
+          doc.PIIS_DOC_ID,
+          doc.OBJECT_ID,
+          doc.FILE_DICT_ID,
+          doc.FILE_NAME,
+          doc.FILE_SIZE,
+          doc.FILE_PATH
         from inspection_units u
-        left join inspection_announcement_info d on u.UNITS_ID = d.UNITS_ID
-        where u.plan_id = #{planId}
-        group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
+          left join inspection_plan p on p.PLAN_ID = u.PLAN_ID
+          left join inspection_announcement_info i on i.UNITS_ID = u.UNITS_ID
+          left join piis_document doc on concat('AnnouncementInfo', i.ANNOUNCEMENT_INFO_ID) = doc.OBJECT_ID
+        where u.PLAN_ID = #{planId}
     </select>
 
-    <select id="selectInspectionAnnouncementInfoList" parameterType="InspectionAnnouncementInfoPO"
+    <select id="selectInspectionAnnouncementInfoWithFile" parameterType="InspectionAnnouncementInfoPO"
             resultMap="InspectionAnnouncementInfoResult">
-         select ANNOUNCEMENT_INFO_ID, PLAN_ID, UNITS_ID, APPROVER_ID, APPROVER_NAME, APPROVAL_FLAG, i.CREATED_BY, i.CREATED_TIME, i.UPDATED_BY, i.UPDATED_TIME, i.ENT_ID
-         from inspection_announcement_info
-         where ANNOUNCEMENT_INFO_ID = #{announcementInfoId}
---          left join piis_document doc on concat('AnnouncementInfo', i.ANNOUNCEMENT_INFO_ID) = doc.OBJECT_ID
-    </select>
-
-    <select id="selectDocumentForAnnouncementInfo" parameterType="java.lang.Long"
-            resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap">
-        select doc.PIIS_DOC_ID,
+         select ANNOUNCEMENT_INFO_ID, PLAN_ID, UNITS_ID, APPROVER_ID, APPROVER_NAME, APPROVAL_FLAG,
+         i.CREATED_BY as 'c.CREATED_BY',
+         i.CREATED_TIME as 'c.CREATED_TIME',
+         i.UPDATED_BY as 'c.UPDATED_BY',
+         i.UPDATED_TIME as 'c.UPDATED_TIME',
+         i.ENT_ID as 'c.ENT_ID',
+         doc.PIIS_DOC_ID,
          doc.OBJECT_ID,
          doc.FILE_DICT_ID,
          doc.FILE_NAME,
          doc.FILE_SIZE,
          doc.FILE_PATH
-         from piis_document doc
-         where doc.OBJECT_ID = concat('AnnouncementInfo', #{announcementInfoId})
+         from inspection_announcement_info i
+         left join piis_document doc on concat('AnnouncementInfo', i.ANNOUNCEMENT_INFO_ID) = doc.OBJECT_ID
+         where i.ANNOUNCEMENT_INFO_ID = #{announcementInfoId}
     </select>
 
 </mapper>

@@ -52,5 +52,6 @@ public class ${ClassName}PO extends PIBaseApprovalEntityPO {
     private $column.javaType $column.javaField;
 #end
 #end
+    @TableField(exist = false)
     private List<PiisDocumentPO> documents;
 }

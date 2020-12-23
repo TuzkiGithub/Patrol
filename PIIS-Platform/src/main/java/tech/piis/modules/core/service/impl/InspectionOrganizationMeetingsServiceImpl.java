@@ -261,14 +261,15 @@ public class InspectionOrganizationMeetingsServiceImpl implements IInspectionOrg
             InspectionOrganizationMeetingsPO inspectionConsultInfo = new InspectionOrganizationMeetingsPO()
                     .setOrganizationMeetingsId(Long.valueOf(event.getBizId()));
             String remark = event.getRemark();
-            if(BRANCH_NAME.equals(remark)){
+            if (BRANCH_NAME.equals(remark)) {
                 inspectionConsultInfo.setOrganizationType(BRANCH_TYPE);
-            }else if(TEMP_BRANCH_NAME.equals(remark)){
+            } else if (TEMP_BRANCH_NAME.equals(remark)) {
                 inspectionConsultInfo.setOrganizationType(TEMP_BRANCH_TYPE);
             }
             Integer eventType = event.getEventType();
             if (OperationEnum.SELECT.getCode() == eventType) {
                 InspectionOrganizationMeetingsPO result = inspectionOrganizationMeetingsMapper.selectOrganizationMeetingsWithFile(inspectionConsultInfo);
+                result.setParticipants(BizUtils.paramsCovert2List(result.getParticipantsId(), result.getParticipantsName()));
                 event.setData(result);
             } else if (OperationEnum.UPDATE.getCode() == eventType) {
                 Integer continueApprovalFlag = event.getContinueApprovalFlag();

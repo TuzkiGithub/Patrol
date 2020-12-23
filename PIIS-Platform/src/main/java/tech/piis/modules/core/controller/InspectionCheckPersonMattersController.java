@@ -2,9 +2,11 @@ package tech.piis.modules.core.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import tech.piis.common.constant.BizConstants;
 import tech.piis.common.constant.GenConstants;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.ResultEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.aspectj.lang.annotation.Log;
@@ -19,6 +21,8 @@ import tech.piis.modules.core.service.IPiisDocumentService;
 
 import java.util.List;
 
+import static tech.piis.common.constant.PiisConstants.NO_APPROVAL;
+
 
 /**
  * 抽查个人事项报告Controller
@@ -32,15 +36,12 @@ public class InspectionCheckPersonMattersController extends BaseController {
     @Autowired
     private IInspectionCheckPersonMattersService inspectionCheckPersonMattersService;
 
-    @Autowired
-    private IPiisDocumentService documentService;
-
     /**
      * 查询抽查个人事项报告列表
      *
      * @param inspectionCheckPersonMatters
      */
-    @PreAuthorize("@ss.hasPermi('piis:check/matters:list')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionCheckPersonMattersPO inspectionCheckPersonMatters) throws BaseException {
         if (null != inspectionCheckPersonMatters) {
@@ -67,7 +68,7 @@ public class InspectionCheckPersonMattersController extends BaseController {
      *
      * @param planId 巡视计划ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:check/matters:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/count")
     public AjaxResult countInspectionCheckPersonMattersList(String planId) throws BaseException {
         return AjaxResult.success(inspectionCheckPersonMattersService.selectInspectionCheckPersonMattersCount(planId));
@@ -78,14 +79,35 @@ public class InspectionCheckPersonMattersController extends BaseController {
      *
      * @param inspectionCheckPersonMatters
      */
-    @PreAuthorize("@ss.hasPermi('piis:check/matters:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "抽查个人事项报告", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InspectionCheckPersonMattersPO inspectionCheckPersonMatters) {
         if (null == inspectionCheckPersonMatters) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
         }
+        if (NO_APPROVAL == inspectionCheckPersonMatters.getIsApproval()) {
+            inspectionCheckPersonMatters.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionCheckPersonMatters.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
+        }
         return toAjax(inspectionCheckPersonMattersService.save(inspectionCheckPersonMatters));
+    }
+
+    /**
+     * 审批抽查个人事项报告
+     *
+     * @param checkPersonMattersList
+     */
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
+    @Log(title = "抽查个人事项报告", businessType = BusinessType.APPROVAL)
+    @PostMapping("approval")
+    public AjaxResult approval(@RequestBody List<InspectionCheckPersonMattersPO> checkPersonMattersList) {
+        if (CollectionUtils.isEmpty(checkPersonMattersList)) {
+            return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        inspectionCheckPersonMattersService.doApproval(checkPersonMattersList);
+        return AjaxResult.success();
     }
 
     /**
@@ -93,12 +115,17 @@ public class InspectionCheckPersonMattersController extends BaseController {
      *
      * @param inspectionCheckPersonMatters
      */
-    @PreAuthorize("@ss.hasPermi('piis:check/matters:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "抽查个人事项报告", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionCheckPersonMattersPO inspectionCheckPersonMatters) throws BaseException {
         if (null == inspectionCheckPersonMatters) {
             return AjaxResult.error(BizConstants.PARAMS_NULL);
+        }
+        if (NO_APPROVAL == inspectionCheckPersonMatters.getIsApproval()) {
+            inspectionCheckPersonMatters.setApprovalFlag(ApprovalEnum.NO_APPROVAL.getCode());
+        } else {
+            inspectionCheckPersonMatters.setApprovalFlag(ApprovalEnum.TO_BE_SUBMIT.getCode());
         }
         BizUtils.setUpdatedOperation(InspectionCheckPersonMattersPO.class, inspectionCheckPersonMatters);
         return toAjax(inspectionCheckPersonMattersService.update(inspectionCheckPersonMatters));
@@ -108,7 +135,7 @@ public class InspectionCheckPersonMattersController extends BaseController {
      * 删除抽查个人事项报告
      * checkPersonMattersIds 抽查个人事项报告ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:check/matters:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "抽查个人事项报告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{checkPersonMattersIds}")
     public AjaxResult remove(@PathVariable Long[] checkPersonMattersIds) throws BaseException {

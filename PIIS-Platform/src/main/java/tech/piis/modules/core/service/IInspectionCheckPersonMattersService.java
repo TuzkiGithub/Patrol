@@ -59,4 +59,10 @@ public interface IInspectionCheckPersonMattersService {
      * @return
      */
     int deleteByInspectionCheckPersonMattersIds(Long[] checkPersonMattersIds);
+
+    /**
+     * 批量审批抽查个人事项报告
+     * @param checkPersonMattersList
+     */
+    void doApproval(List<InspectionCheckPersonMattersPO> checkPersonMattersList);
 }

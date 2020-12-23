@@ -13,6 +13,10 @@
         <result property="participantsId" column="PARTICIPANTS_ID"/>
         <result property="participantsName" column="PARTICIPANTS_NAME"/>
         <result property="organizationType" column="ORGANIZATION_TYPE"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
+        <result property="mattersType" column="MATTERS_TYPE"/>
         <result property="meetingsContent" column="MEETINGS_CONTENT"/>
         <result property="createdBy" column="CREATED_BY"/>
         <result property="createdTime" column="CREATED_TIME"/>
@@ -20,7 +24,8 @@
         <result property="updatedTime" column="UPDATED_TIME"/>
         <result property="entId" column="ENT_ID"/>
 
-        <collection property="documents" javaType="java.util.List" resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
     </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
@@ -49,11 +54,12 @@
           left join inspection_Organization_Meetings o on u.UNITS_ID = o.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID, ORGANIZATION_TYPE
-        order by u.created_time, u.UNITS_ID desc
+        order by u.UNITS_ID desc
     </select>
 
-    <select id="selectOrganizationMeetingsWithFile" parameterType="InspectionOrganizationMeetingsPO" resultMap="InspectionOrganizationMeetingsResult">
-        select ORGANIZATION_MEETINGS_ID, PLAN_ID, MEETINGS_NAME, MEETINGS_TIME, MEETINGS_PLACE, PARTICIPANTS_ID, PARTICIPANTS_NAME, ORGANIZATION_TYPE, MEETINGS_CONTENT, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID from inspection_organization_meetings m
+    <select id="selectOrganizationMeetingsWithFile" parameterType="InspectionOrganizationMeetingsPO"
+            resultMap="InspectionOrganizationMeetingsResult">
+        select ORGANIZATION_MEETINGS_ID, PLAN_ID, MEETINGS_NAME, MEETINGS_TIME, MEETINGS_PLACE, PARTICIPANTS_ID, PARTICIPANTS_NAME, ORGANIZATION_TYPE, MEETINGS_CONTENT, APPROVAL_FLAG,APPROVER_ID,APPROVER_NAME, MATTERS_TYPE, m.CREATED_BY, m.CREATED_TIME, m.UPDATED_BY, m.UPDATED_TIME, m.ENT_ID from inspection_organization_meetings m
  left join piis_document doc on concat('OrganizationMeetings', m.ORGANIZATION_MEETINGS_ID) = doc.OBJECT_ID
  WHERE ORGANIZATION_MEETINGS_ID = ${organizationMeetingsId}
  AND ORGANIZATION_TYPE = #{organizationType}

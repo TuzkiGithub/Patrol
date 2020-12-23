@@ -45,7 +45,7 @@ public class InspectionNotificationController extends BaseController {
      *
      * @param inspectionNotification
      */
-    @PreAuthorize("@ss.hasPermi('piis:notification:list')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionNotificationPO inspectionNotification) throws BaseException {
         startPage();
@@ -59,7 +59,7 @@ public class InspectionNotificationController extends BaseController {
      *
      * @param inspectionNotification
      */
-    @PreAuthorize("@ss.hasPermi('piis:notification:add')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "情况通报 ", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionNotificationPO inspectionNotification) {
@@ -76,7 +76,7 @@ public class InspectionNotificationController extends BaseController {
      *
      * @param inspectionNotification
      */
-    @PreAuthorize("@ss.hasPermi('piis:notification:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "情况通报 ", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionNotificationPO inspectionNotification) throws BaseException {
@@ -92,7 +92,7 @@ public class InspectionNotificationController extends BaseController {
      * 删除情况通报
      * notificationIds 情况通报 ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:notification:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:workPreparation:perms')")
     @Log(title = "情况通报 ", businessType = BusinessType.DELETE)
     @DeleteMapping("/{notificationIds}")
     public AjaxResult remove(@PathVariable String[] notificationIds) throws BaseException {

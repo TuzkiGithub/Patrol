@@ -16,11 +16,14 @@
         <result property="copyCompanyName" column="COPY_COMPANY_NAME"/>
         <result property="toDoTime" column="TO_DO_TIME"/>
         <result property="printTime" column="PRINT_TIME"/>
-        <result property="createdBy" column="CREATED_BY"/>
-        <result property="createdTime" column="CREATED_TIME"/>
-        <result property="updatedBy" column="UPDATED_BY"/>
-        <result property="updatedTime" column="UPDATED_TIME"/>
-        <result property="entId" column="ENT_ID"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="createdBy" column="f.CREATED_BY"/>
+        <result property="createdTime" column="f.CREATED_TIME"/>
+        <result property="updatedBy" column="f.UPDATED_BY"/>
+        <result property="updatedTime" column="f.UPDATED_TIME"/>
+        <result property="entId" column="f.ENT_ID"/>
         <collection property="feedbackQuestionsList" javaType="java.util.List"
                     resultMap="InspectionFeedbackQuestionsResult"/>
     </resultMap>
@@ -53,17 +56,61 @@
 </sql>
 
     <select id="selectInspectionFeedbackList" parameterType="InspectionFeedbackPO" resultMap="InspectionFeedbackResult">
-        select f.FEEDBACK_ID, PLAN_ID, UNITS_ID, FILE_NAME, FILE_CODE, MAIN_COMPANY_ID, MAIN_COMPANY_NAME, COPY_COMPANY_ID, COPY_COMPANY_NAME, TO_DO_TIME,PRINT_TIME, f.CREATED_BY, f.CREATED_TIME, f.UPDATED_BY, f.UPDATED_TIME, f.ENT_ID ,
+        select f.FEEDBACK_ID, PLAN_ID, UNITS_ID, FILE_NAME, FILE_CODE, MAIN_COMPANY_ID, MAIN_COMPANY_NAME, COPY_COMPANY_ID, COPY_COMPANY_NAME, TO_DO_TIME,PRINT_TIME,
+        f.CREATED_BY as 'f.CREATED_BY ',
+        f.CREATED_TIME as 'f.CREATED_TIME',
+        f.UPDATED_BY as 'f.UPDATED_BY',
+        f.UPDATED_TIME as 'f.UPDATED_TIME',
+        f.ENT_ID  as 'f.ENT_ID',
+        f.APPROVAL_FLAG, f.APPROVER_ID, f.APPROVER_NAME,
         FEEDBACK_QUESTIONS_ID, PROBLEM_CLASSIFICATION, PROBLEM_PERFORMANCE, DEPUTY_LEADER_ID, DEPUTY_LEADER_NAME, RECTIFICATION_COMPANY_ID, RECTIFICATION_COMPANY_NAME, MAIN_LEADER_ID, MAIN_LEADER_NAME, RECTIFICATION_STATUS, RECTIFICATION_MEASURES
         from
         (
-          select FEEDBACK_ID, PLAN_ID, UNITS_ID, FILE_NAME, FILE_CODE, MAIN_COMPANY_ID, MAIN_COMPANY_NAME, COPY_COMPANY_ID, COPY_COMPANY_NAME, TO_DO_TIME, PRINT_TIME, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID
+          select FEEDBACK_ID, PLAN_ID, UNITS_ID, FILE_NAME, FILE_CODE, MAIN_COMPANY_ID, MAIN_COMPANY_NAME, COPY_COMPANY_ID, COPY_COMPANY_NAME, TO_DO_TIME, PRINT_TIME, APPROVER_ID, APPROVER_NAME, APPROVAL_FLAG, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, ENT_ID
           from inspection_feedback
           where PLAN_ID = #{planId}
           and   UNITS_ID = #{unitsId}
           limit #{pageNum}, #{pageSize}
         )f
         left join inspection_feedback_questions q on q.FEEDBACK_ID = f.FEEDBACK_ID
+    </select>
+
+    <select id="selectInspectionFeedback" parameterType="InspectionFeedbackPO"
+            resultMap="InspectionFeedbackResult">
+        select
+          f.FEEDBACK_ID,
+          PLAN_ID,
+          UNITS_ID,
+          FILE_NAME,
+          FILE_CODE,
+          MAIN_COMPANY_ID,
+          MAIN_COMPANY_NAME,
+          COPY_COMPANY_ID,
+          COPY_COMPANY_NAME,
+          TO_DO_TIME,
+          PRINT_TIME,
+          f.CREATED_BY as 'f.CREATED_BY ',
+          f.CREATED_TIME as 'f.CREATED_TIME',
+          f.UPDATED_BY as 'f.UPDATED_BY',
+          f.UPDATED_TIME as 'f.UPDATED_TIME',
+          f.ENT_ID as 'f.ENT_ID',
+          f.APPROVAL_FLAG,
+          f.APPROVER_ID,
+          f.APPROVER_NAME,
+          FEEDBACK_QUESTIONS_ID,
+          PROBLEM_CLASSIFICATION,
+          PROBLEM_PERFORMANCE,
+          DEPUTY_LEADER_ID,
+          DEPUTY_LEADER_NAME,
+          RECTIFICATION_COMPANY_ID,
+          RECTIFICATION_COMPANY_NAME,
+          MAIN_LEADER_ID,
+          MAIN_LEADER_NAME,
+          RECTIFICATION_STATUS,
+          RECTIFICATION_MEASURES
+        from inspection_feedback f
+        left join inspection_feedback_questions q on q.FEEDBACK_ID = f.FEEDBACK_ID
+        where f.FEEDBACK_ID = #{feedbackId}
     </select>
 
     <select id="selectInspectionFeedbackCount" parameterType="java.lang.String"
@@ -73,7 +120,6 @@
         left join inspection_feedback d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
     </select>
 
 </mapper>

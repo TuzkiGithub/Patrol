@@ -20,5 +20,19 @@ public interface InspectionFeedbackMapper extends BaseMapper<InspectionFeedbackP
      */
     List<UnitsBizCountVO> selectInspectionFeedbackCount(String planId) throws BaseException;
 
+    /**
+     * 查询反馈意见列表
+     * @param inspectionFeedbackPO
+     * @return
+     * @throws BaseException
+     */
     List<InspectionFeedbackPO> selectInspectionFeedbackList(InspectionFeedbackPO inspectionFeedbackPO) throws BaseException;
+
+    /**
+     * 查询反馈意见
+     * @param inspectionFeedbackPO
+     * @return
+     * @throws BaseException
+     */
+    InspectionFeedbackPO selectInspectionFeedback(InspectionFeedbackPO inspectionFeedbackPO) throws BaseException;
 }

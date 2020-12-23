@@ -47,7 +47,7 @@ public class InspectionNotificationServiceImpl implements IInspectionNotificatio
         List<InspectionNotificationPO> inspectionNotificationList = inspectionNotificationMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(inspectionNotificationList)) {
             inspectionNotificationList.forEach(inspectionNotificationPO -> {
-                List<PiisDocumentPO> documents = documentService.getFileListByBizId("InspectionNotification" + inspectionNotificationPO.getNotificationId());
+                List<PiisDocumentPO> documents = documentService.getFileListByBizId("Notification" + inspectionNotificationPO.getNotificationId());
                 inspectionNotificationPO.setDocuments(documents);
             });
         }
@@ -67,7 +67,7 @@ public class InspectionNotificationServiceImpl implements IInspectionNotificatio
         Object bizId = inspectionNotification.getNotificationId();
         List<PiisDocumentPO> documents = inspectionNotification.getDocuments();
         documents.forEach(document -> document.setOperationType(INSERT));
-        documentService.updateDocumentBatch(documents, "InspectionNotification" + bizId);
+        documentService.updateDocumentBatch(documents, "Notification" + bizId);
         return result;
     }
 
@@ -81,7 +81,7 @@ public class InspectionNotificationServiceImpl implements IInspectionNotificatio
     @Override
     public int update(InspectionNotificationPO inspectionNotification) throws BaseException {
         Object bizId = inspectionNotification.getNotificationId();
-        documentService.updateDocumentBatch(inspectionNotification.getDocuments(), "InspectionNotification" + bizId);
+        documentService.updateDocumentBatch(inspectionNotification.getDocuments(), "Notification" + bizId);
         return inspectionNotificationMapper.updateById(inspectionNotification);
     }
 

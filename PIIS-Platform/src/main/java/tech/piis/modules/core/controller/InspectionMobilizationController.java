@@ -38,7 +38,7 @@ public class InspectionMobilizationController extends BaseController {
      *
      * @param inspectionMobilization
      */
-    @PreAuthorize("@ss.hasPermi('piis:mobilization:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping()
     public AjaxResult list(InspectionMobilizationPO inspectionMobilization) throws BaseException {
         List<InspectionMobilizationPO> mobilizationPOList = inspectionMobilizationService.selectInspectionMobilizationList(inspectionMobilization);
@@ -50,7 +50,7 @@ public class InspectionMobilizationController extends BaseController {
      *
      * @param inspectionMobilization
      */
-    @PreAuthorize("@ss.hasPermi('piis:mobilization:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "巡视动员会", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody @Valid InspectionMobilizationPO inspectionMobilization) {
@@ -66,7 +66,7 @@ public class InspectionMobilizationController extends BaseController {
      *
      * @param inspectionMobilization
      */
-    @PreAuthorize("@ss.hasPermi('piis:mobilization:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "巡视动员会", businessType = BusinessType.INSERT)
     @PostMapping("preservation")
     public AjaxResult preservation(@RequestBody @Valid InspectionMobilizationPO inspectionMobilization) {
@@ -88,7 +88,7 @@ public class InspectionMobilizationController extends BaseController {
      *
      * @param inspectionMobilization
      */
-    @PreAuthorize("@ss.hasPermi('piis:mobilization:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "巡视动员会", businessType = BusinessType.INSERT)
     @PostMapping("submit")
     public AjaxResult submit(@RequestBody @Valid InspectionMobilizationPO inspectionMobilization) {
@@ -110,7 +110,7 @@ public class InspectionMobilizationController extends BaseController {
      *
      * @param inspectionMobilization
      */
-    @PreAuthorize("@ss.hasPermi('piis:mobilization:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "巡视动员会", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionMobilizationPO inspectionMobilization) throws BaseException {
@@ -125,7 +125,7 @@ public class InspectionMobilizationController extends BaseController {
      * 删除巡视动员会
      * mobilizationIds 巡视动员会ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:mobilization:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "巡视动员会", businessType = BusinessType.DELETE)
     @DeleteMapping("/{mobilizationIds}")
     public AjaxResult remove(@PathVariable Long[] mobilizationIds) throws BaseException {

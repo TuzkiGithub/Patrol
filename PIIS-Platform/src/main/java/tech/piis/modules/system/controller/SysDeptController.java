@@ -21,7 +21,6 @@ import java.util.List;
 /**
  * 部门信息
  *
- * @author Kevin<EastascendWang                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               gmail.com>
  */
 @RestController
 @RequestMapping("/system/dept")
@@ -106,7 +105,6 @@ public class SysDeptController extends BaseController {
      *
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping(value = "/find/{deptId}")
     public AjaxResult findDeptById(@PathVariable("deptId") String deptId) {
         List<SysDept> sysDepts = this.deptService.selectChildrenDeptByParentId(deptId);
@@ -118,7 +116,6 @@ public class SysDeptController extends BaseController {
      *
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('system:dept:query')")
     @GetMapping(value = "parentNode")
     public AjaxResult findParentNode() {
         return AjaxResult.success(this.deptService.selectDeptById("0000000000"));

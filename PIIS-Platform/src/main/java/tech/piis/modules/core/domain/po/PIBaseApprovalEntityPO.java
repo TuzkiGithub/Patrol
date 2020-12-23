@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,10 +22,24 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class PIBaseApprovalEntityPO {
+
+    /**
+     * 巡视计划ID参数，数据过滤使用
+     */
+    @TableField(exist = false)
+    private Set<String> planIdDataScope;
+
+    /**
+     * 巡视组ID参数，数据过滤使用
+     */
+    @TableField(exist = false)
+    private Set<String> groupIdDataScope;
+
     /**
      * 创建人
      */
     private String createdBy;
+
     /**
      * 创建时间
      */

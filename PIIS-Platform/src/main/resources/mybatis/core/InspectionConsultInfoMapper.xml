@@ -17,11 +17,11 @@
         <result property="approverName" column="APPROVER_NAME"/>
         <result property="approvalFlag" column="APPROVAL_FLAG"/>
         <result property="checkTime" column="CHECK_TIME"/>
-        <result property="createdBy" column="CREATED_BY"/>
-        <result property="createdTime" column="CREATED_TIME"/>
-        <result property="updatedBy" column="UPDATED_BY"/>
-        <result property="updatedTime" column="UPDATED_TIME"/>
-        <result property="entId" column="ENT_ID"/>
+        <result property="createdBy" column="c.CREATED_BY"/>
+        <result property="createdTime" column="c.CREATED_TIME"/>
+        <result property="updatedBy" column="c.UPDATED_BY"/>
+        <result property="updatedTime" column="c.UPDATED_TIME"/>
+        <result property="entId" column="c.ENT_ID"/>
 
         <collection property="consultInfoDetailList" javaType="java.util.List"
                     resultMap="consultInfoDetailResultMap"/>
@@ -29,7 +29,6 @@
 
     <resultMap id="consultInfoDetailResultMap" type="InspectionConsultInfoDetailPO">
         <id property="consultInfoDetailId" column="CONSULT_INFO_DETAIL_ID"/>
-        <!--<result property="consultInfoId" column="CONSULT_INFO_ID"/>-->
         <result property="checkInfoName" column="CHECK_INFO_NAME"/>
         <result property="checkInfoCount" column="CHECK_INFO_COUNT"/>
         <result property="checkInfoMaterialType" column="CHECK_INFO_MATERIAL_TYPE"/>
@@ -64,14 +63,14 @@
           c.CHECK_PERSON_NAME,
           c.CONSULT_CONTENT,
           c.CHECK_TIME,
-          c.CREATED_BY,
-          c.CREATED_TIME,
+          c.CREATED_BY as 'c.CREATED_BY',
+          c.CREATED_TIME as 'c.CREATED_TIME',
           c.APPROVER_ID,
           c.APPROVER_NAME,
           c.APPROVAL_FLAG,
-          c.UPDATED_BY,
-          c.UPDATED_TIME,
-          c.ENT_ID,
+          c.UPDATED_BY as 'c.UPDATED_BY',
+          c.UPDATED_TIME as 'c.UPDATED_TIME',
+          c.ENT_ID as 'c.ENT_ID',
           d.CONSULT_INFO_DETAIL_ID,
           d.CHECK_INFO_NAME,
           d.CHECK_INFO_COUNT,
@@ -126,11 +125,11 @@
           c.APPROVER_ID,
           c.APPROVER_NAME,
           c.APPROVAL_FLAG,
-          c.CREATED_BY,
-          c.CREATED_TIME,
-          c.UPDATED_BY,
-          c.UPDATED_TIME,
-          c.ENT_ID,
+          c.CREATED_BY as 'c.CREATED_BY',
+          c.CREATED_TIME as 'c.CREATED_TIME',
+          c.UPDATED_BY as 'c.UPDATED_BY',
+          c.UPDATED_TIME as 'c.UPDATED_TIME',
+          c.ENT_ID as 'c.ENT_ID',
           d.CONSULT_INFO_DETAIL_ID,
           d.CHECK_INFO_NAME,
           d.CHECK_INFO_COUNT,
@@ -163,7 +162,6 @@
         left join inspection_consult_info d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
     </select>
 
 </mapper>

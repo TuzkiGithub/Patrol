@@ -6,6 +6,7 @@ import tech.piis.common.enums.OrgEnum;
 import tech.piis.common.utils.DateUtils;
 import tech.piis.common.utils.StringUtils;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.domain.vo.UnitsBriefVO;
 import tech.piis.modules.core.domain.vo.UserBriefVO;
 import tech.piis.modules.survey.domain.po.SurveyOptionPO;
 import tech.piis.modules.survey.domain.po.SurveyQuestionPO;
@@ -359,6 +360,52 @@ public class BizUtils {
             data.forEach(var -> {
                 userId.append(var.getUserId()).append(",");
                 userName.append(var.getUserName()).append(",");
+            });
+        }
+        String userIdStr = userId.toString().substring(0, userId.toString().lastIndexOf(","));
+        String userNameStr = userName.toString().substring(0, userName.toString().lastIndexOf(","));
+        result.add(userIdStr);
+        result.add(userNameStr);
+        return result;
+    }
+
+    /**
+     * 将机构拼接字符串转为List
+     *
+     * @param orgId
+     * @param orgName
+     */
+    public static List<UnitsBriefVO> paramsCovert2OrgList(String orgId, String orgName) {
+        List<UnitsBriefVO> result = new ArrayList<>();
+        if (!org.springframework.util.StringUtils.isEmpty(orgId) && !org.springframework.util.StringUtils.isEmpty(orgName)) {
+            String[] orgIdsArr = orgId.split(",");
+            String[] orgNamesArr = orgName.split(",");
+            if (orgIdsArr.length != 0 && orgNamesArr.length != 0) {
+                int length = orgNamesArr.length;
+                for (int i = 0; i < length; i++) {
+                    UnitsBriefVO unitsBriefVO = new UnitsBriefVO();
+                    unitsBriefVO.setUnitsName(orgNamesArr[i]);
+                    unitsBriefVO.setUnitsId(orgIdsArr[i]);
+                    result.add(unitsBriefVO);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 将机构对象数组转为字符串  以，分割
+     *
+     * @param data
+     */
+    public static List<String> paramsCovert2OrgString(List<UnitsBriefVO> data) {
+        List<String> result = new ArrayList<>();
+        StringBuilder userId = new StringBuilder();
+        StringBuilder userName = new StringBuilder();
+        if (!CollectionUtils.isEmpty(data)) {
+            data.forEach(var -> {
+                userId.append(var.getUnitsId()).append(",");
+                userName.append(var.getUnitsName()).append(",");
             });
         }
         String userIdStr = userId.toString().substring(0, userId.toString().lastIndexOf(","));

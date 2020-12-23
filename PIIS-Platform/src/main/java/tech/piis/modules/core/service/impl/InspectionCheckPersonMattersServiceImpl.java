@@ -1,28 +1,41 @@
 package tech.piis.modules.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import tech.piis.common.enums.ApprovalEnum;
 import tech.piis.common.enums.FileEnum;
+import tech.piis.common.enums.OperationEnum;
 import tech.piis.common.exception.BaseException;
 import tech.piis.framework.utils.BizUtils;
 import tech.piis.framework.utils.file.FileUploadUtils;
+import tech.piis.modules.core.domain.dto.PlanBriefDTO;
 import tech.piis.modules.core.domain.po.InspectionCheckPersonMattersPO;
 import tech.piis.modules.core.domain.po.PiisDocumentPO;
+import tech.piis.modules.core.domain.vo.PlanBriefVO;
 import tech.piis.modules.core.domain.vo.UnitsBizCountVO;
+import tech.piis.modules.core.event.WorkFlowEvent;
 import tech.piis.modules.core.mapper.InspectionCheckPersonMattersMapper;
 import tech.piis.modules.core.service.IInspectionCheckPersonMattersService;
+import tech.piis.modules.core.service.IInspectionPlanService;
 import tech.piis.modules.core.service.IPiisDocumentService;
+import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
+import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.DELETE;
 import static tech.piis.common.constant.OperationConstants.INSERT;
+import static tech.piis.common.constant.PiisConstants.*;
 
 /**
  * 抽查个人事项报告Service业务层处理
@@ -32,7 +45,8 @@ import static tech.piis.common.constant.OperationConstants.INSERT;
  */
 @Transactional
 @Service
-public class InspectionCheckPersonMattersServiceImpl implements IInspectionCheckPersonMattersService {
+@Slf4j
+public class InspectionCheckPersonMattersServiceImpl implements IInspectionCheckPersonMattersService, ApplicationListener<WorkFlowEvent> {
     @Autowired
     private InspectionCheckPersonMattersMapper inspectionCheckPersonMattersMapper;
 
@@ -45,13 +59,19 @@ public class InspectionCheckPersonMattersServiceImpl implements IInspectionCheck
     @Value("${piis.serverAddr}")
     private String serverAddr;
 
+    @Autowired
+    private IInspectionPlanService planService;
+
+    @Autowired
+    private IWfWorkflowTodoService todoService;
+
     /**
      * 统计巡视方案下被巡视单位InspectionCheckPersonMatters次数
      *
      * @param planId 巡视计划ID
      */
     public List<UnitsBizCountVO> selectInspectionCheckPersonMattersCount(String planId) throws BaseException {
-        return inspectionCheckPersonMattersMapper.selectInspectionCheckPersonMattersCount(planId);
+        return inspectionCheckPersonMattersMapper.selectInspectionCheckPersonMattersCount(planId).stream().sorted(Comparator.comparing(UnitsBizCountVO::getUnitsId).reversed()).collect(Collectors.toList());
     }
 
     /**
@@ -143,5 +163,77 @@ public class InspectionCheckPersonMattersServiceImpl implements IInspectionCheck
     public int deleteByInspectionCheckPersonMattersIds(Long[] checkPersonMattersIds) {
         List<Long> list = Arrays.asList(checkPersonMattersIds);
         return inspectionCheckPersonMattersMapper.deleteBatchIds(list);
+    }
+
+    /**
+     * 新增代办
+     *
+     * @param inspectionCheckPersonMattersPO
+     */
+    private void handleTodo(InspectionCheckPersonMattersPO inspectionCheckPersonMattersPO) {
+        String planId = inspectionCheckPersonMattersPO.getPlanId();
+        Long unitsId = inspectionCheckPersonMattersPO.getUnitsId();
+        PlanBriefDTO planBriefDTO = new PlanBriefDTO()
+                .setPlanId(planId)
+                .setUnitsId(unitsId);
+        PlanBriefVO planPO = planService.selectPiisBrief(planBriefDTO);
+        WfWorkFlowTodoPO wfWorkFlowTodoPO = new WfWorkFlowTodoPO()
+                .setLookStatus(NO_LOOK)
+                .setTodoName("[抽查个人事项报告]-" + planPO.getPlanName() + "-" + planPO.getGroupName() + "-" + planPO.getOrgName())
+                .setBusinessId(String.valueOf(inspectionCheckPersonMattersPO.getCheckPersonMattersId()))
+                .setTodoStatus(TODO_NEED)
+                .setApproverId(inspectionCheckPersonMattersPO.getApproverId())
+                .setApproverName(inspectionCheckPersonMattersPO.getApproverName());
+        BizUtils.setCreatedOperation(WfWorkFlowTodoPO.class, wfWorkFlowTodoPO);
+        todoService.saveWorkflowTodo(wfWorkFlowTodoPO);
+    }
+
+    /**
+     * 批量审批抽查个人事项报告
+     *
+     * @param checkPersonMattersList
+     */
+    @Override
+    public void doApproval(List<InspectionCheckPersonMattersPO> checkPersonMattersList) {
+        if (!CollectionUtils.isEmpty(checkPersonMattersList)) {
+            checkPersonMattersList.forEach(checkPersonMattersPO -> {
+                checkPersonMattersPO.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                inspectionCheckPersonMattersMapper.updateById(checkPersonMattersPO);
+                handleTodo(checkPersonMattersPO);
+            });
+        }
+    }
+
+    /**
+     * Handle an application event.
+     *
+     * @param event the event to respond to
+     */
+    @Override
+    public void onApplicationEvent(WorkFlowEvent event) {
+        log.info("###ApplicationListener notify event [抽查个人事项报告]###");
+        Object object = event.getSource();
+        if (object instanceof InspectionCheckPersonMattersServiceImpl) {
+            Integer eventType = event.getEventType();
+            InspectionCheckPersonMattersPO checkPersonMattersPO = new InspectionCheckPersonMattersPO()
+                    .setCheckPersonMattersId(Long.valueOf(event.getBizId()));
+            if (OperationEnum.SELECT.getCode() == eventType) {
+                event.setData(inspectionCheckPersonMattersMapper.selectCheckPersonMatters(checkPersonMattersPO));
+            } else if (OperationEnum.UPDATE.getCode() == eventType) {
+                Integer continueApprovalFlag = event.getContinueApprovalFlag();
+                Integer agreeFlag = event.getAgreeFlag();
+                if (NO_APPROVAL == continueApprovalFlag) {
+                    if (AGREE == agreeFlag) {
+                        checkPersonMattersPO.setApprovalFlag(ApprovalEnum.PASSED.getCode());
+                    } else {
+                        checkPersonMattersPO.setApprovalFlag(ApprovalEnum.REJECTED.getCode());
+                    }
+                } else {
+                    checkPersonMattersPO.setApprovalFlag(ApprovalEnum.SUBMITTING.getCode());
+                }
+                BizUtils.setUpdatedOperation(InspectionCheckPersonMattersPO.class, checkPersonMattersPO);
+                inspectionCheckPersonMattersMapper.updateById(checkPersonMattersPO);
+            }
+        }
     }
 }

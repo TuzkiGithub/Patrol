@@ -28,10 +28,8 @@ import tech.piis.modules.core.service.IPiisDocumentService;
 import tech.piis.modules.workflow.domain.po.WfWorkFlowTodoPO;
 import tech.piis.modules.workflow.service.IWfWorkflowTodoService;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static tech.piis.common.constant.OperationConstants.DELETE;
 import static tech.piis.common.constant.OperationConstants.INSERT;
@@ -87,7 +85,7 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService, Appl
      * @param planId 巡视计划ID
      */
     public List<UnitsBizCountVO> selectInspectionVisitCount(String planId) throws BaseException {
-        return inspectionVisitMapper.selectInspectionVisitCount(planId);
+        return inspectionVisitMapper.selectInspectionVisitCount(planId).stream().sorted(Comparator.comparing(UnitsBizCountVO::getUnitsId).reversed()).collect(Collectors.toList());
     }
 
     /**
@@ -217,7 +215,6 @@ public class InspectionVisitServiceImpl implements IInspectionVisitService, Appl
      */
     @Override
     public void onApplicationEvent(WorkFlowEvent event) {
-        System.out.println("###ApplicationListener notify event [信访管理-来访]###");
         log.info("###ApplicationListener notify event [信访管理-来访]###");
         Object object = event.getSource();
         if (object instanceof InspectionVisitServiceImpl) {

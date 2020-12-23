@@ -57,4 +57,10 @@ public interface IInspectionClueTransferService {
      * @return
      */
     int count(InspectionClueTransferPO inspectionClueTransfer);
+
+    /**
+     * 审批线索移交
+     * @param clueTransferList
+     */
+    void doApprovals(List<InspectionClueTransferPO> clueTransferList);
 }

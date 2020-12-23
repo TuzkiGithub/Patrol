@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tech.piis.modules.core.mapper.InspectionProblemDraftMapper">
+
+    <resultMap id="InspectionProblemDraftResult" type="InspectionProblemDraftPO">
+        <result property="problemDraftId" column="PROBLEM_DRAFT_ID"/>
+        <result property="planId" column="PLAN_ID"/>
+        <result property="unitsId" column="UNITS_ID"/>
+        <result property="draftName" column="DRAFT_NAME"/>
+        <result property="draftCode" column="DRAFT_CODE"/>
+        <result property="problemOrigin" column="PROBLEM_ORIGIN"/>
+        <result property="underTakerId" column="UNDER_TAKER_ID"/>
+        <result property="underTakerName" column="UNDER_TAKER_NAME"/>
+        <result property="problemDesc" column="PROBLEM_DESC"/>
+        <result property="remark" column="REMARK"/>
+        <result property="approverId" column="APPROVER_ID"/>
+        <result property="approverName" column="APPROVER_NAME"/>
+        <result property="approvalFlag" column="APPROVAL_FLAG"/>
+        <result property="createdBy" column="C_CREATED_BY"/>
+        <result property="createdTime" column="C_CREATED_TIME"/>
+        <result property="updatedBy" column="C_UPDATED_BY"/>
+        <result property="updatedTime" column="C_UPDATED_TIME"/>
+        <result property="entId" column="C_ENT_ID"/>
+        <collection property="documents" javaType="java.util.List"
+                    resultMap="tech.piis.modules.core.mapper.PiisDocumentMapper.documentResultMap"/>
+    </resultMap>
 
     <resultMap id="unitsBizCountResultMap" type="UnitsBizCountVO">
         <result property="unitsId" column="units_id"/>
@@ -18,7 +41,38 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join inspection_problem_draft d on u.UNITS_ID = d.UNITS_ID
         where u.plan_id = #{planId}
         group by u.UNITS_ID
-        order by u.created_time, u.UNITS_ID desc
     </select>
-    
+
+    <select id="selectInspectionProblemDraftWithFile" parameterType="InspectionProblemDraftPO"
+            resultMap="InspectionProblemDraftResult">
+    select
+      PROBLEM_DRAFT_ID,
+      PLAN_ID,
+      UNITS_ID,
+      DRAFT_NAME,
+      DRAFT_CODE,
+      PROBLEM_ORIGIN,
+      UNDER_TAKER_ID,
+      UNDER_TAKER_NAME,
+      PROBLEM_DESC,
+      REMARK,
+      APPROVAL_FLAG,
+      APPROVER_NAME,
+      APPROVER_ID,
+      d.CREATED_BY as 'C_CREATED_BY',
+      d.CREATED_TIME as 'C_CREATED_TIME',
+      d.UPDATED_BY as 'C_UPDATED_BY',
+      d.UPDATED_TIME as 'C_UPDATED_TIME',
+      d.ENT_ID as 'C_ENT_ID',
+      doc.PIIS_DOC_ID,
+      doc.OBJECT_ID,
+      doc.FILE_DICT_ID,
+      doc.FILE_NAME,
+      doc.FILE_SIZE,
+      doc.FILE_PATH
+    from inspection_problem_draft d
+      left join piis_document doc on concat('ProblemDraft', d.PROBLEM_DRAFT_ID) = doc.OBJECT_ID
+    where d.PROBLEM_DRAFT_ID = #{problemDraftId}
+    </select>
+
 </mapper>

@@ -51,7 +51,7 @@ InspectionCallVisitController extends BaseController {
      *
      * @param inspectionCallVisit
      */
-    @PreAuthorize("@ss.hasPermi('piis:call/visit:list')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/list")
     public TableDataInfo list(InspectionCallVisitPO inspectionCallVisit) throws BaseException {
         startPage();
@@ -64,7 +64,7 @@ InspectionCallVisitController extends BaseController {
      *
      * @param callVisitId 文件关联ID
      */
-    @PreAuthorize("@ss.hasPermi('piis:call/visit:query')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @GetMapping("/file")
     public AjaxResult findInspectionCallVisitFile(String callVisitId) throws BaseException {
         List<PiisDocumentPO> documents = documentService.getFileListByBizId("CallVisit" + callVisitId);
@@ -77,7 +77,7 @@ InspectionCallVisitController extends BaseController {
      *
      * @param inspectionCallVisit
      */
-    @PreAuthorize("@ss.hasPermi('piis:call/visit:add')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "来电", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InspectionCallVisitPO inspectionCallVisit) {
@@ -99,7 +99,7 @@ InspectionCallVisitController extends BaseController {
      *
      * @param callVisitList
      */
-    @PreAuthorize("@ss.hasPermi('piis:call/visit:approval')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "来电", businessType = BusinessType.INSERT)
     @PostMapping("approval")
     public AjaxResult approval(@RequestBody List<InspectionCallVisitPO> callVisitList) {
@@ -115,7 +115,7 @@ InspectionCallVisitController extends BaseController {
      *
      * @param inspectionCallVisit
      */
-    @PreAuthorize("@ss.hasPermi('piis:call/visit:edit')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "来电", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InspectionCallVisitPO inspectionCallVisit) throws BaseException {
@@ -136,7 +136,7 @@ InspectionCallVisitController extends BaseController {
      * 删除来电
      * callVisitIds 来电ID数组
      */
-    @PreAuthorize("@ss.hasPermi('piis:call/visit:remove')")
+    @PreAuthorize("@ss.hasPermi('piis:sceneUnderstand:perms')")
     @Log(title = "来电", businessType = BusinessType.DELETE)
     @DeleteMapping("/{callVisitIds}")
     public AjaxResult remove(@PathVariable String[] callVisitIds) throws BaseException {
